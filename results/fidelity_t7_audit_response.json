@@ -1,0 +1,37 @@
+{
+ "kind": "T3 response to T7's regression-identifiability audit (acceptance + one additional cut)",
+ "acceptance": {
+  "verdict": "ACCEPTED in full. My cycle-12/13 wording is downgraded as T7 recommends: (a) 'COMPUTE TERM RESOLVED' -> compute 24.1 ms is the BEST-SUPPORTED WORKING VALUE (non-overlapping anchor-reproduction bands 12.52-12.87 vs 13.54-13.95 tok/s over the miss interval + the 410-bin identity), NOT statistically certified \u2014 the regression intercept alone cannot separate 18.1/24.1 (both fixed terms inside the 95% interval 22.84-55.65); (b) 'every constant measured or measured-confirmed' -> withdrawn; the evidence hierarchy is now stated per-constant below; (c) the fitted slope is a DESCRIPTIVE physical-MB association, not a directly measured logical-miss cost.",
+  "unchanged": "the regression remains a real measured association (17 points, R2 0.66); the microbench (A/B/install/sync), the source read, and the anchor reproduction stand as separate evidence lines."
+ },
+ "additional_cut_slope_value": {
+  "question": "does the observed slope VALUE discriminate pure byte-service from per-miss (io+install) cost?",
+  "pure_byte_service_at_measured_drive_rates": "0.179-0.263 ms/MB (1/5.59 to 1/3.82 GB/s, microbench bulk96 to k=1 step rate)",
+  "serial_io_install_model": "0.297 ms/MB ((0.52 io + 0.30 install)/2.765)",
+  "observed": "0.288 +/- 0.053 ms/MB",
+  "reading": "the observed slope sits ABOVE every pure-rate value and within 3% of the serial io+install prediction; but it is within 1 SE of the slowest measured rate (0.263), so this cut SUPPORTS a per-miss overhead beyond bytes without proving it. Marginal, honest.",
+  "attribution_caveat": "converting the slope to a per-EXPERT cost (0.797 ms) assumes physical~logical bytes; mincore bounds that error at <=3.2% IF the snapshot represents decode-time cache state \u2014 that premise is exactly T6's active stock-vs-flow audit; flagged as the dependency."
+ },
+ "final_evidence_hierarchy_for_docs": {
+  "directly_measured": [
+   "physical SSD MB/token (iostat, 17 points)",
+   "per-layer k-miss read latency + install + sync (microbench, F_NOCACHE)",
+   "throughput variation across prompts (10.2-13.1 tok/s)",
+   "page-cache occupancy snapshot (mincore: 2.29/71.6 GB)"
+  ],
+  "inferred_robustly": [
+   "miss-cost slope 0.288 ms/MB (descriptive association; value favors io+install over pure byte-rate, marginally)",
+   "logical misses in [50.8, 53.5]/tok (mincore-bounded, pending T6 stock-vs-flow)",
+   "serial-model anchor reproduction (12.52-12.87 tok/s at comp24.1 over the miss band)"
+  ],
+  "assumed_working_values": [
+   "compute 24.1 ms @410-bin (best-supported; not statistically certified; 48GB keeps 18.1 @546-bin)",
+   "oMLX serial-resolve discipline transfers to other tiers (extrapolation)"
+  ],
+  "what_would_settle_it": [
+   "second residency point (Test B/D silicon)",
+   "direct logical-miss + resolve/install/compute timing on matched windows (T7's ask; T1/T2 territory)",
+   "T6's stock-vs-flow mincore audit"
+  ]
+ }
+}
