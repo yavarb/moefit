@@ -235,6 +235,32 @@ and only after install cost drops. The read-path lever is confirmed but
 its paying form is sequential/duty-cycle, not the A-batch form I
 speculatively ranked in the cycle-2 gap doc — corrected here.
 
+## Entry 5 — speculative page-in from router soft top-k + cancel-on-wrong-route (T5, CLOSE-OUT)
+
+`experiments/design_spec_pagein.py` (+ contention re-pricing, real-trace
+checks, gate-head calibration; owner: glm_writeups/T5, commits 245eb87,
+b283105, ab6d37a, 6b359d4, d7f45b6, 765c933, 6a4e38d). All SIM/signal-level
+on locked synth or captured real routes, measured constants; no silicon run.
+
+| axis tested | number | verdict |
+|---|---|---|
+| steady-state tps (hist1, 52-expert budget, cap143) | 142.1 MB/tok wasted vs 1.7 useful (232 MB per saved miss); net +0.05..+0.17 tps | **DROP** — below noise |
+| contention re-pricing (T2 measured 0.07–0.20 ms/bg-expert) | saving 0.32–0.50 ms/tok vs charge 3.81–10.30 → −0.76..−2.22 tps on 15.55, BOTH install bases | DROP strengthened — predicted silicon regression |
+| history precision, real routes (all windows) | steady 1.2% / cold prefill 10.6–25.4% / cold decode 7.5–27.7% (two fixed proxies) | at-or-below breakeven everywhere |
+| gate head (score ≥ 8) | 46.2% precision but only 2.6 cand/tok → net +0.1..+0.8 ms/tok | lever exists, head too small — DROP final |
+
+Durable outputs beyond the kill: (1) the breakeven-precision framework
+(p* = contention-per-issued / saving-per-confirmed = 9–24% serial /
+14–38% DB-ON) — validated as the spec-fetch signal discriminator by
+bracketing T1's router-preview design (+6.7 ms/tok reported, inside my
++4.9..+8.8 band; 43.6% precision clears both bands; 3.6 MB waste per saved
+miss vs history's 232 MB). (2) cancel-on-wrong-route deferred install —
+pollution-free vs immediate install (+0.08–0.12 tps; misses 57.4 → 57.6–57.9
+when un-cancelled) — transferred into T1's guarded pipeline (held-not-
+installed, cancelled on wrong route) and T2's sidecar. Structural finding:
+current-token top-10 self-prediction is empty (demand resolution); the viable
+signal class sees the residual stream (preview), not the past (history).
+
 ## Method notes for all design rows
 
 - Traces: `results/traces_synth` (synthetic). Trace-shape uncertainty on
@@ -264,6 +290,13 @@ speculatively ranked in the cycle-2 gap doc — corrected here.
   `results/analysis_t6_predict_coalesce.json` and
   `results/analysis_t6_packed_layout.json` (owner: sheryl_analysis_a/T6,
   commit 969ec54, SIM, measured serial constants).
+- Entry 5 numbers read from `results/design_spec_pagein.json`,
+  `results/design_spec_pagein_contention.json`,
+  `results/spec_pagein_realtrace_check.json`,
+  `results/spec_pagein_decode_check.json`,
+  `results/spec_pagein_coldwindow_breakeven.json` (owner:
+  glm_writeups/T5, commits listed in the entry; SIM/signal-level, measured
+  constants; T1 cross-check from `results/design_xlayer_guarded.json`).
 - Cross-track synthesis draws on T8
   `results/t8_pipelining_predictor_probes.json` (SIM), T3
   `results/sim_serial_policy_ranking.json` (commit 9cd94bd), T6 notebook
