@@ -36,6 +36,34 @@ class HybridExpertPack:
         return {c['name']:memoryview(exact_pread(self.fds[c['file']],c['size'],
                     c['offset']+eid*c['size'])) for c in self.parts}
 
+    def read_components(self, eid, names):
+        """Fetch only explicit components, without dequantization or padding.
+
+        Duplicate names collapse in first-occurrence order. Adjacent packed
+        components coalesce with zero gap overread. No full-expert checksum is
+        possible on partial reads; immutable matching source is required.
+        """
+        from moefit.coalesced_read import read_batch
+        if self.closed: raise ValueError('Store is closed')
+        if type(eid) is not int or not 0 <= eid < self.parts[0]['experts']:
+            raise ValueError('Invalid expert ID')
+        names = list(names)
+        if any(type(n) is not str for n in names):
+            raise ValueError('Component names must be strings')
+        names = list(dict.fromkeys(names))
+        parts = {c['name']:c for c in self.parts}
+        if any(n not in parts for n in names):
+            raise ValueError('Unknown component')
+        if eid in self.pack.positions:
+            packed = {c['name']:c for c in self.pack.manifest['components']}
+            base = self.pack.positions[eid]*self.pack.manifest['stride']
+            views, _ = read_batch(self.pack.fd,
+                [(base+packed[n]['pack_offset'],packed[n]['size']) for n in names],
+                max_gap=0,max_span=self.pack.manifest['stride'],max_amplification=1)
+            return dict(zip(names,views))
+        return {n:memoryview(exact_pread(self.fds[parts[n]['file']],parts[n]['size'],
+                    parts[n]['offset']+eid*parts[n]['size'])) for n in names}
+
     def read_many(self, ids, *, max_experts_per_span=4):
         """Deduplicate within this call, coalesce packed IDs, retain input order.
 

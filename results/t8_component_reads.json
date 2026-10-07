@@ -1,0 +1,40 @@
+{
+  "scope": "Tiny SYNTHETIC actual pread counters/byte comparisons, NOT bandwidth or decode.",
+  "rows": {
+    "0_full": {
+      "calls": 1,
+      "bytes": 72
+    },
+    "0_gate": {
+      "calls": 1,
+      "bytes": 24
+    },
+    "0_sparse": {
+      "calls": 2,
+      "bytes": 16
+    },
+    "0_empty": {
+      "calls": 0,
+      "bytes": 0
+    },
+    "3_full": {
+      "calls": 9,
+      "bytes": 72
+    },
+    "3_gate": {
+      "calls": 3,
+      "bytes": 24
+    },
+    "3_sparse": {
+      "calls": 2,
+      "bytes": 16
+    },
+    "3_empty": {
+      "calls": 0,
+      "bytes": 0
+    }
+  },
+  "component_checks": 28,
+  "zero_io_guards": 4,
+  "caveat": "Only caller-requested components fetched. Full inference still needs all required projections; split reads may increase calls if all components eventually consumed."
+}
