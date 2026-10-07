@@ -16,7 +16,10 @@ What this ACTUALLY does on current engines (no lies):
   - decode speed itself is DRAM-bound; this does NOT make tokens fly
 
 Requires: python3, model checkpoint readable on disk. macOS only.
-Run under launchd or:  python3 specexp_prefetch.py --serve-url ...
+This file lives at the repo root (not tools/):
+    python3 specexp_prefetch.py --model-dir <dir> --model <id> --ple-prefetch
+Agent-integrated mode reads JSON arrays of token ids on stdin and warms
+the PLE rows of every token in the array (rows_per_token x N per line).
 """
 import argparse, json, os, re, struct, sys, time, threading
 from collections import OrderedDict, deque
@@ -36,6 +39,11 @@ class ModelGeom:
         wm = {}
         if idx.exists():
             wm = json.load(open(idx))["weight_map"]
+        elif (self.dir / "model.safetensors").exists():
+            with open(self.dir / "model.safetensors", "rb") as f:
+                n = struct.unpack("<Q", f.read(8))[0]
+                hdr = json.loads(f.read(n))
+            wm = {k: "model.safetensors" for k in hdr if k != "__metadata__"}
         import re as _re
         shards = []
         for name, fn in wm.items():
@@ -62,6 +70,24 @@ class ModelGeom:
             self.ngram["shards"].append(
                 dict(path=path, base=data_start + meta["data_offsets"][0],
                      stride=int(stride), rows=rows))
+        start = 0
+        self._cum = []
+        for sh in self.ngram["shards"]:
+            self._cum.append((start, start + sh["rows"], sh))
+            start += sh["rows"]
+        self.total_rows = start
+
+    def row_ranges(self, rows):
+        """global row ids -> {path: [(byte offset, byte length), ...]}"""
+        by_file = {}
+        for r in rows:
+            for lo, hi, sh in self._cum:
+                if lo <= r < hi:
+                    off = sh["base"] + (r - lo) * sh["stride"]
+                    by_file.setdefault(sh["path"], []).append(
+                        (off, sh["stride"]))
+                    break
+        return by_file
 
 
 # ---------------- n-gram keys (mirrors Qwen4ExpNGramEmbedding) ----------------
@@ -149,21 +175,43 @@ class NgramKeys:
 
 # ---------------- page warming (macOS) ----------------
 
-def warm_file_range(path, offsets, page=16384):
-    """Touch pages at offsets to pull them into unified memory. Best-effort:
-    uses a small mmap + volatile reads; harmless if already resident."""
+def warm_file_range(path, ranges, page=16384):
+    """Touch every page covered by each (offset, length) range to pull it
+    into unified memory. Best-effort: mmap + one read per page; harmless if
+    already resident. A bare int offset is treated as a 1-byte range.
+    Returns the number of ranges touched."""
     import mmap
+    touched = 0
     try:
         with open(path, "rb") as f:
             sz = os.fstat(f.fileno()).st_size
             mm = mmap.mmap(f.fileno(), 0, prot=mmap.PROT_READ)
-            for off in offsets:
-                if 0 <= off < sz:
-                    mm[(off // page) * page]  # read one byte -> fault-in
+            for rng in ranges:
+                off, ln = (rng, 1) if isinstance(rng, int) else rng
+                if not (0 <= off < sz):
+                    continue
+                last = min(off + max(ln, 1) - 1, sz - 1)
+                for pg in range((off // page) * page, last + 1, page):
+                    mm[pg]                    # read one byte -> fault-in
+                touched += 1
             mm.close()
-        return len(offsets)
+        return touched
     except (OSError, ValueError):
         return 0
+
+
+def warm_tokens(keys, geom, ctx, new_ids):
+    """Append new_ids to ctx and warm the PLE rows for EVERY new position
+    (an N-token turn needs N x rows_per_token rows, not just the last
+    token's). Returns rows warmed."""
+    rows = []
+    for tid in new_ids:
+        ctx.append(int(tid))
+        rows.extend(keys.rows(list(ctx)))
+    warmed = 0
+    for path, ranges in geom.row_ranges(rows).items():
+        warmed += warm_file_range(path, ranges)
+    return warmed
 
 
 # ---------------- sidecar ----------------
@@ -243,26 +291,12 @@ def main():
         except json.JSONDecodeError:
             continue
         t0 = time.time()
-        for tid in ids:
-            ctx.append(int(tid))
         warmed = 0
         if keys and geom.ngram:
-            rows = keys.rows(list(ctx))
-            # global row -> (shard, local row) via cumulative shard sizes
-            by_file = {}
-            start = 0
-            cum = []
-            for sh in geom.ngram["shards"]:
-                cum.append((start, start + sh["rows"], sh))
-                start += sh["rows"]
-            for r in rows:
-                for lo, hi, sh in cum:
-                    if lo <= r < hi:
-                        off = sh["base"] + (r - lo) * sh["stride"]
-                        by_file.setdefault(sh["path"], []).append(off)
-                        break
-            warmed = sum(warm_file_range(p, offs)
-                         for p, offs in by_file.items())
+            warmed = warm_tokens(keys, geom, ctx, ids)
+        else:
+            for tid in ids:
+                ctx.append(int(tid))
         dt = time.time() - t0
         print(f"toks={len(ids)} warmed_rows={warmed} in {dt*1000:.1f}ms",
               flush=True)
