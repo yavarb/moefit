@@ -1,0 +1,35 @@
+{
+ "kind": "simulated (signal-level check on REAL decode routes)",
+ "trace": "/Users/yb/.hermes/cache/scratch/xlayer.npz \u2014 T1 capture, 8 prompts x 161 decode tokens x 48 layers",
+ "signal": "decayed route-COUNT history (x0.7 per 4 tok); count variant of 6b359d4's score-based signal (within 0.1-2.3% on synth)",
+ "positions_scored": 1280,
+ "hist1_precision_pct": {
+  "loose_proxy": 27.69,
+  "strict_proxy": 7.53
+ },
+ "hist3_precision_pct": {
+  "loose_proxy": 46.67,
+  "strict_proxy": 15.16
+ },
+ "prefill_reference_6b359d4": {
+  "hist1_pct": [
+   10.6,
+   25.4
+  ],
+  "hist3_pct": [
+   22.0,
+   45.4
+  ]
+ },
+ "breakeven_bands_d7f45b6": {
+  "serial": [
+   9,
+   24
+  ],
+  "db_on": [
+   14,
+   38
+  ]
+ },
+ "verdict": "DECODE-WINDOW RESULT: decayed-history hist1 precision on real DECODE positions is 7.53% (strict) / 27.69% (loose proxy) vs 10.6/25.4% on the prefill-heavy holdout \u2014 CONSISTENT (no prefill artifact). Read against breakeven (9-24% serial / 14-38% DB-ON): the cold-window marginality verdict of d7f45b6 stands or strengthens; and per T3's c90c06d the misses here are cold-expert dominated, so even this precision overstates steady-decode usefulness (many scored 'hits' fall inside the 161-token prompt's own early-cold phase)."
+}
