@@ -153,6 +153,38 @@ def replay(gold, cap, policy):
                 if calls[li] % 4 == 0:
                     for e in r:
                         r[e][0] *= 0.7
+    elif policy == "admit_second_chance":
+        # T3 invention v2: ADMISSION CONTROL on the omlx-decay machinery.
+        # Motivation (T6 exact replay): 78.95% of LRU misses recur later —
+        # i.e. ~21% are one-shot. A one-shot miss that gets cached evicts a
+        # useful resident for zero future benefit. Policy: first miss of an
+        # expert is fetched but NOT installed (no eviction triggered);
+        # second and later misses install under oMLX decay rules. No knobs.
+        res = [dict() for _ in range(sp.L)]      # e -> count (omlx decay)
+        miss_hist = [dict() for _ in range(sp.L)]  # e -> lifetime miss count
+        calls = [0] * sp.L
+        for t in range(T):
+            for li in range(sp.L):
+                r, hist = res[li], miss_hist[li]
+                cur = set(int(x) for x in gold[t, li])
+                for e in cur:
+                    if e in r:
+                        r[e] = r.get(e, 0.0) + 1.0
+                        continue
+                    M[t, li] += 1
+                    hist[e] = hist.get(e, 0) + 1
+                    if hist[e] >= 2:
+                        # recurring miss: install under omlx eviction rules
+                        while len(r) >= cap:
+                            cand = [x for x in r if x not in cur]
+                            if not cand:
+                                break
+                            del r[min(cand, key=lambda x: r[x])]
+                        r[e] = 1.0
+                calls[li] += 1
+                if calls[li] % 4 == 0:
+                    for e in r:
+                        r[e] *= 0.7
     else:
         raise ValueError(policy)
     return M

@@ -1,0 +1,63 @@
+{
+ "cap": 143,
+ "kind": "simulated",
+ "policy": "admit_second_chance (omlx-decay + first-miss-no-install)",
+ "lru": {
+  "miss_global": 57.4,
+  "miss_suffix": 47.751,
+  "tps_suffix": 13.28,
+  "tps_global": 11.96
+ },
+ "omlx_decay": {
+  "miss_global": 56.932,
+  "miss_suffix": 46.943,
+  "tps_suffix": 13.41,
+  "tps_global": 12.01
+ },
+ "admit_second_chance": {
+  "miss_global": 58.075,
+  "miss_suffix": 46.562,
+  "tps_suffix": 13.47,
+  "tps_global": 11.87
+ },
+ "cap92": {
+  "lru": {
+   "miss_global": 91.795,
+   "miss_suffix": 85.975,
+   "tps_suffix": 9.2,
+   "tps_global": 8.81
+  },
+  "omlx_decay": {
+   "miss_global": 89.006,
+   "miss_suffix": 82.287,
+   "tps_suffix": 9.48,
+   "tps_global": 8.99
+  },
+  "admit_second_chance": {
+   "miss_global": 89.259,
+   "miss_suffix": 81.483,
+   "tps_suffix": 9.54,
+   "tps_global": 8.98
+  }
+ },
+ "cap192": {
+  "lru": {
+   "miss_global": 41.11,
+   "miss_suffix": 28.296,
+   "tps_suffix": 17.39,
+   "tps_global": 14.5
+  },
+  "omlx_decay": {
+   "miss_global": 41.015,
+   "miss_suffix": 28.181,
+   "tps_suffix": 17.42,
+   "tps_global": 14.51
+  },
+  "admit_second_chance": {
+   "miss_global": 43.141,
+   "miss_suffix": 29.569,
+   "tps_suffix": 17.04,
+   "tps_global": 14.12
+  }
+ }
+}
