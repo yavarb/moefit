@@ -1,0 +1,47 @@
+{
+ "kind": "measured",
+ "host": "santacruz",
+ "runs_per_arm": 3,
+ "off_tps": [
+  14.72,
+  13.95,
+  13.19
+ ],
+ "on_tps": [
+  20.21,
+  20.05,
+  19.67
+ ],
+ "off_median": 13.95,
+ "on_median": 20.05,
+ "median_delta": 6.100000000000001,
+ "paired_deltas": [
+  5.49,
+  6.1,
+  6.48
+ ],
+ "mean_paired": 6.02,
+ "pct": 43.7,
+ "min_on_minus_max_off": 4.95,
+ "sidecar_wasted_total": 0,
+ "sessions": [
+  {
+   "server_pid": 31205,
+   "file": "c704058a",
+   "pairs": [
+    "A/B",
+    "A2/B2"
+   ],
+   "text_hash": 806452101
+  },
+  {
+   "server_pid": 35646,
+   "file": "d9850d99",
+   "pairs": [
+    "A3/B3"
+   ],
+   "text_hash": 247260284
+  }
+ ],
+ "note": "text identical within each session across ON/OFF; hash differs across the two server sessions (different patched file/server restart), not across arms. Exact-replay regime."
+}
