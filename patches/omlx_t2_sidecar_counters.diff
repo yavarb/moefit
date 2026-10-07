@@ -1,0 +1,150 @@
+--- orig.py	2026-10-06 23:40:51
++++ patched.py	2026-10-06 23:46:27
+@@ -288,6 +288,46 @@
+     """Experts whose reads may be in flight at once."""
+     _io_pool()
+     return _IO_BATCH
++
++
++# --- moefit T2 sidecar (route replay prefetch) + counters -------------------
++# Records each layer's decode route sets; a gap >1 s between calls ends a
++# request and the recording becomes the replay script. While the flag file
++# exists, after layer L routes token t the script's routes for (t+1, L) are
++# read in the background on a SEPARATE pool (never ahead of demand reads in
++# the shared one). Bytes are held, not installed (no eviction / pollution);
++# the next demand call installs from them, so only the SSD wait is hidden.
++_SC_FLAG = os.environ.get("MOEFIT_SIDECAR_FLAG", "/tmp/omlx_sidecar_on")
++_SC_STATS = os.environ.get("MOEFIT_STATS_PATH", "/tmp/omlx_moe_stats.json")
++_SC_POOL: ThreadPoolExecutor | None = None
++_SC_STATE = {"on": False, "checked": 0.0, "dumped": 0.0}
++_ALL_CACHES: list = []
++
++
++def _sc_pool() -> ThreadPoolExecutor:
++    global _SC_POOL
++    if _SC_POOL is None:
++        _SC_POOL = ThreadPoolExecutor(max_workers=4, thread_name_prefix="moefit-sc")
++    return _SC_POOL
++
++
++def _sc_tick() -> bool:
++    now = time.perf_counter()
++    if now - _SC_STATE["checked"] > 0.25:
++        _SC_STATE["checked"] = now
++        _SC_STATE["on"] = os.path.exists(_SC_FLAG)
++    if now - _SC_STATE["dumped"] > 1.0:
++        _SC_STATE["dumped"] = now
++        keys = ("hits", "misses", "sc_issued", "sc_used", "sc_wasted", "sc_aligned", "sc_lost")
++        tot = {k: sum(getattr(c, k, 0) for c in _ALL_CACHES) for k in keys}
++        tot.update(t=time.time(), sidecar_on=_SC_STATE["on"], layers=len(_ALL_CACHES))
++        try:
++            with open(_SC_STATS + ".tmp", "w") as f:
++                json.dump(tot, f)
++            os.replace(_SC_STATS + ".tmp", _SC_STATS)
++        except OSError:
++            pass
++    return _SC_STATE["on"]
+ 
+ 
+ def _shutdown_io_pool() -> None:
+@@ -393,6 +433,15 @@
+         self.map = mx.full((self.n_experts,), -1, dtype=mx.int32)
+         self.hits = self.misses = 0
+         self.warm = False
++        self._sc_script: list = []
++        self._sc_index: dict = {}
++        self._sc_rec: list = []
++        self._sc_ptr = 0
++        self._sc_last = 0.0
++        self._sc_pending: dict = {}
++        self.sc_issued = self.sc_used = self.sc_wasted = 0
++        self.sc_aligned = self.sc_lost = 0
++        _ALL_CACHES.append(self)
+ 
+     def _plans(self, e: int) -> list:
+         """Read plans for expert ``e``'s tensors, in slot-write order."""
+@@ -474,9 +523,24 @@
+         happened.
+         """
+         pool = _io_pool()
+-        queue = [e for e in needed if e not in self.slot_of] if pool is not None else []
+-        window = _io_batch()
+         pending: dict[int, list] = {}
++        if self._sc_pending:
++            for e in needed:
++                g = self._sc_pending.pop(e, None)
++                if g is not None and e not in self.slot_of:
++                    pending[e] = g
++                    self.sc_used += 1
++            for g in self._sc_pending.values():  # wrong route: cancel, never installed
++                self.sc_wasted += 1
++                for _, _, _, f in g:
++                    f.cancel()
++            self._sc_pending = {}
++        queue = (
++            [e for e in needed if e not in self.slot_of and e not in pending]
++            if pool is not None
++            else []
++        )
++        window = _io_batch()
+         sent = 0
+         keepalive = barrier = None
+         slow = False
+@@ -549,6 +613,49 @@
+         # per-chunk eval in __call__, which is a different mechanism.
+         return slow
+ 
++    def _sidecar_after(self, routes: set) -> None:
++        """Record this decode call's routes; prefetch the script's next call."""
++        on = _sc_tick()
++        now = time.perf_counter()
++        if now - self._sc_last > 1.0:  # new request
++            if len(self._sc_rec) >= 8:
++                self._sc_script = self._sc_rec
++                self._sc_index = {}
++                for i, key in enumerate(self._sc_script):
++                    self._sc_index.setdefault(key, []).append(i)
++            self._sc_rec = []
++            self._sc_ptr = 0
++        self._sc_last = now
++        key = frozenset(routes)
++        self._sc_rec.append(key)
++        script = self._sc_script
++        if not on or not script:
++            return
++        p = self._sc_ptr
++        if p < len(script) and script[p] == key:
++            j = p
++        else:
++            js = self._sc_index.get(key)
++            j = None
++            if js:
++                j = next((i for i in js if i >= p), js[0])
++        if j is None:
++            self.sc_lost += 1
++            return
++        self.sc_aligned += 1
++        self._sc_ptr = j + 1
++        if j + 1 >= len(script):
++            return
++        pool = _sc_pool()
++        for e in script[j + 1]:
++            if e in self.slot_of or e in self._sc_pending:
++                continue
++            self._sc_pending[e] = [
++                (name, field, plan, pool.submit(CheckpointExpertStore.read, plan))
++                for name, field, plan in self._plans(e)
++            ]
++            self.sc_issued += 1
++
+     def qmm(
+         self, name: str, x: mx.array, slots: mx.array, sorted_indices: bool = False
+     ) -> mx.array:
+@@ -641,6 +748,7 @@
+             return y_hit
+ 
+         slow = c._ensure_ids(set(flat), on_slow_read)
++        c._sidecar_after(set(flat))
+         if y_hit is None:  # fast reads, or no resident route: one gather
+             out = self._glu(mx.expand_dims(x, (-2, -3)), mx.take(c.map, indices))
+             out = out.squeeze(-2)
