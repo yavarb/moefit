@@ -25,7 +25,7 @@ are client-observed SSE arrivals: timing is TRANSPORT-provisional
 (Amendment 1) unless a server-side token-level source vouches for it
 (`timing_provenance` field says which).
 """
-import argparse, json, time, urllib.error, urllib.request
+import argparse, hashlib, json, time, urllib.error, urllib.request
 from pathlib import Path
 
 
@@ -212,6 +212,11 @@ def main():
         label=a.label, kind="measured",
         timestamp=time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         host=a.host, ram_gib=a.ram_gib, model=a.model,
+        # prompt identity (sha256, never the text): lets A/B/A scorers
+        # mechanically verify the SAME prompt was used across arms
+        # (score_dbuf_aba.py requires it; older blobs without it are
+        # scored only with an explicit unhashed-prompt acceptance)
+        prompt_sha256=hashlib.sha256(prompt.encode()).hexdigest()[:16],
         max_tokens=a.max_tokens, runs=runs,
         decode_tps_median=round(median, 2),
         decode_tps_min=round(min(tpss), 2),

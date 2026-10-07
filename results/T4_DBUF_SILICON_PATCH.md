@@ -102,7 +102,18 @@ is then the same env vars as CASE B; OFF is either unset vars or the
 
 ## Scoring (mechanical)
 
-Score against `results/t4_dbuf_silicon_prereg.json`:
+ONE COMMAND, fail-closed — run this on the A/B/A blobs:
+
+    python3 experiments/score_dbuf_aba.py --on on1.json [on2.json ...] \
+        --off off.json
+
+It enforces eligibility (>=3 runs/arm, actual runs[*].tokens >= 1024 —
+max_tokens never gates — finish/integrity clean, matched host/model,
+SAME prompt via the collector's new prompt_sha256 field; pre-hash blobs
+need --accept-unhashed-prompt) and emits the verdict against
+`results/t4_dbuf_silicon_prereg.json` amendment2. Regression-tested
+(tests/test_score_dbuf.py, 9 cases incl. the masked 128-token-run
+refusal). Score against `results/t4_dbuf_silicon_prereg.json`:
 - ON >= OFF + 0.30 tps (median, >=3 same-prompt A/B/A pairs) → staged
   install TRANSFERS to silicon.
 - |delta| < 0.30 → WASH: consistent with the small-install regime
