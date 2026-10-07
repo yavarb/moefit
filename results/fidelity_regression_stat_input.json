@@ -1,0 +1,12 @@
+{
+ "kind": "T3 input to T7's cycle-3 statistical audit (not a replacement audit)",
+ "facts_for_the_audit": {
+  "token_counts": "ALL 17 regression points have tokens=256 (verified across regress1/2, ssd_tok_run2/4, anchor_Repea/Count, measured_santa_cruz_36gb_ssd). The shared-denominator concern (ms/tok and MB/tok both divide by tok/s) is MOOT for this dataset: with N constant, regressing T/256 on B/256 is the T-on-B regression scaled by 1/256 \u2014 slope/intercept scale, r2 and residual structure are unchanged, no correlated-error coupling.",
+  "ols_reproduction": "slope 0.2883 +/- 0.0534 ms/MB, intercept 39.25 +/- 8.37 ms (matches the reported 39.2 +/- 8.4)."
+ },
+ "honest_statistical_strength_of_my_cycle12_claim": {
+  "regression_alone": "does NOT statistically resolve comp18.1 vs comp24.1: model fixed term 36.0 (comp24.1) sits 0.39 sigma below the measured intercept; 30.0 (comp18.1) sits 1.10 sigma below; RSS 392 vs 1667 around the respective fixed-intercept lines (fitted RSS 213). 18.1 is disfavored but not excluded at conventional significance.",
+  "primary_evidence": "the anchor-reproduction bands with the mincore-bounded miss interval: comp24.1 -> 12.52-12.87 tok/s vs comp18.1 -> 13.54-13.95 across logical-miss 50.8-53.5/tok \u2014 NON-OVERLAPPING against measured 12.71-13.07. Plus the bin identity (the 36GB M4 Max is the 410 GB/s part) as physical corroboration, not statistical proof.",
+  "conclusion_status": "compute 24.1 is the best-supported value, not a statistically-certified one; my cycle-12/13 wording 'resolved' should be read as 'best explanation across independent lines', pending either a second residency point or direct logical-miss counters."
+ }
+}
