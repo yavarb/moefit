@@ -31,10 +31,11 @@ class Routes:
 
 
 class RoutingReplayCache:
-    def __init__(self, max_bytes=16*1024*1024):
+    def __init__(self, max_bytes=16*1024*1024, *, compact_prefixes=False):
         if max_bytes <= 0:
             raise ValueError('max_bytes must be positive')
         self.max_bytes = max_bytes
+        self.compact_prefixes = compact_prefixes
         self.bytes = 0
         self.entries = OrderedDict()
         self.hits = self.misses = self.evictions = 0
@@ -49,6 +50,18 @@ class RoutingReplayCache:
         if not isinstance(namespace, bytes) or not namespace or layers <= 0:
             raise ValueError('namespace and positive layer count required')
         return LayeredReplaySession(self, namespace, layers, deterministic)
+
+    def _empty_prefix(self):
+        return b'' if self.compact_prefixes else ()
+
+    def _extend_prefix(self, prefix, token_id):
+        if not isinstance(token_id, (int, np.integer)) or token_id < 0:
+            raise ValueError('invalid token id')
+        if self.compact_prefixes:
+            if token_id > 0xffffffff:
+                raise ValueError('compact token ids must fit uint32')
+            return prefix + int(token_id).to_bytes(4, 'little')
+        return prefix + (int(token_id),)
 
     def clear(self):
         self.entries.clear()
@@ -66,7 +79,8 @@ class RoutingReplayCache:
             # Conservative accounting for Python tuple/int key overhead;
             # payload capacity is bounded, not a process RSS guarantee.
             namespace_size = len(key[0]) if isinstance(key[0], bytes) else len(key[0][0]) + 96
-            size = value.indices.nbytes + value.weights.nbytes + namespace_size + 128 + 40*len(key[1])
+            prefix_size = len(key[1]) if isinstance(key[1], bytes) else 40*len(key[1])
+            size = value.indices.nbytes + value.weights.nbytes + namespace_size + 128 + prefix_size
             if size <= self.max_bytes:
                 while self.bytes + size > self.max_bytes:
                     _, (_, removed) = self.entries.popitem(last=False)
@@ -80,7 +94,7 @@ class RoutingReplayCache:
 class ReplaySession:
     def __init__(self, cache, namespace, enabled):
         self.cache, self.namespace, self.enabled = cache, namespace, enabled
-        self.prefix = ()
+        self.prefix = cache._empty_prefix()
 
     def step(self, token_id, compute):
         """Consume actual input token; callback returns all-layer ids/weights.
@@ -91,7 +105,7 @@ class ReplaySession:
         """
         if not isinstance(token_id, (int, np.integer)) or token_id < 0:
             raise ValueError('token id must be a nonnegative integer')
-        prefix = self.prefix + (int(token_id),)
+        prefix = self.cache._extend_prefix(self.prefix, token_id)
         value, hit = self.cache._resolve((self.namespace, prefix), compute, self.enabled)
         self.prefix = prefix  # callback failure does not advance session
         return value, hit
@@ -107,7 +121,7 @@ class LayeredReplaySession:
     def __init__(self, cache, namespace, layers, enabled):
         self.cache, self.namespace = cache, namespace
         self.layers, self.enabled = layers, enabled
-        self.prefix = ()
+        self.prefix = cache._empty_prefix()
         self.next_layer = layers
 
     def begin_token(self, token_id):
@@ -115,7 +129,7 @@ class LayeredReplaySession:
             raise RuntimeError('previous token has unfinished layers')
         if not isinstance(token_id, (int, np.integer)) or token_id < 0:
             raise ValueError('invalid token id')
-        self.prefix += (int(token_id),)
+        self.prefix = self.cache._extend_prefix(self.prefix, token_id)
         self.next_layer = 0
 
     def route(self, layer, compute):

@@ -1,0 +1,128 @@
+{
+  "kind": "MEASURED local routing-only CPU kernel; NOT LLM decode or SSD",
+  "budget_bytes": 8388608,
+  "tokens": 512,
+  "layers": 8,
+  "trials": [
+    {
+      "tuple": [
+        {
+          "seconds": 0.09411104199999998,
+          "routing_tokens_per_s": 5440.381799194191,
+          "hits": 0,
+          "accounted_bytes": 8372695,
+          "entries": 425,
+          "evictions": 3671
+        },
+        {
+          "seconds": 0.09665858299999996,
+          "routing_tokens_per_s": 5296.994680751736,
+          "hits": 0,
+          "accounted_bytes": 8372695,
+          "entries": 425,
+          "evictions": 7767
+        }
+      ],
+      "packed": [
+        {
+          "seconds": 0.08927466699999997,
+          "routing_tokens_per_s": 5735.109602817114,
+          "hits": 0,
+          "accounted_bytes": 5279744,
+          "entries": 4096,
+          "evictions": 0
+        },
+        {
+          "seconds": 0.005204458999999995,
+          "routing_tokens_per_s": 98377.18002966313,
+          "hits": 4096,
+          "accounted_bytes": 5279744,
+          "entries": 4096,
+          "evictions": 0
+        }
+      ]
+    },
+    {
+      "tuple": [
+        {
+          "seconds": 0.09433558300000011,
+          "routing_tokens_per_s": 5427.432403741008,
+          "hits": 0,
+          "accounted_bytes": 8372695,
+          "entries": 425,
+          "evictions": 3671
+        },
+        {
+          "seconds": 0.09778770800000003,
+          "routing_tokens_per_s": 5235.831890036729,
+          "hits": 0,
+          "accounted_bytes": 8372695,
+          "entries": 425,
+          "evictions": 7767
+        }
+      ],
+      "packed": [
+        {
+          "seconds": 0.09356216699999997,
+          "routing_tokens_per_s": 5472.297365664907,
+          "hits": 0,
+          "accounted_bytes": 5279744,
+          "entries": 4096,
+          "evictions": 0
+        },
+        {
+          "seconds": 0.0053318330000000635,
+          "routing_tokens_per_s": 96027.013599262,
+          "hits": 4096,
+          "accounted_bytes": 5279744,
+          "entries": 4096,
+          "evictions": 0
+        }
+      ]
+    },
+    {
+      "tuple": [
+        {
+          "seconds": 0.09462424999999985,
+          "routing_tokens_per_s": 5410.875119221561,
+          "hits": 0,
+          "accounted_bytes": 8372695,
+          "entries": 425,
+          "evictions": 3671
+        },
+        {
+          "seconds": 0.0954627910000001,
+          "routing_tokens_per_s": 5363.346227746468,
+          "hits": 0,
+          "accounted_bytes": 8372695,
+          "entries": 425,
+          "evictions": 7767
+        }
+      ],
+      "packed": [
+        {
+          "seconds": 0.08930425000000008,
+          "routing_tokens_per_s": 5733.209785648494,
+          "hits": 0,
+          "accounted_bytes": 5279744,
+          "entries": 4096,
+          "evictions": 0
+        },
+        {
+          "seconds": 0.005428916000000061,
+          "routing_tokens_per_s": 94309.8032830116,
+          "hits": 4096,
+          "accounted_bytes": 5279744,
+          "entries": 4096,
+          "evictions": 0
+        }
+      ]
+    }
+  ],
+  "repeat_tuple_tokens_per_s": 5296.994680751736,
+  "repeat_packed_tokens_per_s": 96027.013599262,
+  "repeat_speedup": 18.12858410981717,
+  "repeat_hit_rate_tuple": 0.0,
+  "repeat_hit_rate_packed": 1.0,
+  "caveat": "Capacity effect at a fixed conservative accounted-byte budget, not RSS-equated. Packed prefixes remain quadratic total length; full bytes equality, no digest collisions. Local machine may have concurrent T1 GPU capture."
+}
