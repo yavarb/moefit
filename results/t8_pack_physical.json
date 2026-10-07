@@ -1,0 +1,72 @@
+{
+  "scope": "Real oQ4e pack file reads plus whole-disk counters; NOT decode. No global purge; cached pages may persist.",
+  "rows": [
+    {
+      "rep": 0,
+      "order": "random",
+      "seconds": 0.012170583000000068,
+      "useful_GBps": 14.538925538735409,
+      "issued_bytes": 177209344,
+      "physical_bytes": 49152,
+      "physical_over_issued": 0.00027736686390532545,
+      "idle_before_Bps": 5327853.957388826,
+      "checksum": 2161066771,
+      "idle_after_Bps": 6094232.786420897,
+      "device_attribution_gate": false
+    },
+    {
+      "rep": 0,
+      "order": "sequential",
+      "seconds": 0.012130541999999522,
+      "useful_GBps": 14.586916231773236,
+      "issued_bytes": 177209344,
+      "physical_bytes": 0,
+      "physical_over_issued": 0.0,
+      "idle_before_Bps": 6468035.870038078,
+      "checksum": 2161066771,
+      "idle_after_Bps": 7817281.854728903,
+      "device_attribution_gate": false
+    },
+    {
+      "rep": 1,
+      "order": "sequential",
+      "seconds": 0.012255834000000299,
+      "useful_GBps": 14.43779346228055,
+      "issued_bytes": 177209344,
+      "physical_bytes": 53248,
+      "physical_over_issued": 0.00030048076923076925,
+      "idle_before_Bps": 17657776.633815728,
+      "checksum": 2161066771,
+      "idle_after_Bps": 3993483.7964968183,
+      "device_attribution_gate": false
+    },
+    {
+      "rep": 1,
+      "order": "random",
+      "seconds": 0.012259832999999887,
+      "useful_GBps": 14.4330840395625,
+      "issued_bytes": 177209344,
+      "physical_bytes": 0,
+      "physical_over_issued": 0.0,
+      "idle_before_Bps": 8092333.211185411,
+      "checksum": 2161066771,
+      "idle_after_Bps": 16192481.280151028,
+      "device_attribution_gate": false
+    },
+    {
+      "rep": 2,
+      "order": "random",
+      "seconds": 0.012279166999999092,
+      "useful_GBps": 14.41035861797572,
+      "issued_bytes": 177209344,
+      "physical_bytes": 2244608,
+      "physical_over_issued": 0.012666420118343196,
+      "idle_before_Bps": 47417008.74963273,
+      "checksum": 2161066771
+    }
+  ],
+  "initial_idle_Bps": 8128247.190571583,
+  "verified_experts": 64,
+  "blocker": "Background read rate 81720622.89315772 B/s",
+  "physical_claim_supported": false
+}
