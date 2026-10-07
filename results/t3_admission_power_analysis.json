@@ -1,0 +1,31 @@
+{
+ "basis": "pre-registered BEFORE any LIP A/B/A data; measured run spread from chief_executor n=1024 x3 (15.73/15.42/15.55)",
+ "measured_run_spread": {
+  "mean": 15.567,
+  "sd": 0.156
+ },
+ "power_two_sided_alpha05_80pct_runs_per_arm": {
+  "0.17": 7,
+  "0.3": 3,
+  "0.5": 1,
+  "1.0": 1
+ },
+ "se_of_3run_median": 0.104,
+ "min_resolvable_effect_2SE": 0.209,
+ "implication_single_prompt": "3 runs/arm resolves only ~>=0.21 tps; the DB-ON LIP upper bound (+0.17) is BELOW the resolution floor \u2014 WASH is not just expected, it is the statistically forced outcome of the 3-run protocol; a null result cannot be read as 'effect absent', only 'effect below floor'.",
+ "multi_prompt_bench_prediction": {
+  "design": "13-prompt concatenated decode, n>=1024 each, retained cache (steady-state regime where LIP's sim gain lives)",
+  "sim_suffix_gain_miss_per_tok": 1.291,
+  "value_per_miss_ms": {
+   "db_on_io_only": 0.52,
+   "serial": 0.82
+  },
+  "predicted_delta_tps": {
+   "db_on": "+0.17 upper bound",
+   "serial": "+0.26"
+  },
+  "runs_per_arm_needed_80pct": 7,
+  "note": "even the multi-prompt steady-state gain is at the ~7-8 runs/arm resolution floor; recommend 8 runs/arm or a higher-signal readout (miss counters from T2's patch) instead of more tok/s runs"
+ },
+ "recommendation": "the decisive LIP readout is the COUNTER log (per-request hits/misses from T2's patch in the same restart), not tps: sim predicts -1.29 miss/tok suffix delta which the counter resolves directly; tps A/B/A stays as the Chief-mandated coarse check"
+}
