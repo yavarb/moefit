@@ -16,6 +16,8 @@ On a Mac with enough RAM (about 128 GB for the quant we test), you load the whol
 
 **moefit** keeps the always-needed weights in RAM, pages the experts in from SSD as they are needed, and remembers which experts a prompt actually used so agent loops don’t thrash the disk.
 
+**Validated on:** [Jundot’s Qwen3.8-Flash-Next oQ4e+MTP MLX](https://huggingface.co/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp) (the checkpoint used for the numbers below). It should work on any other **MLX** build of the same Qwen3.8-Flash-Next MoE — 4-bit or 8-bit — as long as `estimate.py` reports `PAGING`. Bigger quants leave less room for resident experts and will be slower; dense (non-MoE) models are out of scope.
+
 If you have a coding agent on your Mac (Claude Code, Cursor, Codex, Hermes, …), paste this:
 
 ```
@@ -137,4 +139,4 @@ python3 check_docs.py
 
 ## Credits and license
 
-Model: [Qwen3.8-Flash-Next](https://huggingface.co/Qwen/Qwen3.8-Flash-Next) (Qwen team). Checkpoint used in tests: Jundot’s oQ4e+MTP MLX quant. Architecture pieces from [oMLX](https://github.com/jundot/omlx) keep their Apache-2.0 attribution. **MIT.**
+Model: [Qwen3.8-Flash-Next](https://huggingface.co/Qwen/Qwen3.8-Flash-Next) (Qwen team). Validated checkpoint: [Jundot oQ4e+MTP MLX](https://huggingface.co/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp); other MLX quants of the same MoE should work via `estimate.py`. Architecture pieces from [oMLX](https://github.com/jundot/omlx) keep their Apache-2.0 attribution. **MIT.**
