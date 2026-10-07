@@ -1,0 +1,119 @@
+{
+ "kind": "simulated",
+ "design": "within-layer double-buffer / staged install x sidecar prefetch composition",
+ "constants": {
+  "compute_ms": 24.1,
+  "idle_window_ms": 29.1,
+  "ssd_gbs": 4.85,
+  "expert_mb": 2.765,
+  "install_ms": 0.3,
+  "layers": 48
+ },
+ "rows": [
+  {
+   "scenario": "lru_baseline",
+   "stats": {
+    "misses_per_tok": 57.15,
+    "steps_with_miss": 0.69,
+    "prefetch_per_tok": 0.0
+   },
+   "no_install_stream": {
+    "io": 36.34,
+    "demand_install": 17.14,
+    "prefetch_install_exposed": 0.0,
+    "sync": 5.86,
+    "total_ms": 83.44,
+    "tps": 11.98,
+    "gpu_idle_frac": 0.711
+   },
+   "staged_install": {
+    "io": 36.34,
+    "demand_install": 9.94,
+    "prefetch_install_exposed": 0.0,
+    "sync": 5.86,
+    "total_ms": 76.23,
+    "tps": 13.12,
+    "gpu_idle_frac": 0.684
+   },
+   "t2_committed_pess": 12.12,
+   "t2_committed_opt": 12.12,
+   "pess_reproduces_t2": true,
+   "staged_reproduces_t2_opt": null,
+   "staged_tps_gain": 1.14
+  },
+  {
+   "scenario": "sidecar",
+   "stats": {
+    "misses_per_tok": 10.12,
+    "steps_with_miss": 0.116,
+    "prefetch_per_tok": 47.01
+   },
+   "no_install_stream": {
+    "io": 6.38,
+    "demand_install": 3.04,
+    "prefetch_install_exposed": 14.1,
+    "sync": 5.86,
+    "total_ms": 53.47,
+    "tps": 18.7,
+    "gpu_idle_frac": 0.549
+   },
+   "staged_install": {
+    "io": 6.38,
+    "demand_install": 1.67,
+    "prefetch_install_exposed": 0.0,
+    "sync": 5.86,
+    "total_ms": 38.0,
+    "tps": 26.31,
+    "gpu_idle_frac": 0.366
+   },
+   "t2_committed_pess": 19.02,
+   "t2_committed_opt": 26.0,
+   "pess_reproduces_t2": true,
+   "staged_reproduces_t2_opt": true,
+   "staged_tps_gain": 7.61
+  },
+  {
+   "scenario": "sidecar_opt",
+   "stats": {
+    "misses_per_tok": 3.5,
+    "steps_with_miss": 0.04,
+    "prefetch_per_tok": 28.12
+   },
+   "no_install_stream": {
+    "io": 2.2,
+    "demand_install": 1.05,
+    "prefetch_install_exposed": 8.44,
+    "sync": 5.86,
+    "total_ms": 41.65,
+    "tps": 24.01,
+    "gpu_idle_frac": 0.421
+   },
+   "staged_install": {
+    "io": 2.2,
+    "demand_install": 0.58,
+    "prefetch_install_exposed": 0.0,
+    "sync": 5.86,
+    "total_ms": 32.74,
+    "tps": 30.55,
+    "gpu_idle_frac": 0.264
+   },
+   "t2_committed_pess": 24.54,
+   "t2_committed_opt": 30.94,
+   "pess_reproduces_t2": true,
+   "staged_reproduces_t2_opt": true,
+   "staged_tps_gain": 6.54
+  }
+ ],
+ "honest_gpu_idle_band": {
+  "note": "baseline GPU-idle band under the T3-corrected miss interval [50.8, 54.1]/tok (synth 58.3 overstates by 6-15%): scale misses by 0.871-0.928",
+  "serial_idle_frac_at_50_8": 0.692,
+  "serial_idle_frac_at_54_1": 0.702,
+  "db_idle_frac_at_50_8": 0.67,
+  "db_idle_frac_at_54_1": 0.677
+ },
+ "notes": [
+  "All numbers SIM under measured constants; no silicon run of either design exists.",
+  "Scenario stats are T2's committed design_idle_prefetch.json cap143 rows (read verbatim; not re-simulated here).",
+  "The staged-install model REPRODUCING T2's optimistic rows identifies the silicon prerequisite for that branch: a shadow buffer + parallel install stream."
+ ]
+}
