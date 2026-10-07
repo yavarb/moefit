@@ -18,9 +18,18 @@ PROMPT = ("Write a long, detailed essay on the history of unified memory "
           "to Apple Silicon. Cover trade-offs in bandwidth, latency and cost.")
 
 
+def server_pid():
+    import subprocess
+    return subprocess.run(["pgrep", "-f", "omlx-server"], capture_output=True, text=True).stdout.split()
+
+
 def stats():
     time.sleep(1.3)  # let the 1 s dumper flush
-    return json.load(open(STATS))
+    for _ in range(30):
+        if os.path.exists(STATS):
+            return json.load(open(STATS))
+        time.sleep(1)
+    raise SystemExit("stats file missing (server restarted?)")
 
 
 def decode(url, model, n):
@@ -60,7 +69,11 @@ def main():
     ap.add_argument("--out", default="t2_sidecar_aba.json")
     a = ap.parse_args()
     runs = []
+    pid0 = server_pid()
     for arm in a.arms.split(","):
+        if server_pid() != pid0:
+            print("ABORT: omlx-server pid changed", pid0, server_pid(), flush=True)
+            break
         on = arm.startswith("B")
         if on:
             open(FLAG, "w").close()
@@ -75,11 +88,16 @@ def main():
         tot = d["hits"] + d["misses"]
         r["misses_per_token_incl_prefill"] = round(d["misses"] / max(r["tokens"], 1), 2)
         r["hit_rate"] = round(d["hits"] / tot, 4) if tot else None
+        r["server_pid"] = pid0
+        if server_pid() != pid0:
+            r["invalid"] = "server restarted during run"
         runs.append(r); print(json.dumps(r), flush=True)
+        json.dump(dict(partial=True, runs=runs), open(a.out, "w"), indent=1)
     if os.path.exists(FLAG):
         os.remove(FLAG)
-    A = [r["tps"] for r in runs if r["arm"].startswith("A") and r["arm"] != "A0"]
-    B = [r["tps"] for r in runs if r["arm"].startswith("B")]
+    ok = [r for r in runs if not r.get("invalid")]
+    A = [r["tps"] for r in ok if r["arm"].startswith("A") and r["arm"] != "A0"] or [0]
+    B = [r["tps"] for r in ok if r["arm"].startswith("B")] or [0]
     out = dict(kind="measured", host=os.uname().nodename,
                timestamp=time.strftime("%Y-%m-%dT%H:%M:%S%z"),
                max_tokens=a.max_tokens, prompt=PROMPT, runs=runs,
