@@ -81,6 +81,19 @@ Verdicts:
   — diminishing returns past cap ~192 argue against footprint growth as a
   strategy on its own.
 
+**Correction to the stack-distance interpretation** (astra_analysis_a/T6,
+`results/analysis_t6_censoring.json`, 2026-10-07): the original reading
+of this sweep ("tail unexploitable; eviction-policy headroom structurally
+zero") was over-strong. The p99 reuse distance of 28,821 was a COLD
+SENTINEL (1.77% compulsory first-touches), not a measured reuse distance —
+the true tail is p99=434, max=511, and 78.95% of LRU misses recur later in
+the trace. The drop-eviction-heuristics verdict STANDS, but on the entry-1
+numbers (every online policy ≤ LRU; Belady bound +41–51% reachable only
+with future knowledge), not on any proof that the tail is unexploitable.
+Also from that reanalysis: cache lifecycle matters — a concatenated
+13-prompt replay gives 58.28 miss/tok vs 64.32 with reset-per-prompt
+caches at cap 143; design comparisons should fix the lifecycle explicitly.
+
 ## Entry 3 — idle-window sidecar prefetch (SIM; first designs to beat baseline)
 
 `experiments/design_idle_prefetch.py` → `results/design_idle_prefetch.json`

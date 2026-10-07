@@ -214,6 +214,18 @@ n=128 scoring at cap ≥ 180, no crowded boxes, no 54.8.
    model with the same mean predicts p95/mean ≈ 1.0. Measured p95/mean
    ≥ 1.3 → serial-resolve; ≈ 1.0 → byte-backlog (SIM predictions,
    `results/t7_serial_band.json`).
+   **Provenance caveat before trusting the verdict**
+   (astra_local_exp/T8, `results/t8_sse_timing_probe.json`, offline
+   counterexamples — NOT silicon): the S-vs-Q readout is only as good as
+   the token-level timing. Transport chunking alone can flip it while
+   generation is unchanged — variable 1/3-token SSE deltas flip Q→S
+   (ratio 1.000 → 1.512), pair coalescing flips S→Q (1.500 → 1.008),
+   buffering 4 single-token SSE lines gives a false S-like 4.016, and a
+   usage-only 5s trailer distorts collector tps 12.50 → 10.05. Test C
+   therefore requires verified token-level timing provenance
+   (chunk-count agreement with generated tokens is necessary but not
+   sufficient); treat an S/Q verdict from unverified chunk timestamps as
+   provisional.
 4. A cap-180 silicon point if memory allows (~27 GiB footprint; watch the
    memory-guard at 18–19% free). T7's gated band through model S predicts
    **14.0–15.7 tok/s** (n≥1024; SIM, measured constants).
@@ -244,14 +256,17 @@ n=128 scoring at cap ≥ 180, no crowded boxes, no 54.8.
    worth 16.8 → 21.9–24.9 tok/s (L2 = 110–200 experts/layer, SIM), and
    the drive stops binding at ~31 physical misses/token.
 
-Tooling: `experiments/gap_report.py --serial` pairs the silicon-realistic
-serial-model prediction with any measured record in one command
-(commit 23aecd9) and now prints the S-vs-Q verdict automatically from any
-run with per-token gaps (`moefit/metrics.serial_signature_check`,
-commit 8536806 — Test C of the pre-registered protocol is zero-touch);
-the full instrumentation reference is [INSTRUMENTATION.md](../INSTRUMENTATION.md);
-`moefit/metrics.py` is the RunRecord schema (tok-gap
-p50/p90/p95/p99 supported); `experiments/gap_santa_cruz.py` and
+Tooling: the silicon loop is zero-touch end-to-end —
+`experiments/collect_silicon_run.py` (streamed-timestamp blob) →
+`experiments/gap_report.py --serial` (dual bandwidth/serial accounting,
+S-vs-Q verdict printed automatically via
+`moefit/metrics.serial_signature_check`, commit 8536806) →
+`experiments/score_silicon_run.py` (executes the pre-registered Tests A–D
+decision rules as code, anti-rules enforced mechanically — commit 140da04;
+post-hoc scoring is not possible by construction). Full reference:
+[INSTRUMENTATION.md](../INSTRUMENTATION.md). `moefit/metrics.py` is the
+RunRecord schema (tok-gap p50/p90/p95/p99 supported);
+`experiments/gap_santa_cruz.py` and
 `experiments/microbench_expert_reads.py` regenerate the tables above;
 `experiments/fidelity_santa_cruz.py` regenerates the policy table;
 `experiments/serial_predict.py` prices any policy's miss matrix in
