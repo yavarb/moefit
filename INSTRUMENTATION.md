@@ -62,8 +62,12 @@ python3 experiments/serial_predict.py --cap 143 --mode lru --hit-refresh
 Runs the policy sim with `want_misses=True` on locked traces and prices
 the miss matrix through the measured serial constants. Rule of thumb at
 cap143: every miss/tok removed is worth ~0.82 ms/tok (0.52 io + 0.30
-install). `--hit-refresh` = oMLX ExpertCache semantics (required to
-reproduce measured 12.7-13.0 tok/s; no-refresh contrast: 10.56).
+install). `--hit-refresh` approximates oMLX's ExpertCache (actual policy:
+decayed-count eviction per the oMLX 0.7.0 source; exact replay in
+`experiments/design_omlx_exact.py` — omlx-exact 56.9 miss/tok @cap143
+matches the measured ~57.4 within 1%, true-LRU replay gives 58.3; both
+reproduce measured 12.7–13.0 tok/s, serial tps within 0.6%).
+No-refresh contrast: 10.56 tok/s.
 Equivalent implementation inside the sim: `sim_paging.solve_policy_serial`.
 
 ## Anchors (measured, Santa Cruz 36GB idle)

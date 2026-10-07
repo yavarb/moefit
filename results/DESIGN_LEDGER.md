@@ -59,6 +59,13 @@ true-LRU replay 0.879, shipped FIFO-LRU 0.84 undercounts by 3.9pp):
 | mechanism (true-LRU basis, cap 143) | served | verdict |
 |---|---|---|
 | plain true-LRU | 0.879 | baseline |
+
+Baseline note: the true-LRU basis is a <1% approximation of silicon —
+oMLX 0.7.0's actual policy is DECAYED-COUNT eviction (source read,
+`experiments/design_omlx_exact.py`), whose exact replay gives 56.9
+miss/tok @cap143, matching the measured ~57.4 (iostat-derived) within 1%,
+closer than true-LRU's 58.3; serial tps differ by ≤0.6% and all ranking
+verdicts are robust to the identification.
 | static hot-set pinning (0 → 50% of cap) | −2.9pp at any pin fraction | **pinning HURTS** — persist-pin-style designs lose at this cap |
 | perfect next-token prefetcher | +12.1pp | **upper bound for ANY prefetcher** — the served-fraction lever caps here |
 | sidecar (exact prefix knowledge) | 1.000 | removes all sync misses; only helps if it feeds pipelining |
@@ -90,9 +97,15 @@ the true tail is p99=434, max=511, and 78.95% of LRU misses recur later in
 the trace. The drop-eviction-heuristics verdict STANDS, but on the entry-1
 numbers (every online policy ≤ LRU; Belady bound +41–51% reachable only
 with future knowledge), not on any proof that the tail is unexploitable.
-Also from that reanalysis: cache lifecycle matters — a concatenated
-13-prompt replay gives 58.28 miss/tok vs 64.32 with reset-per-prompt
-caches at cap 143; design comparisons should fix the lifecycle explicitly.
+Also from that reanalysis: cache lifecycle and evaluation window matter —
+a concatenated 13-prompt replay gives 58.28 miss/tok vs 64.32 with
+reset-per-prompt caches at cap 143, but a matched-window check shows the
+gap is INITIAL-WINDOW dominated, not a steady-state policy effect: on
+identical suffixes (first 128 tokens of each prompt trimmed, 1218 tokens)
+retained-vs-reset misses differ by exactly 1 (47.779 vs 47.780/tok).
+Report the cache-reset policy and window mask with every steady-state
+comparison; window selection must not masquerade as a policy effect
+(`results/T6_CENSORING_AUDIT.md`, astra_analysis_a).
 
 ## Entry 3 — idle-window sidecar prefetch (SIM; first designs to beat baseline)
 

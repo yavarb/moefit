@@ -239,6 +239,15 @@ n=128 scoring at cap ≥ 180, no crowded boxes, no 54.8.
    with generated tokens is necessary but not sufficient; treat verdicts
    from unverified chunk timestamps as provisional and descriptive, not
    causal.
+   **Protocol Amendment 1** (T3, commit 9640761 — independently reproduced
+   the byte-only counterexample at ratio 1.827): the readout survives as
+   ONE-DIRECTIONAL falsification only — measured p95/mean ≈ 1.0 with
+   verified token-level provenance falsifies BOTH serial-resolve and
+   bursty byte-service; ≥ 1.3 is compatible with both and yields no
+   verdict. Mechanism arbitration moves to mean-based tests: Test D
+   (compute-term separation), a second residency point (S/Q diverge in
+   the mean at cap 180: 17.4 vs 12.2–18.0), and the sidecar-pread design
+   test — the only direct test of the overlap assumption.
 4. A cap-180 silicon point if memory allows (~27 GiB footprint; watch the
    memory-guard at 18–19% free). T7's gated band through model S predicts
    **14.0–15.7 tok/s** (n≥1024; SIM, measured constants).
