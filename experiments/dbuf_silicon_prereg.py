@@ -42,6 +42,49 @@ out = dict(
     kind="pre-registered prediction", design="within-layer double-buffer / "
     "staged expert install (T4, commits 56fdb43/4475d05)",
     owner="T4 glm_instrumentation; silicon execution T9 silicon_dbuf",
+    amendment3=dict(
+        registered="2026-10-08 ~09:40 ET, BEFORE any BATCH1 data exists "
+                   "(T9's isolating arm staged 9991556, queued)",
+        trigger=("T9's attribution caveat on the landed A/B/A: "
+                 "IO_WORKERS=1 disabled THREE mechanisms at once - "
+                 "slab-parallel reads, the read-ahead/install overlap "
+                 "(the DB itself), and _forward_overlap (decode "
+                 "overlap; requires a non-None pool). The measured "
+                 "+6.53 is therefore the whole stock pipeline vs "
+                 "fully serial, NOT the DB-only term."),
+        batch1_semantics=("The DB-only OFF arm is OMLX_MOE_OFFLOAD_"
+                          "IO_BATCH=1 (T9 staged): window=1 means "
+                          "refill is prefetch(done+window), so expert "
+                          "i+1's reads are submitted only after expert "
+                          "i INSTALLS - read-ahead/install overlap gone "
+                          "- while slab-parallel reads and _forward_"
+                          "overlap stay on (source-verified in the "
+                          "merged file, lines 580-619)."),
+        scoring_rule=("Score ON (15.72 pooled median, on_A + on_A2) "
+                      "vs BATCH1 with score_dbuf_aba.py "
+                      "--off-label 'IO_BATCH=1 (DB off, slab+overlap "
+                      "on)' against the ORIGINAL +0.33..+1.10 install "
+                      "band - that comparison is the FAITHFUL test of "
+                      "the registered DB-only prediction (sim +1.15)."),
+        fully_serial_anchor=("The IO_WORKERS=1 arm (measured 9.20 "
+                             "median, 108.7 ms/tok) remains the "
+                             "fully-serial FLOOR anchor for pipeline "
+                             "attribution: ON - BATCH1 = pure DB term; "
+                             "BATCH1 - 9.20 = slab-parallel + decode-"
+                             "overlap term."),
+        reading_correction=("T4 CORRECTS its cycle-30 reading: the "
+                            "45.1 ms/tok ~= 1.14-1.22 ms/miss computed "
+                            "there is the WHOLE PIPELINE's contribution "
+                            "(slab + DB + decode-overlap), not serial-"
+                            "fetch exposure alone. What survives "
+                            "unchanged: the serial-model constants "
+                            "(measured on the DB-ON box) are DB-ON-"
+                            "conditioned marginals - the model's "
+                            "11.9-12.75 vs the measured 9.20 serial "
+                            "floor understates the true serial cost. "
+                            "Apportioning fetch vs install vs overlap "
+                            "within the 45.1 ms/tok awaits the BATCH1 "
+                            "arm.")),
     amendment2=dict(
         registered="2026-10-08 ~05:35 ET, BEFORE any T9 A/B/A data exists",
         trigger=("T9's source read of the INSTALLED Santa Cruz file "

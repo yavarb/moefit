@@ -96,6 +96,11 @@ def main():
                     help="score blobs lacking prompt_sha256 (operator "
                          "attests same-prompt; collector default prompt "
                          "is a fixed literal)")
+    ap.add_argument("--off-label", default="IO_WORKERS=1 serial",
+                    help="semantic label of the OFF arm for the record "
+                         "(e.g. 'IO_BATCH=1 (DB off, slab+overlap on)' "
+                         "per prereg amendment3 — scoring the BATCH1 "
+                         "arm against the original install band)")
     a = ap.parse_args()
 
     prereg = json.loads(Path(a.prereg).read_text())
@@ -129,8 +134,8 @@ def main():
 
     out = dict(
         test="DBUF A/B/A (Amendment 2)",
-        kind="T4 staged-install ON(default) vs OFF(IO_WORKERS=1), "
-             "T9 silicon execution",
+        kind="T4 staged-install ON(default) vs OFF(%s), "
+             "T9 silicon execution" % a.off_label,
         prereg_source=a.prereg,
         prediction=dict(
             on_is_measured_baseline=15.55,
