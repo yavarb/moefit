@@ -1,87 +1,118 @@
-# SETUP — running Qwen3.8-Flash-class MoE on a smaller-RAM Mac
+# SETUP: Qwen3.8-Flash-class MoE on a 24 to 64 GB Mac
 
 Audience: an AI agent setting this up for a human, or a competent human.
-Every step has a **verify** block. Do not continue past a failing verify;
-report it instead. Never delete user files.
+Every step has a **verify** block. Do not continue past a failing verify.
+Report the failure instead. Never delete user files, never resize swap,
+and never disable SIP.
 
-## The measured reality (Qwen3.8-Flash-Next oQ4e)
+## What the simulation says
 
-Simulated at measured bandwidths; DRAM model calibrated within 4% of
-real-machine decode (57.4 tok/s measured on M4 Max 128 GB). Page and
-capacity accounting audited — an earlier optimistic version of this
-table was wrong (a cache-capacity leak) and has been replaced.
+Geometry: 2.9 GiB non-expert floor, 35.9 GiB routed experts (512 per
+layer, 48 layers, 1.46 MiB each, top-10 routing), 17.9 GiB n-gram table.
+Decode reads about 700 MB of expert weights per token from unified DRAM
+whether or not they were cached, so tok/s is DRAM-bound and the ceiling
+belongs to the chip: 14.8 tok/s on a base M4, 29.9 on an M4 Pro, 59.8 on
+an M4 Max. Paging decides whether those bytes are already in RAM (no
+stall) or arrive on demand from SSD (stall).
 
-Geometry: 2.9 GiB non-expert floor + 35.9 GiB routed experts
-(512/layer × 48) + 17.9 GiB PLE n-gram table. Decode consumes ~700 MB
-of expert bytes per token through the same unified DRAM whether or not
-they are cached, so **tokens/sec is DRAM-bound: the ceiling belongs to
-the chip, not the cache** (~14.8 tok/s base M4, ~29.9 M4 Pro, ~59.8
-M4 Max). Paging only decides whether those bytes arrive before the
-token needs them (free) or at that instant (stall).
+Simulated decode speed in tok/s, holdout routing trace, measured tier
+bandwidths, capacity audited every token (`results/sim_paging.json`):
 
-Best simulated configs, 8k holdout tokens:
-
-| RAM | experts/layer resident | LRU | pinned hot-set | + routing sidecar |
+| RAM tier | experts/layer resident | LRU | pinned hot-set | routing sidecar |
 |---|---|---|---|---|
-| 24 GB | 32 | 14.8 (at ceiling) | 14.1 | 13.6 |
-| 24 GB | 128 | 14.8 | 14.8 | 14.2 |
-| 32 GB | 64 | 26.1 | 25.8 | **26.6** |
-| 32 GB | 192 | 29.9 | 29.9 (75 MB/tok SSD) | 29.2 |
-| 48 GB | 128 | 53.5 | **58.3** | 54.1 |
-| 48 GB | 192 | 59.8 | 59.8 | 58.5 |
+| 24 GB (M4) | 32 | 14.8 | 14.1 | 13.6 |
+| 24 GB (M4) | 128 | 14.8 | 14.8 | 14.2 |
+| 32 GB (M4 Pro) | 64 | 26.1 | 25.8 | **26.6** |
+| 32 GB (M4 Pro) | 192 | 29.9 | 29.9 (75 MB/tok SSD) | 29.2 |
+| 48 GB (M4 Max) | 128 | 53.5 | **58.3** | 54.1 |
+| 48 GB (M4 Max) | 192 | 59.8 | 59.8 | 58.5 |
 
-Honest conclusions:
-1. Plain LRU expert paging already reaches the DRAM ceiling at most
-   sizes. The headline result is simply: **a 48 GB Mac runs this 57 GiB
-   model at ~90% of a 128 GB Mac's decode speed** once the 2.9 GiB
-   floor fits.
-2. A **pinned static hot-set** (learned from build traces, no runtime
-   prediction) beats LRU in the mid-capacity band and costs zero
-   prefetch bandwidth — the cheapest real win. The **routing sidecar**
-   (bit-exact replay of cached prefixes, ~0.55 KB/token) wins the
-   tight-capacity band and never does harm on repeated prefixes.
-3. n-gram **speculative prefetch measured net-negative** at tight
-   capacity: ~75% miss rate wastes the SSD headroom that hides other
+Policies:
+
+- **LRU**: plain least-recently-used expert cache, no prediction.
+- **Pinned hot-set**: half the capacity holds the experts most used in
+  the build traces, the other half is LRU. No runtime prediction, no
+  prefetch bandwidth.
+- **Routing sidecar**: a stored per-prefix routing trace replayed
+  bit-exactly for prompts seen before (about 0.55 KB per token). The
+  table shows its upper bound, where every prefix is a repeat.
+
+What follows from the table:
+
+1. LRU alone reaches the chip ceiling at most sizes. A 48 GB Mac holding
+   128 experts per layer runs at about 93% of the 128 GB machine's
+   measured 57.4 tok/s; with the pinned hot-set it reaches the ceiling.
+2. The pinned hot-set beats LRU in the middle of the capacity range and
+   costs no prefetch bandwidth. It is the cheapest real win.
+3. The routing sidecar wins the tight-capacity rows and never hurts on
+   repeated prefixes.
+4. n-gram speculative prefetch loses at tight capacity: about 75% of
+   prefetches are wasted and they eat the SSD time that hides other
    misses. Do not ship it for byte-exact MoE execution.
-4. SSD wear: LRU steady state moves ~140–340 MB/token; at 15 tok/s
-   that is terabytes/day. Prefer the pinned-hot-set (lowest SSD) and
-   size RAM for the low-SSD rows.
+5. SSD traffic under LRU is about 141 to 341 MB per token (steady state,
+   cap 128 down to cap 32). At 15 tok/s that is several terabytes per
+   day. Prefer the pinned hot-set, and pick the RAM tier whose row shows
+   the lowest SSD traffic you can afford.
 
-## Step 0 — measure the machine and model
+## Step 0: measure the machine and the model
+
 ```
 python3 estimate.py /path/to/model-dir
 ```
-Verify: JSON verdict printed. `FULL` → stop, load normally. `PAGING` →
-note `resident_experts_per_layer`. `NO-GO` → floor exceeds usable RAM;
-do not force it (swap will not fix a floor problem).
 
-## Step 1 — PLE table warming (small, verified bit-exact)
-The 17.9 GiB n-gram table is LRU-evicted under pressure; every token
-gathers 16 random rows. The warmer computes the next token's exact rows
-(hash replica verified bit-exact against the live model) and touches
-their file pages:
+**verify**: a JSON verdict is printed. On `FULL`, stop and load the
+model normally. On `PAGING`, note `resident_experts_per_layer` for the
+later steps. On `NO-GO`, the floor exceeds usable RAM, and swap will not
+fix a floor problem, so do not force the load. The estimator uses Apple's published 120 GB/s for a base
+M4, so on a 24 GB M4 it prints a slightly lower ceiling than the table
+above, which uses 135 GB/s.
+
+## Step 1: warm the n-gram table (small, bit-exact)
+
+The 17.9 GiB table is evicted under memory pressure, and every token
+gathers 16 rows from random places in the table. The warmer computes those rows
+exactly (hash replica verified bit-exact against the live model) and
+touches their file pages before the engine needs them:
+
 ```
-python3 specexp_prefetch.py --model-dir ... --model <id> --ple-prefetch
+python3 specexp_prefetch.py --model-dir /path/to/model-dir --model <served-id> --ple-prefetch
 ```
-Feed JSON arrays of token ids per turn (agent-integrated mode).
-Verify: `warmed_rows=16` lines; `iostat -d 2` shows random-read spikes
-at token boundaries flatten during long generations.
 
-## Step 2 — routing sidecar for agent loops
-`--sidecar` persists per-prefix routing traces; replay is bit-exact
-(verified 8208/8208 router decisions identical across greedy re-runs).
-Repeated/growing prefixes need no prediction and pay no stall.
-Verify: second identical prompt logs sidecar hits.
+Feed one JSON array of token ids per line on stdin (agent-integrated
+mode). Every token in the array is warmed.
 
-## Step 3 — what NOT to believe
+**verify**: each input line logs `warmed_rows=16` per token fed (an
+N-token array logs `warmed_rows=` 16 times N). During long generations,
+`iostat -d 2` shows the random-read spikes at token boundaries flatten.
+
+## Step 2: routing sidecar for agent loops
+
+`--sidecar <path>` persists per-prefix routing traces. Replay is
+bit-exact: 8208 of 8208 router decisions were identical across greedy
+re-runs of the same prompt. Repeated or growing prefixes need no
+prediction and pay no stall. The default path is
+`~/Library/Application Support/specexp/sidecar.jsonl`, and the tool
+creates that directory.
+
+**verify**: the second identical prompt logs sidecar hits. After
+restarting the tool, the same prompt still logs hits
+(`tests/test_sidecar.py` covers this).
+
+## Step 3: what NOT to believe
+
 - No predictor changes the DRAM-bound tok/s ceiling.
-- Expert-skipping speculation (skip non-predicted experts): coverage
-  ~0.43@14 makes per-token strict hits ~impossible. Do not implement.
-- n-gram speculative prefetch: measured net-negative at tight RAM.
-- 24 GB: runs at ~14 tok/s ceiling; the OS may still pressure the
-  floor. 32 GB is the honest comfortable minimum.
+- Expert-skipping speculation (skip non-predicted experts): coverage of
+  0.44 at 14 candidates makes strict per-token hits almost impossible,
+  so do not implement expert skipping.
+- n-gram speculative prefetch: net-negative at tight RAM in the shipped
+  simulation.
+- 24 GB runs at the 14.8 tok/s ceiling and the OS may still press on the
+  floor. 32 GB is the comfortable minimum.
 
-## Prior art
-Strata (stratallm.org), oMLX (github.com/jundot/omlx), mlx-vlm. This
-repo's code is clean-room; vendored arch under `vendor_mlx_vlm/` is
-Apache-2.0 with attribution.
+## Checking the numbers
+
+```
+python3 check_docs.py
+```
+
+**verify**: prints `all documented numbers match results/sim_paging.json`.

@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 .DS_Store
 ._*
+results/traces/
+results/traces_synth/*.npz
