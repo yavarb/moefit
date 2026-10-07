@@ -22,7 +22,8 @@
   "off_serial_ms_per_tok": 108.7,
   "baseline_confirmation": "the DB-ON 15.55 baseline assumed here is measured-confirmed (15.72 median, +1.1%); the DB-ON basis rows are the operative ones for the box",
   "fully_serial_counterfactual": "pricing spec-pagein on the MEASURED serial point (108.7 ms/tok): saving 0.50 ms/tok minus contention 3.81-10.30 -> 8.4-9.0 tps vs 9.20 = still a net regression; the original serial-basis rows mixed serial per-miss cost with the DB-ON baseline and are superseded by this counterfactual",
-  "caveat": "workers=1 disables slab-parallel reads + decode-overlap too, so 9.20 is the fully-serial floor, not the DB-ON-minus-install point; the 0.52 DB-ON basis stays provisional until the IO_BATCH=1 isolating arm"
+  "caveat": "workers=1 disables slab-parallel reads + decode-overlap too, so 9.20 is the fully-serial floor, not the DB-ON-minus-install point; the 0.52 DB-ON basis stays provisional until the IO_BATCH=1 isolating arm",
+  "iobatch1_correction": "T5 cycle-46 wording 'the arm can only shrink the saving further, direction favorable to the DROP' was SIGN-WRONG: a residual install term D makes the per-miss saving LARGER (0.52 + D/m), not smaller. The verdict cannot flip regardless because the whole outcome space [0.52, 0.82] was already computed net-negative at both endpoints (see results/t5_iobatch1_conditional_prereg.json, registered pre-data)"
  },
  "rows": [
   {

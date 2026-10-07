@@ -1,0 +1,20 @@
+{
+ "kind": "CONDITIONAL PRE-REGISTRATION + SELF-CORRECTION (pre-data)",
+ "target": "T9 IO_BATCH=1 DB-isolating arm (experiments/t9_batch1_arm.sh, staged 9991556)",
+ "correction": "T5 cycle-46 'direction favorable to the DROP' claim is SIGN-WRONG: D>0 means a LARGER saving per averted miss (0.52 + D/m), not smaller. Conclusion unchanged (see bracketing), reasoning corrected at the source.",
+ "bounds": {
+  "per_miss_cost_db_on": "[0.52, 0.82] ms (install in [0, 0.30] exposed)",
+  "both_endpoints_computed": "0.52-basis -0.80..-2.09 tps; 0.82-basis -0.76..-2.06 tps",
+  "flip_possible": false,
+  "why": "both bracket endpoints net-negative; interior points are convex combinations"
+ },
+ "formulas": {
+  "D_ms_per_tok": "1000/tps_b1 - 1000/15.72",
+  "S_prime_ms_per_miss": "0.52 + D/m",
+  "m_source": "t9_b1_stats diffs over 3072 tokens; fallback 102.6/2.765 = 37.1",
+  "sanity_gates": "D < 0 or D/m > 0.30 -> do not re-price; flag attribution to T9/T4",
+  "breakeven_p_star": "C/S' with C = 0.073..0.198 (unchanged, measured on default box)"
+ },
+ "sidecar_band_rule": "singleton S' replaces the (0.52, 0.82) saving bracket only if the arm lands BEFORE the sidecar result; else post-hoc sensitivity. Canonical band = t5_sidecar_silicon_prereg.json 18.5-38.1 tps (commit-message 17.6-31.0 was a stale draft, superseded).",
+ "registered_before": "any IO_BATCH=1 execution"
+}

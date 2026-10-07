@@ -1,0 +1,166 @@
+{
+  "scope": "MEASURED LOCAL WARM file read+CRC on train-selected32-expert integration fixture. NOT physical SSD, full512 layout, or decode.",
+  "selected": [
+    0,
+    44,
+    62,
+    93,
+    95,
+    98,
+    109,
+    134,
+    168,
+    174,
+    198,
+    200,
+    205,
+    235,
+    246,
+    251,
+    259,
+    270,
+    316,
+    319,
+    349,
+    367,
+    371,
+    384,
+    401,
+    412,
+    416,
+    426,
+    427,
+    432,
+    470,
+    481
+  ],
+  "learned_order": [
+    200,
+    367,
+    174,
+    432,
+    259,
+    412,
+    319,
+    168,
+    251,
+    205,
+    371,
+    235,
+    109,
+    246,
+    44,
+    0,
+    270,
+    426,
+    93,
+    134,
+    95,
+    349,
+    481,
+    62,
+    198,
+    384,
+    470,
+    316,
+    401,
+    98,
+    427,
+    416
+  ],
+  "component_equalities": 288,
+  "route_sha256": "1a5ce55ab3a41949ca6a49ff4f3f67665648ed6c8bec5376cae2828c8aeb49ff",
+  "heldout_positions": 32,
+  "heldout_selected_demands": 54,
+  "heldout_total_demands": 320,
+  "seconds": {
+    "heldout_subset_identity": [
+      0.038639583000000144,
+      0.018523584000000426,
+      0.024129708999999888,
+      0.04161445800000019,
+      0.05167295800000016,
+      0.14601850000000027
+    ],
+    "heldout_subset_learned": [
+      0.03068616699999982,
+      0.02148954199999986,
+      0.033493125000000123,
+      0.09669320899999967,
+      0.09533762499999998,
+      0.3287549590000003
+    ],
+    "sequential_ids_identity": [
+      0.018863917000000008,
+      0.01096837500000003,
+      0.010424833000000078,
+      0.013793292000000346,
+      0.03333874999999997,
+      0.07328358300000026
+    ],
+    "sequential_ids_learned": [
+      0.01805566699999961,
+      0.012641083000000108,
+      0.01144779199999979,
+      0.016521292000000187,
+      0.1559345419999998,
+      0.03349141700000047
+    ],
+    "random_ids_identity": [
+      0.017387832999999908,
+      0.014129666999999735,
+      0.019443915999999728,
+      0.015143708000000089,
+      0.020056915999999703,
+      0.018003000000000213
+    ],
+    "random_ids_learned": [
+      0.019065832999999976,
+      0.013255291999999752,
+      0.017464665999999962,
+      0.011793541999999935,
+      0.038449915999999806,
+      0.08678675000000036
+    ]
+  },
+  "useful_GBps": {
+    "heldout_subset_identity": 3.720664981841834,
+    "heldout_subset_learned": 2.317757212466742,
+    "sequential_ids_identity": 5.41831973454921,
+    "sequential_ids_learned": 5.11748878783704,
+    "random_ids_identity": 4.999803197624633,
+    "random_ids_learned": 4.843821049364814
+  },
+  "counters": {
+    "heldout_subset_identity": {
+      "read_calls": 49,
+      "issued_bytes": 149520384
+    },
+    "heldout_subset_learned": {
+      "read_calls": 36,
+      "issued_bytes": 149520384
+    },
+    "sequential_ids_identity": {
+      "read_calls": 8,
+      "issued_bytes": 88604672
+    },
+    "sequential_ids_learned": {
+      "read_calls": 29,
+      "issued_bytes": 88604672
+    },
+    "random_ids_identity": {
+      "read_calls": 30,
+      "issued_bytes": 88604672
+    },
+    "random_ids_learned": {
+      "read_calls": 29,
+      "issued_bytes": 88604672
+    }
+  },
+  "ratios": {
+    "heldout_subset": 0.6229416579504524,
+    "sequential_ids": 0.944478923088654,
+    "random_ids": 0.9688023423934116
+  },
+  "caveats": "Subset compaction changes adjacency versus full512 layout. Heldout routes filtered to train-selected experts, not cache misses. Sequential control means ascending expert IDs, not sequential offsets in learned layout. Physical device attribution unavailable."
+}

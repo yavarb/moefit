@@ -1,0 +1,584 @@
+{
+  "kind": "MEASURED_LOCAL_CACHE_INFLUENCED_FILE_IO_NOT_DEVICE_OR_DECODE",
+  "host": "ybs-MacBook-Pro-2.local",
+  "source": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp",
+  "components": [
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.gate_proj.weight",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 1941800721,
+      "size": 819200,
+      "experts": 512,
+      "dtype": "U32",
+      "shape": [
+        640,
+        320
+      ]
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.gate_proj.scales",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 5001814601,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        640,
+        40
+      ]
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.gate_proj.biases",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 4975600201,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        640,
+        40
+      ]
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.up_proj.weight",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 1322369361,
+      "size": 819200,
+      "experts": 512,
+      "dtype": "U32",
+      "shape": [
+        640,
+        320
+      ]
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.up_proj.scales",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 576723121,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        640,
+        40
+      ]
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.up_proj.biases",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 3577522281,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        640,
+        40
+      ]
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.down_proj.weight",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 652937761,
+      "size": 819200,
+      "experts": 512,
+      "dtype": "U32",
+      "shape": [
+        2560,
+        80
+      ]
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.down_proj.scales",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 2830661761,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        2560,
+        10
+      ]
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.down_proj.biases",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 2906876401,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        2560,
+        10
+      ]
+    }
+  ],
+  "batches": [
+    [
+      283,
+      129,
+      127,
+      468,
+      477,
+      481,
+      8,
+      97,
+      389,
+      480
+    ],
+    [
+      340,
+      113,
+      432,
+      15,
+      434,
+      420,
+      339,
+      31,
+      390,
+      494
+    ],
+    [
+      181,
+      441,
+      3,
+      4,
+      269,
+      38,
+      367,
+      283,
+      338,
+      451
+    ],
+    [
+      148,
+      192,
+      126,
+      424,
+      61,
+      16,
+      303,
+      227,
+      390,
+      14
+    ],
+    [
+      255,
+      141,
+      492,
+      48,
+      106,
+      124,
+      214,
+      341,
+      231,
+      36
+    ],
+    [
+      356,
+      387,
+      482,
+      123,
+      283,
+      208,
+      486,
+      340,
+      471,
+      475
+    ],
+    [
+      313,
+      504,
+      129,
+      364,
+      214,
+      60,
+      397,
+      488,
+      201,
+      496
+    ],
+    [
+      463,
+      22,
+      186,
+      39,
+      381,
+      507,
+      498,
+      299,
+      437,
+      495
+    ],
+    [
+      307,
+      6,
+      193,
+      417,
+      135,
+      414,
+      470,
+      248,
+      365,
+      457
+    ],
+    [
+      220,
+      212,
+      279,
+      142,
+      420,
+      285,
+      494,
+      406,
+      13,
+      66
+    ],
+    [
+      489,
+      86,
+      310,
+      88,
+      24,
+      334,
+      297,
+      184,
+      376,
+      447
+    ],
+    [
+      300,
+      337,
+      2,
+      15,
+      412,
+      252,
+      282,
+      446,
+      139,
+      59
+    ],
+    [
+      365,
+      27,
+      220,
+      188,
+      482,
+      115,
+      168,
+      323,
+      159,
+      238
+    ],
+    [
+      155,
+      114,
+      316,
+      182,
+      32,
+      386,
+      259,
+      299,
+      377,
+      490
+    ],
+    [
+      320,
+      298,
+      12,
+      85,
+      236,
+      241,
+      192,
+      348,
+      281,
+      458
+    ],
+    [
+      13,
+      270,
+      106,
+      388,
+      425,
+      21,
+      308,
+      447,
+      180,
+      479
+    ],
+    [
+      250,
+      471,
+      142,
+      482,
+      170,
+      193,
+      321,
+      106,
+      61,
+      42
+    ],
+    [
+      327,
+      145,
+      198,
+      448,
+      304,
+      354,
+      408,
+      419,
+      19,
+      164
+    ],
+    [
+      290,
+      240,
+      192,
+      201,
+      204,
+      129,
+      91,
+      105,
+      275,
+      152
+    ],
+    [
+      416,
+      258,
+      133,
+      70,
+      454,
+      268,
+      64,
+      155,
+      0,
+      41
+    ],
+    [
+      215,
+      439,
+      24,
+      101,
+      340,
+      422,
+      153,
+      500,
+      130,
+      179
+    ],
+    [
+      58,
+      158,
+      322,
+      337,
+      363,
+      63,
+      71,
+      371,
+      170,
+      271
+    ],
+    [
+      397,
+      459,
+      143,
+      388,
+      431,
+      454,
+      382,
+      390,
+      457,
+      56
+    ],
+    [
+      215,
+      284,
+      60,
+      311,
+      122,
+      222,
+      330,
+      18,
+      172,
+      385
+    ],
+    [
+      242,
+      180,
+      316,
+      212,
+      498,
+      224,
+      119,
+      441,
+      490,
+      306
+    ],
+    [
+      347,
+      374,
+      288,
+      43,
+      136,
+      324,
+      244,
+      510,
+      32,
+      381
+    ],
+    [
+      431,
+      462,
+      21,
+      365,
+      266,
+      347,
+      459,
+      81,
+      242,
+      485
+    ],
+    [
+      203,
+      127,
+      479,
+      9,
+      290,
+      142,
+      204,
+      337,
+      404,
+      94
+    ],
+    [
+      0,
+      193,
+      321,
+      223,
+      30,
+      138,
+      293,
+      488,
+      178,
+      186
+    ],
+    [
+      498,
+      218,
+      274,
+      133,
+      23,
+      449,
+      495,
+      97,
+      485,
+      66
+    ],
+    [
+      19,
+      82,
+      130,
+      29,
+      363,
+      479,
+      219,
+      141,
+      65,
+      409
+    ],
+    [
+      170,
+      257,
+      96,
+      153,
+      398,
+      58,
+      481,
+      104,
+      475,
+      364
+    ]
+  ],
+  "component_byte_checks": 252,
+  "rows": [
+    {
+      "rep": 0,
+      "mode": "serial",
+      "seconds": 0.06424687500000001,
+      "useful_GBps": 13.77087990661024,
+      "planned_reads": 2880,
+      "checksum": 369557
+    },
+    {
+      "rep": 0,
+      "mode": "futures",
+      "seconds": 0.047849583,
+      "useful_GBps": 18.489941699178445,
+      "planned_reads": 2880,
+      "checksum": 369557
+    },
+    {
+      "rep": 0,
+      "mode": "lanes",
+      "seconds": 0.041790750000000015,
+      "useful_GBps": 21.170617899894108,
+      "planned_reads": 2856,
+      "checksum": 369557
+    },
+    {
+      "rep": 1,
+      "mode": "futures",
+      "seconds": 0.04675699999999999,
+      "useful_GBps": 18.922000983809912,
+      "planned_reads": 2880,
+      "checksum": 369557
+    },
+    {
+      "rep": 1,
+      "mode": "lanes",
+      "seconds": 0.041372666,
+      "useful_GBps": 21.38455375343711,
+      "planned_reads": 2856,
+      "checksum": 369557
+    },
+    {
+      "rep": 1,
+      "mode": "serial",
+      "seconds": 0.063452583,
+      "useful_GBps": 13.943262167908907,
+      "planned_reads": 2880,
+      "checksum": 369557
+    },
+    {
+      "rep": 2,
+      "mode": "lanes",
+      "seconds": 0.043258624999999995,
+      "useful_GBps": 20.452245072514444,
+      "planned_reads": 2856,
+      "checksum": 369557
+    },
+    {
+      "rep": 2,
+      "mode": "serial",
+      "seconds": 0.064807416,
+      "useful_GBps": 13.651770963989675,
+      "planned_reads": 2880,
+      "checksum": 369557
+    },
+    {
+      "rep": 2,
+      "mode": "futures",
+      "seconds": 0.05823704200000007,
+      "useful_GBps": 15.191980389388576,
+      "planned_reads": 2880,
+      "checksum": 369557
+    }
+  ],
+  "median_useful_GBps": {
+    "serial": 13.77087990661024,
+    "futures": 18.489941699178445,
+    "lanes": 21.170617899894108
+  },
+  "lanes_vs_futures": 1.1449802408427698,
+  "lanes_vs_serial": 1.537346781285332,
+  "caveat": "F_NOCACHE accepted, no physical counters. T1 may be using same host for capture; no isolation claim. No checkpoint writes or model loads."
+}

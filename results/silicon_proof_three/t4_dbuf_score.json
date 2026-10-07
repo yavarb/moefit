@@ -1,0 +1,54 @@
+{
+  "kind": "MEASURED dbuf A/B/A scored against t4_dbuf_silicon_prereg amendment2",
+  "arms": {
+    "ON_A": {
+      "median": 15.75,
+      "runs": [
+        15.7,
+        16.0,
+        15.75
+      ],
+      "label": "T9 dbuf ON (stock 0.7.0 IO_WORKERS=12 default) n1024"
+    },
+    "OFF_B": {
+      "median": 9.2,
+      "runs": [
+        8.99,
+        9.47,
+        9.2
+      ],
+      "label": "T9 dbuf OFF (IO_WORKERS=1 serial) n1024"
+    },
+    "ON_A2": {
+      "median": 15.64,
+      "runs": [
+        15.52,
+        16.63,
+        15.64
+      ],
+      "label": "T9 dbuf ON2 (default env, merged 214e8823 flags off) n1024"
+    }
+  },
+  "baseline_claimed": 15.55,
+  "paired_deltas_tps": [
+    6.709999999999999,
+    6.529999999999999,
+    6.529999999999999,
+    7.159999999999998,
+    6.550000000000001,
+    6.440000000000001
+  ],
+  "median_paired_delta_tps": 6.54,
+  "delta_ON_minus_OFF": 6.550000000000001,
+  "delta_ON2_minus_OFF": 6.440000000000001,
+  "decision_rule": ">=+0.30 TRANSFERS; |d|<0.30 WASH; <=-0.30 CONTENTION_FAIL",
+  "verdict": "TRANSFERS",
+  "bit_exactness": "collector stores token COUNTS not text; streamed_deltas is int count \u2014 TEXT MATCH NOT CAPTURED in blobs. Timing arms used temperature=0 greedy; finish=length all runs.",
+  "note": "OFF=IO_WORKERS=1 disables entire IO pool+read-ahead (not install-staging alone). Delta far exceeds install-only band +0.33..+1.10 \u2014 indicates fetch-parallelism dominates.",
+  "artifacts": [
+    "t9_on_A.json",
+    "t9_off_B.json",
+    "t9_on_A2.json"
+  ],
+  "md5_live": "214e8823 (merged T2 sidecar+LIP code; flags off during these arms)"
+}
