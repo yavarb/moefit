@@ -1,0 +1,51 @@
+{
+ "kind": "PRE-REGISTERED PREDICTION (no sidecar data existed at commit)",
+ "target": "T2 sidecar silicon A/B/A (experiments/t2_sidecar_aba.py, in flight)",
+ "framework": "T5 breakeven (d7f45b6/c69ca70) \u2014 first prospective silicon test",
+ "constants": {
+  "base_ms_per_tok": 63.6,
+  "saving_ms_per_confirmed": [
+   0.52,
+   0.82
+  ],
+  "contention_ms_per_issued": [
+   0.073,
+   0.198
+  ],
+  "provenance": "T9 75cdc0f (baseline), T4 Amd 2 0af86e7 + T1 microbench (saving), T2 probe a853292 (contention)"
+ },
+ "rows": [
+  {
+   "m_miss_per_tok": 30,
+   "net_ms_per_tok": [
+    9.7,
+    22.4
+   ],
+   "predicted_tps": [
+    18.5,
+    24.3
+   ]
+  },
+  {
+   "m_miss_per_tok": 50,
+   "net_ms_per_tok": [
+    16.1,
+    37.4
+   ],
+   "predicted_tps": [
+    21.0,
+    38.1
+   ]
+  }
+ ],
+ "predicted_band_tps": [
+  18.5,
+  38.1
+ ],
+ "decision_rules": [
+  "inside band -> framework TRANSFERS prospectively; DB-ON saving 0.52 supported",
+  "below floor -> saving constant overstated OR coverage m_cov << m_iss; T2 stats counters (m_iss/tok vs m_cov/tok) arbitrate which",
+  "above ceiling -> live-pipeline contention cheaper than 0.073 ms/expert; revise contention term down for all background-read designs"
+ ],
+ "note": "T2's own sim bracket (12.1 -> 19.0 install-critical / 26.0 async, 377eb7c) sits INSIDE this band \u2014 the framework and the design-side model agree before the measurement."
+}
