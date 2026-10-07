@@ -1,0 +1,41 @@
+{
+ "kind": "simulated",
+ "policy": {
+  "mode": "lru",
+  "cap": 143,
+  "probe_picks": 6,
+  "hit_refresh": true,
+  "traces_dir": "/private/tmp/moefit-lab/repo/results/traces_synth",
+  "eval_sub": 2882
+ },
+ "served": 0.879,
+ "sync_mb_per_tok": 156.9,
+ "async_mb_per_tok": 0.0,
+ "serial_model": {
+  "breakdown_ms": {
+   "compute": 18.1,
+   "io": 37.0,
+   "install": 17.5,
+   "sync": 5.9
+  },
+  "total_ms": 78.4,
+  "tps": 12.75,
+  "miss_experts_per_tok": 58.3,
+  "frac_layer_steps_with_miss": 0.692,
+  "constants": {
+   "io_A_ms": 0.2,
+   "io_B_ms": 0.52,
+   "install_ms": 0.3,
+   "sync_ms": 0.122,
+   "expert_mb": 2.765
+  },
+  "compute_ms_assumed": 18.1
+ },
+ "note": "serial constants MEASURED on Santa Cruz (oMLX resolve discipline, not SSD ceiling; drive does 3.8-5.6 GB/s). compute_ms is ASSUMED. Prediction is SIMULATED.",
+ "shipped_bandwidth_model": {
+  "tier": "48GB-M4M",
+  "tps": 36.59311908764067,
+  "compute_ms": 18.126066552901023,
+  "stream_ms": 27.32754203338053
+ }
+}
