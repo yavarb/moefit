@@ -4,7 +4,7 @@ exactly: same served count, same sync bytes, same async bytes, for every
 policy, with and without a finite prefetch allowance, on traces with
 heavy timestamp ties (many experts touched in the same token).
 
-Needs numpy: /tmp/specexp-venv/bin/python tests/test_sim_equivalence.py
+Needs numpy: /tmp/moefit-venv/bin/python tests/test_sim_equivalence.py
 """
 import os, sys, time
 import numpy as np

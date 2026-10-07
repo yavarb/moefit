@@ -50,9 +50,9 @@ def load(model_dir: str | os.PathLike = DEFAULT_MODEL,
     import sys, os
     from pathlib import Path as _P
     # oMLX runtime deps for the vendored arch (imported last-resort; this
-    # venv keeps priority). Override with SPECEXP_OMLX_SITE=... if it moves.
+    # venv keeps priority). Override with MOEFIT_OMLX_SITE=... if it moves.
     omlx_site = os.environ.get(
-        "SPECEXP_OMLX_SITE",
+        "MOEFIT_OMLX_SITE",
         "/Users/yb/.hermes/cache/scratch/omlxenv/lib/python3.13/site-packages")
     if Path(omlx_site).exists() and omlx_site not in sys.path:
         sys.path.append(omlx_site)
@@ -63,14 +63,14 @@ def load(model_dir: str | os.PathLike = DEFAULT_MODEL,
         mlx_vlm.models.__path__.insert(0, str(vendor / "models"))
         import mlx_vlm.models.qwen4_exp  # noqa: F401
         import mlx_vlm.utils as _u
-        if not getattr(_u.get_model_and_args, "_specexp_bypass", False):
+        if not getattr(_u.get_model_and_args, "_moefit_bypass", False):
             _orig_gma = _u.get_model_and_args
             def _gma(config, model_path=None):
                 if str(config.get("model_type", "")).lower() == "qwen4_exp":
                     config = {k: v for k, v in config.items() if k != "model_file"}
                     return _orig_gma(config, model_path=None)
                 return _orig_gma(config, model_path=model_path)
-            _gma._specexp_bypass = True
+            _gma._moefit_bypass = True
             _u.get_model_and_args = _gma
     from mlx_vlm import load as mlx_load
     model, proc = mlx_load(str(model_dir))

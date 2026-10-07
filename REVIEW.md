@@ -1,6 +1,6 @@
-# Review of pagepilot (then "specexp", branch `fable-review`)
+# Review of moefit (branch `fable-review`)
 
-Scope: `experiments/sim_paging.py`, `estimate.py`, `specexp_prefetch.py`,
+Scope: `experiments/sim_paging.py`, `estimate.py`, `moefit_prefetch.py`,
 and the user-facing docs. The real routing traces
 (`results/traces/*.npz`) and the model were not available, so every
 simulation in this review ran on a synthetic trace calibrated to the
@@ -9,7 +9,7 @@ was run, and the command and its output are quoted or named.
 
 Test runner notes: the stdlib tests run with plain `python3`. The
 simulator tests need numpy, as the simulator does, and were run with
-`/tmp/specexp-venv/bin/python` (Python 3.14, numpy 2.5.3).
+`/tmp/moefit-venv/bin/python` (Python 3.14, numpy 2.5.3).
 
 ## A. Bugs found, with reproductions
 
@@ -52,7 +52,7 @@ ever hit. The SETUP verify step ("second identical prompt logs sidecar
 hits") passes within one process and fails across a restart, which is
 the case that the persistence exists for. Separately, `record()`
 appended to the default path under `~/Library/Application
-Support/specexp/` without creating that directory, so the first write on
+Support/moefit/` without creating that directory, so the first write on
 a fresh Mac raised `FileNotFoundError`.
 
 Reproduction (`tests/test_sidecar.py`), before the fix:
@@ -62,7 +62,7 @@ same-process lookup: [1, 2, 3]
 after-restart lookup: None
 FAIL: sidecar entries do not survive restart
 FAIL: second layer entry lost
-FAIL: record() into a missing directory raised: [Errno 2] No such file or directory: '.../Library/Application Support/specexp/sidecar.jsonl'
+FAIL: record() into a missing directory raised: [Errno 2] No such file or directory: '.../Library/Application Support/moefit/sidecar.jsonl'
 ```
 
 Fix: one `_key()` helper used by load, record, and lookup; `mkdir -p` of
@@ -255,7 +255,7 @@ about 0.4 tok/s, so a 5-point gain would have changed the 32 GB advice.
 
 ### B3. Measured delta
 
-`/tmp/specexp-venv/bin/python experiments/hetero_alloc.py --traces-dir results/traces_synth`
+`/tmp/moefit-venv/bin/python experiments/hetero_alloc.py --traces-dir results/traces_synth`
 (32 GB tier tok/s; full output in `results/hetero_alloc_synth.json`):
 
 | cap | policy | uniform served / tok/s / SSD MB | hetero (build-fit) served / tok/s / SSD MB | oracle (holdout-fit) served | caps range |
@@ -294,7 +294,7 @@ THROTTLE_TABLE_PLACEHOLDER
 
 ### B4. Verdict
 
-Negative. Heterogeneous per-layer capacity does not beat the shipped
+Result: heterogeneous per-layer capacity does not beat the shipped
 uniform allocation on a trace calibrated to the shipped statistics, and
 an oracle allocation cannot either. The allocator was removed from the
 shipped simulator and kept in `experiments/hetero_alloc.py` with its

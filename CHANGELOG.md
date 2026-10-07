@@ -12,11 +12,11 @@ Fixes with runnable reproductions under `tests/`:
   the table lacked, so every packed weight was counted at half its size.
   Tensors are now sized from the header's `data_offsets`.
   (`tests/test_estimate_sizes.py`)
-- `specexp_prefetch.py` sidecar: entries were recorded under
+- `moefit_prefetch.py` sidecar: entries were recorded under
   `<hash>:<layer>` but reloaded under the bare hash, so nothing replayed
   after a restart, and the default path's directory was never created.
   (`tests/test_sidecar.py`)
-- `specexp_prefetch.py` warming: a multi-token input warmed only the last
+- `moefit_prefetch.py` warming: a multi-token input warmed only the last
   token's rows, and a row crossing a 16 KiB page boundary left its tail
   cold. Every token and every page is now warmed; single-file
   `model.safetensors` checkpoints are recognised.
@@ -69,12 +69,9 @@ allows, the pinned hot-set is the cheapest win, n-gram speculative
 prefetch loses, and the sidecar wins tight capacity on repeated
 prefixes.
 
-## Renamed to pagepilot
+## Renamed to moefit
 
-`specexp` was short for "speculative experts", the original thesis. The
-speculation lost to measurement (see above); what shipped is expert
-paging with a pinned hot-set and an exact routing sidecar, so the tool
-is now **pagepilot**. `specexp_prefetch.py` became
-`pagepilot_prefetch.py` and the sidecar moved to
-`~/Library/Application Support/pagepilot/`. History below keeps the old
-names as they were at the time.
+Earlier names were `specexp` and `pagepilot`. The package, prefetch script,
+and Application Support path are now `moefit`. Older changelog entries may
+still mention the previous names.
+

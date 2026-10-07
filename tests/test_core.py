@@ -7,9 +7,9 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from specexp.trigger.ngram_table import NgramExpertTable, ngram_key
-from specexp.quant import pack, dequant
-from specexp.bank.cpu_experts import CPUExpertBank
+from moefit.trigger.ngram_table import NgramExpertTable, ngram_key
+from moefit.quant import pack, dequant
+from moefit.bank.cpu_experts import CPUExpertBank
 
 
 def test_ngram_key_pads_and_windows():
@@ -61,7 +61,7 @@ def test_cpu_bank_matches_oracle():
     gu = rng.normal(0, .1, (E, 2 * H, I)).astype(np.float32)
     dn = rng.normal(0, .1, (E, I, H)).astype(np.float32)
     # bank reads quant-format via dequant; feed it real 4-bit tensors.
-    from specexp.quant import pack as _pack
+    from moefit.quant import pack as _pack
     gup, gus, gub = _pack(gu, group_size=8)
     dnp, dns, dnb = _pack(dn, group_size=8)
     bank = CPUExpertBank((gup, gus, gub), (dnp, dns, dnb), hidden=H, n_experts=E, group_size=8)
@@ -87,7 +87,7 @@ def test_bank_duplicate_expert_same_token_sums():
     E, H, I, T, K = 4, 16, 16, 3, 2
     gu = rng.normal(0, .1, (E, 2 * H, I)).astype(np.float32)
     dn = rng.normal(0, .1, (E, I, H)).astype(np.float32)
-    from specexp.quant import pack as _pack
+    from moefit.quant import pack as _pack
     gup, gus, gub = _pack(gu, group_size=8)
     dnp, dns, dnb = _pack(dn, group_size=8)
     bank = CPUExpertBank((gup, gus, gub), (dnp, dns, dnb), hidden=H, n_experts=E, group_size=8)

@@ -1,10 +1,10 @@
 """Sidecar persistence must survive a process restart.
 
-Repro for two bugs in pagepilot_prefetch.Sidecar:
+Repro for two bugs in moefit_prefetch.Sidecar:
   1. record() keys entries as "<prefix>:<layer>" but __init__ reloads them
      keyed by the bare prefix hash, so after a restart lookup() never hits.
   2. The default sidecar path lives under ~/Library/Application Support/
-     specexp/, and record() appends to the file without creating the
+     moefit/, and record() appends to the file without creating the
      directory, so the first record() on a fresh Mac raises.
 
 run: python3 tests/test_sidecar.py
@@ -13,7 +13,7 @@ import os, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from pagepilot_prefetch import Sidecar  # noqa: E402
+from moefit_prefetch import Sidecar  # noqa: E402
 
 
 def main():
@@ -36,7 +36,7 @@ def main():
             fails += 1
 
         nested = os.path.join(d, "Library", "Application Support",
-                              "specexp", "sidecar.jsonl")
+                              "moefit", "sidecar.jsonl")
         try:
             Sidecar(nested).record("p", 0, [1])
             print("record() into a missing directory: OK")

@@ -12,7 +12,7 @@ says async reads are "hidden by design"; in this regime they are not.
 Uniform-random routing at cap 32 on the 24 GB tier is SSD-bound for every
 policy, so it exercises the regime directly. Needs numpy (as the simulator
 does): run with a python that has numpy, e.g.
-    /tmp/specexp-venv/bin/python tests/test_sim_throttle.py
+    /tmp/moefit-venv/bin/python tests/test_sim_throttle.py
 """
 import sys, os
 import numpy as np

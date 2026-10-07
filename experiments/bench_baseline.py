@@ -2,7 +2,7 @@
 import os, sys, time
 os.environ.setdefault("MLX_MAX_WIRED_LIMIT", str(int(115e9)))
 sys.path.insert(0, ".")
-from specexp.loader import load
+from moefit.loader import load
 import mlx.core as mx
 from mlx_vlm.generate import stream_generate
 

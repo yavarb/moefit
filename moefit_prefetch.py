@@ -1,25 +1,18 @@
 #!/usr/bin/env python3
-"""pagepilot-prefetch — async expert prefetch + routing sidecar for MoE servers.
+"""moefit prefetch — expert paging helper and routing sidecar for MoE servers.
 
-Wraps ANY OpenAI-compatible local server (oMLX, LM Studio, mlx-omni-server,
-llama.cpp server): observes SSE token streams, computes the next token's
-n-gram keys, pins predicted expert shards into the macOS unified-memory
-file cache via mincore+rank, and persists routing traces (the sidecar)
-for exact prefix replay.
+Works with an OpenAI-compatible local server on Apple Silicon (oMLX, LM Studio,
+mlx-omni-server, llama.cpp server, etc.): watches token streams, keeps useful
+expert / PLE pages warm in unified memory, and stores routing traces so a
+repeated prefix (agent loops) can look up the next experts exactly.
 
-What this does on current engines:
-  - expert shards are file-mapped by MLX -> touching pages = warm in RAM
-  - the PLE ngram table is huge and LRU-evicted -> n-gram prefetch keeps
-    the rows the next token needs resident (measured win: table misses
-    stall prefill/decode on random SSD reads)
-  - sidecar traces make routing replay exact for cached prefixes
-  - decode speed itself is DRAM-bound; this does NOT make tokens fly
+This does not invent faster decode — chip memory bandwidth still bounds tok/s.
+It reduces SSD stalls when the model cannot fit in RAM.
 
-Requires: python3, model checkpoint readable on disk. macOS only.
-This file lives at the repo root (not tools/):
-    python3 pagepilot_prefetch.py --model-dir <dir> --model <id> --ple-prefetch
-Agent-integrated mode reads JSON arrays of token ids on stdin and warms
-the PLE rows of every token in the array (rows_per_token x N per line).
+Usage:
+    python3 moefit_prefetch.py --model-dir <dir> --model <id> --ple-prefetch
+
+Agent mode: JSON arrays of token ids on stdin; warms the PLE rows each token needs.
 """
 import argparse, json, os, re, struct, sys, time, threading
 from collections import OrderedDict, deque
@@ -257,7 +250,7 @@ def main():
     ap.add_argument("--serve-url", default="http://localhost:1234")
     ap.add_argument("--model", required=True, help="served model id")
     ap.add_argument("--sidecar", default=os.path.expanduser(
-        "~/Library/Application Support/pagepilot/sidecar.jsonl"))
+        "~/Library/Application Support/moefit/sidecar.jsonl"))
     ap.add_argument("--ple-prefetch", action="store_true",
                     help="warm PLE ngram rows for the next token (real win)")
     a = ap.parse_args()
@@ -267,7 +260,7 @@ def main():
     tcfg = tcfg.get("text_config", tcfg)
     keys = NgramKeys(tcfg) if a.ple_prefetch else None
     sidecar = Sidecar(a.sidecar)
-    print(f"pagepilot-prefetch watching {a.serve_url} model={a.model} "
+    print(f"moefit-prefetch watching {a.serve_url} model={a.model} "
           f"ngram_table={'found' if geom.ngram else 'missing'} "
           f"prefetch={'on' if keys else 'off'}",
           flush=True)

@@ -18,9 +18,9 @@ import numpy as np
 os.environ.setdefault("MLX_MAX_WIRED_LIMIT", str(int(115e9)))
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from specexp.loader import load, DEFAULT_MODEL
-from specexp.trace import RouterTrace
-from specexp.ple_trace import PLETrace
+from moefit.loader import load, DEFAULT_MODEL
+from moefit.trace import RouterTrace
+from moefit.ple_trace import PLETrace
 
 CORPUS = Path(__file__).resolve().parents[1] / "data" / "prompts.jsonl"
 

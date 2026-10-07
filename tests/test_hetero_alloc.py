@@ -8,7 +8,7 @@ Checks, on a small synthetic trace:
      than the pin budget plus the dynamic floor (the leak the audit is
      for), and stays silent for every legal configuration.
 
-Needs numpy: /tmp/specexp-venv/bin/python tests/test_hetero_alloc.py
+Needs numpy: /tmp/moefit-venv/bin/python tests/test_hetero_alloc.py
 """
 import os, sys
 import numpy as np

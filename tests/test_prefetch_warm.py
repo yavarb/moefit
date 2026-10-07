@@ -15,7 +15,7 @@ from collections import deque
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-import pagepilot_prefetch as spf  # noqa: E402
+import moefit_prefetch as spf  # noqa: E402
 
 CFG = dict(ngram_size=3, heads_per_ngram=8, ngram_vocab_size_base=1000,
            vocab_size=1000, eos_token_id=0, seed=1234)

@@ -71,7 +71,7 @@ exactly (hash replica verified bit-exact against the live model) and
 touches their file pages before the engine needs them:
 
 ```
-python3 pagepilot_prefetch.py --model-dir /path/to/model-dir --model <served-id> --ple-prefetch
+python3 moefit_prefetch.py --model-dir /path/to/model-dir --model <served-id> --ple-prefetch
 ```
 
 Feed one JSON array of token ids per line on stdin (agent-integrated
@@ -87,7 +87,7 @@ N-token array logs `warmed_rows=` 16 times N). During long generations,
 bit-exact: 8208 of 8208 router decisions were identical across greedy
 re-runs of the same prompt. Repeated or growing prefixes need no
 prediction and pay no stall. The default path is
-`~/Library/Application Support/pagepilot/sidecar.jsonl`, and the tool
+`~/Library/Application Support/moefit/sidecar.jsonl`, and the tool
 creates that directory.
 
 **verify**: the second identical prompt logs sidecar hits. After

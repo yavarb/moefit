@@ -16,7 +16,7 @@ def _silu(x):
 class CPUExpertBank:
     """Holds dequantized-on-demand experts for one layer.
 
-    weights: tuple (w_u32, scale, bias) each [E,*,*] as in specexp.quant
+    weights: tuple (w_u32, scale, bias) each [E,*,*] as in moefit.quant
     direction: gate_up weights are [E, 2*hidden, in]; down is [E, in, hidden]
     """
 

@@ -12,27 +12,25 @@ Apple Silicon · macOS 14+ · MIT · free and open source
 
 [Qwen3.8-Flash-Next](https://huggingface.co/Qwen/Qwen3.8-Flash-Next) is a large mixture-of-experts (MoE) model. Only a small slice of its weights is used on every token; the rest are “experts” that the router picks per token.
 
-On a Mac with enough RAM (about 128 GB for the quant we test), you load the whole model and you are done. On a Mac with **less** RAM, the usual options are “don’t run it” or “hope swap doesn’t kill you.”
+On a Mac with enough RAM (about 128 GB for the quant we test), you load the whole model and you are done. On a Mac with **less** RAM, you normally cannot run it at all.
 
 **moefit** keeps the always-needed weights in RAM, pages the experts in from SSD as they are needed, and remembers which experts a prompt actually used so agent loops don’t thrash the disk.
 
 If you have a coding agent on your Mac (Claude Code, Cursor, Codex, Hermes, …), paste this:
 
 ```
-Set up moefit on this Mac for me: https://github.com/yavarb/pagepilot
+Set up moefit on this Mac for me: https://github.com/yavarb/moefit
 — read README.md and SETUP.md, run every verify block after each step,
 never delete user files, never resize swap, never disable SIP, and
 report measured numbers back to me.
 ```
-
-(Repo is still named `pagepilot` on GitHub until renamed.)
 
 ---
 
 ## Why this approach is different
 
 1. **Exact routing, not speculation.** For a fixed prompt prefix, the MoE router always chooses the same experts (we checked 8,208/8,208 decisions bit-exact across greedy re-runs). Agent loops that resend a growing prefix can look up the next experts instead of predicting them.
-2. **A pinned hot-set.** Which experts are “frequent” is stable across prompts. Pin the top ones from a short routing trace; let LRU handle the long tail. That beat every runtime predictor we tried, and it spends zero bandwidth on wrong guesses.
+2. **A pinned hot-set.** Which experts are “frequent” is stable across prompts. Pin the top ones from a short routing trace; let LRU handle the long tail. That was more reliable than runtime predictors in our measurements, and it does not spend bandwidth on wrong predictions.
 3. **Page experts, keep the floor.** Attention, shared expert, and the head (~4.6 GiB) stay resident. The ~64.6 GiB of routed experts live mostly on SSD and enter RAM only when needed.
 
 ---
@@ -100,7 +98,7 @@ Longer write-up: [REVIEW.md](REVIEW.md). History of number changes: [CHANGELOG.m
 | File / dir | Role |
 |---|---|
 | `estimate.py` | Go / no-go for a Hugging Face checkpoint on this Mac |
-| `pagepilot_prefetch.py` | Routing sidecar: store and replay traces; warm what each token needs |
+| `moefit_prefetch.py` | Routing sidecar: store and replay traces; warm what each token needs |
 | `check_docs.py` | Fails if README numbers disagree with `results/sim_paging.json` |
 | `experiments/` | Trace collection, paging simulator, probe studies |
 | `results/` | Simulation tables and study outputs |

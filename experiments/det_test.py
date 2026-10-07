@@ -12,8 +12,8 @@ import os
 os.environ.setdefault("MLX_MAX_WIRED_LIMIT", str(int(115e9)))
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from specexp.loader import load
-from specexp.trace import RouterTrace
+from moefit.loader import load
+from moefit.trace import RouterTrace
 
 prompts = [json.loads(l) for l in
            (Path(__file__).resolve().parents[1] / "data/prompts.jsonl").read_text().splitlines() if l.strip()]
