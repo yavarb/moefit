@@ -1,6 +1,6 @@
 {
  "kind": "simulated_vs_measured",
- "note": "synthetic calibrated traces (results/traces_synth); compute_ms is an assumption (128GB measured, BW-scaled); IO/install/sync constants measured on Santa Cruz",
+ "note": "synthetic calibrated traces (results/traces_synth); compute_ms is an assumption (128GB measured, BW-scaled); IO/install/sync constants measured on M4 Max 36 GB",
  "constants": {
   "expert_MB": 2.765,
   "ssd_GBps": 7.4,
@@ -50,7 +50,7 @@
  ],
  "measured": {
   "kind": "measured",
-  "host": "santacruz",
+  "host": "m4max-36gb",
   "timestamp": "2026-10-06T19:53:00-0700",
   "max_tokens": 256,
   "tokens": 256,

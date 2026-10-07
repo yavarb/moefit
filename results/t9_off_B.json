@@ -2,7 +2,7 @@
  "label": "T9 dbuf OFF (IO_WORKERS=1 serial) n1024",
  "kind": "measured",
  "timestamp": "2026-10-06T20:54:53-0700",
- "host": "santacruz",
+ "host": "m4max-36gb",
  "ram_gib": 36.0,
  "model": "Qwen3.8-Flash-Next-oQ4e-mtp",
  "max_tokens": 1024,

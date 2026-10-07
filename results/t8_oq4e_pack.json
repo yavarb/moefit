@@ -1,7 +1,7 @@
 {
   "kind": "MEASURED_LOCAL_FILE_IO_NOT_LLM_DECODE",
-  "host": "ybs-MacBook-Pro-2.local",
-  "source": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp",
+  "host": "mbp-128gb",
+  "source": "~/models/Qwen3.8-Flash-Next-oQ4e-mtp",
   "layer": 0,
   "experts": 64,
   "component_byte_equalities": 576,
@@ -13,7 +13,7 @@
   "source_headers": [
     {
       "name": "language_model.model.layers.0.mlp.switch_mlp.gate_proj.weight",
-      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "file": "~/models/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
       "offset": 1941800721,
       "size": 819200,
       "experts": 512,
@@ -26,7 +26,7 @@
     },
     {
       "name": "language_model.model.layers.0.mlp.switch_mlp.gate_proj.scales",
-      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "file": "~/models/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
       "offset": 5001814601,
       "size": 51200,
       "experts": 512,
@@ -39,7 +39,7 @@
     },
     {
       "name": "language_model.model.layers.0.mlp.switch_mlp.gate_proj.biases",
-      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "file": "~/models/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
       "offset": 4975600201,
       "size": 51200,
       "experts": 512,
@@ -52,7 +52,7 @@
     },
     {
       "name": "language_model.model.layers.0.mlp.switch_mlp.up_proj.weight",
-      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "file": "~/models/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
       "offset": 1322369361,
       "size": 819200,
       "experts": 512,
@@ -65,7 +65,7 @@
     },
     {
       "name": "language_model.model.layers.0.mlp.switch_mlp.up_proj.scales",
-      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "file": "~/models/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
       "offset": 576723121,
       "size": 51200,
       "experts": 512,
@@ -78,7 +78,7 @@
     },
     {
       "name": "language_model.model.layers.0.mlp.switch_mlp.up_proj.biases",
-      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "file": "~/models/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
       "offset": 3577522281,
       "size": 51200,
       "experts": 512,
@@ -91,7 +91,7 @@
     },
     {
       "name": "language_model.model.layers.0.mlp.switch_mlp.down_proj.weight",
-      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "file": "~/models/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
       "offset": 652937761,
       "size": 819200,
       "experts": 512,
@@ -104,7 +104,7 @@
     },
     {
       "name": "language_model.model.layers.0.mlp.switch_mlp.down_proj.scales",
-      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "file": "~/models/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
       "offset": 2830661761,
       "size": 51200,
       "experts": 512,
@@ -117,7 +117,7 @@
     },
     {
       "name": "language_model.model.layers.0.mlp.switch_mlp.down_proj.biases",
-      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "file": "~/models/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
       "offset": 2906876401,
       "size": 51200,
       "experts": 512,

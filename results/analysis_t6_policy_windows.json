@@ -6,7 +6,7 @@
     "results/traces_synth/holdout.npz": "f8262a526f8cf51eda38ee33a175013fa71ffad2682338c2addf06cc058b5d8f",
     "experiments/design_omlx_exact.py": "61d22539ac32e725a183f21fdb9826baf032871fe073cbfc13023525a2d9873d",
     "experiments/design_admission_cache.py": "038f7af0a1f5f9de936c127a5f3b2b79cafbb5f024d7951bdab337475eed5f9d",
-    "results/measured_santa_cruz_36gb_ssd.json": "52d1e2fc4aa9801164edd1f25576e9d927f524276aaef0817e7c4263290caeae",
+    "results/measured_m4max_36gb_ssd.json": "52d1e2fc4aa9801164edd1f25576e9d927f524276aaef0817e7c4263290caeae",
     "results/t8_pagecache_capacity_probe.json": "0528d25620ae4042c2eeba0c33a05c0dc1aa00c197c61c5af2f21e3bd34d3be9"
   },
   "rows": [

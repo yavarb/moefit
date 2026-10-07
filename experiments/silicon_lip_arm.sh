@@ -7,7 +7,7 @@ PORT=8000
 LOG="$OMLX_BASE/logs/moefit-serve.log"
 PIDFILE="$OMLX_BASE/moefit-serve.pid"
 BENCH=/tmp/moefit-bench
-REPO=/Users/yb/work/moefit
+REPO=~/work/moefit
 MODEL=Qwen3.8-Flash-Next-oQ4e-mtp
 
 stop_omlx() {
@@ -56,7 +56,7 @@ stop_omlx
 start_omlx lip_on OMLX_ADMISSION=1
 # warm + collect
 cd "$BENCH"
-/usr/bin/python3 t9_collect.py --url http://127.0.0.1:8000/v1/chat/completions   --model "$MODEL" --max-tokens 1024 --runs 3   --label "T3 LIP ON (OMLX_ADMISSION=1, default IO_WORKERS) n1024"   --host santacruz --ram-gib 36 --out t3_lip_on.json
+/usr/bin/python3 t9_collect.py --url http://127.0.0.1:8000/v1/chat/completions   --model "$MODEL" --max-tokens 1024 --runs 3   --label "T3 LIP ON (OMLX_ADMISSION=1, default IO_WORKERS) n1024"   --host m4max-36gb --ram-gib 36 --out t3_lip_on.json
 
 echo "=== restore stock (ADMISSION unset) ==="
 stop_omlx

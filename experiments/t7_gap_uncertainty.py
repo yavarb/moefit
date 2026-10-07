@@ -7,8 +7,7 @@ Two questions, both local, no silicon runs:
      that only matches shipped aggregate statistics (prior@14, prev, and the
      LRU/prior served table at 4 caps). Different (beta, shift) generator
      configs that pass the SAME calibration gates can still disagree on
-     served fraction at cap=143 -- the exact operating point of the Santa
-     Cruz 13.0 tok/s baseline. This quantifies that band so the 2.8x ratio
+     served fraction at cap=143 -- the exact operating point of the M4 Max 36 GB 13.0 tok/s baseline. This quantifies that band so the 2.8x ratio
      gets an honest error bar instead of being a point estimate.
 
  (2) KNOB ATTRIBUTION. Treat silicon's 76.9 ms/token as ground truth and
@@ -24,7 +23,7 @@ Usage:
       --out results/t7_gap_uncertainty.json
 
 All numbers here are SIMULATED except the 13.0 tok/s / 76.92 ms/tok and
-22.61 GB anchors from results/measured_santa_cruz_36gb.json.
+22.61 GB anchors from results/measured_m4max_36gb.json.
 """
 import argparse, json, sys
 from pathlib import Path
@@ -34,7 +33,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "experiments"))
 import sim_paging as sp
 
-# --- silicon anchors (measured, results/measured_santa_cruz_36gb.json) ---
+# --- silicon anchors (measured, results/measured_m4max_36gb.json) ---
 MEAS_TPS = 13.0
 MEAS_MS = 1000.0 / MEAS_TPS           # 76.92 ms/token
 MEAS_CAP = 143                        # 0.28 residency x 512 experts/layer
@@ -138,7 +137,7 @@ def knob_attribution(sync_mb, async_mb, n=200000, seed=7):
 
 def residency_predictor(caps=(71, 143, 170), traces_dir=str(ROOT / "results/traces_synth")):
     """SIMULATED predictions at alternate residencies for the two rival
-    gap hypotheses anchored at Santa Cruz cap=143 -> 13.0 tok/s:
+    gap hypotheses anchored at M4 Max 36 GB cap=143 -> 13.0 tok/s:
       h1_flat_overhead: keep sim's spec roofline, add a constant
           49.6 ms/tok runtime overhead (the T4 unexplained term as fixed
           cost: scheduling, page-in latency independent of bytes).

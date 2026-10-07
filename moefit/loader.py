@@ -53,7 +53,7 @@ def load(model_dir: str | os.PathLike = DEFAULT_MODEL,
     # venv keeps priority). Override with MOEFIT_OMLX_SITE=... if it moves.
     omlx_site = os.environ.get(
         "MOEFIT_OMLX_SITE",
-        "/Users/yb/.hermes/cache/scratch/omlxenv/lib/python3.13/site-packages")
+        "~/.hermes/cache/scratch/omlxenv/lib/python3.13/site-packages")
     if Path(omlx_site).exists() and omlx_site not in sys.path:
         sys.path.append(omlx_site)
     vendor = _P(__file__).resolve().parents[1] / "vendor_mlx_vlm"

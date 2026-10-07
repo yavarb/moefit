@@ -13,8 +13,8 @@ def load(name):
 
 
 def main():
-    measured_path = 'results/measured_santa_cruz_36gb_ssd.json'
-    gap_path = 'results/gap_santa_cruz.json'
+    measured_path = 'results/measured_m4max_36gb_ssd.json'
+    gap_path = 'results/gap_m4max_36gb.json'
     policy_path = 'results/design_omlx_exact.json'
     measured, gap, policy = map(load, (measured_path, gap_path, policy_path))
     row = next(r for r in gap['rows'] if r['cap'] == 143)
@@ -61,7 +61,7 @@ def main():
                             jacobian_rank=1,
                             caveat='Assumes all disk traffic is expert reads, consistent byte units, complete expert payloads, no read amplification or unrelated IO.'),
         provenance=[
-            'gap_santa_cruz.py: lru_misses(gold, cap), then M.sum(1).mean() -> sim_miss_experts_per_token.',
+            'gap_m4max_36gb.py: lru_misses(gold, cap), then M.sum(1).mean() -> sim_miss_experts_per_token.',
             't8_pagecache_capacity_probe.json: 140.5 measured / 158.8 simulated -> 0.885, not an independent measured fraction.',
             'Inverting that derived fraction to claim measured ~57.4 misses returns the input simulation by construction.',
             'design_omlx_exact.json labels itself simulated; its measured_anchor has throughput and physical bytes, not logical miss counts.',

@@ -3,7 +3,7 @@
  "traces": "results/traces_synth (holdout)",
  "eval_tokens": 2882,
  "cap": 143,
- "silicon_ref": "measured_santa_cruz_36gb.json: 13.0 tok/s @ cap 143",
+ "silicon_ref": "measured_m4max_36gb.json: 13.0 tok/s @ cap 143",
  "reuse_distance": {
   "sweep_runtime_s": 3.3,
   "percentiles_D": {

@@ -1,5 +1,5 @@
 {
- "kind": "MEASURED on MBP (M-series, 128 GB) with F_NOCACHE + UBC drop; NOT Santa Cruz",
+ "kind": "MEASURED on MBP (M-series, 128 GB) with F_NOCACHE + UBC drop; NOT M4 Max 36 GB",
  "prompt": "code_py_review2",
  "residency": 0.28,
  "cap": 143,

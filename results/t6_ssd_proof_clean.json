@@ -1,5 +1,5 @@
 {
-  "host": "santacruz",
+  "host": "m4max-36gb",
   "kind": "REAL_CHECKPOINT_READS_WITH_PHYSICAL_DISK0_COUNTERS",
   "idle_read_Bps": 13160859.928897087,
   "workers": 4,

@@ -23,7 +23,7 @@ def main():
     files = ['results/traces_synth/holdout.npz',
              'experiments/design_omlx_exact.py',
              'experiments/design_admission_cache.py',
-             'results/measured_santa_cruz_36gb_ssd.json',
+             'results/measured_m4max_36gb_ssd.json',
              'results/t8_pagecache_capacity_probe.json']
     hashes = {p: sha(ROOT / p) for p in files}
     d = np.load(ROOT / files[0])

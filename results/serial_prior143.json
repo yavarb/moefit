@@ -31,7 +31,7 @@
   },
   "compute_ms_assumed": 18.1
  },
- "note": "serial constants MEASURED on Santa Cruz (oMLX resolve discipline, not SSD ceiling; drive does 3.8-5.6 GB/s). compute_ms is ASSUMED. Prediction is SIMULATED.",
+ "note": "serial constants MEASURED on M4 Max 36 GB (oMLX resolve discipline, not SSD ceiling; drive does 3.8-5.6 GB/s). compute_ms is ASSUMED. Prediction is SIMULATED.",
  "shipped_bandwidth_model": {
   "tier": "48GB-M4M",
   "tps": 31.69966084481129,

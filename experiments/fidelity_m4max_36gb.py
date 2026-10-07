@@ -1,6 +1,6 @@
-"""T3 fidelity: simulator vs measured Santa Cruz M4 Max 36 GB (13.0 tok/s).
+"""T3 fidelity: simulator vs measured M4 Max 36 GB (13.0 tok/s).
 
-Measured reference (results/measured_santa_cruz_36gb.json, 2026-10-06 idle
+Measured reference (results/measured_m4max_36gb.json, 2026-10-06 idle
 re-bench, commit f20bdd3/c1ca86b):
   - oMLX 0.7.0 expert offload, resident fraction 0.28 -> 143 of 512
     experts per layer (oMLX log: 18.98 of 67.95 GB expert tables resident,
@@ -22,7 +22,7 @@ router traces are not in this checkout; synth was fitted to within a
 few points of the real LRU / pinned served fractions (calibration.json
 overall prior14 fit 0.188 vs target 0.187).
 
-usage: python3 experiments/fidelity_santa_cruz.py
+usage: python3 experiments/fidelity_m4max_36gb.py
 """
 import json
 import sys
@@ -40,7 +40,7 @@ TOK_MS = 1000.0 / MEASURED_TPS  # 76.92 ms/token
 SSD_ASSUMED = 7.4             # GB/s the sim's M4 Max tier assumes
 DRAM_M4MAX = 546.0            # GB/s peak, sim DRAM_EFF=0.537 -> 293 effective
 
-# oMLX-measured geometry (log numbers from measured_santa_cruz_36gb.json)
+# oMLX-measured geometry (log numbers from measured_m4max_36gb.json)
 OMLEX_EXPERT_GB = 67.95       # decimal GB total expert tables
 OMLEX_RESIDENT_GB = 18.98
 OMLEX_FOOTPRINT_GB = 22.61
@@ -156,7 +156,7 @@ def main():
                 "size is unmeasured — candidate instrumentation target.",
     }
 
-    outp = ROOT / "results/fidelity_santa_cruz.json"
+    outp = ROOT / "results/fidelity_m4max_36gb.json"
     outp.write_text(json.dumps(out, indent=1))
     print(json.dumps(out, indent=1))
     print("wrote", outp)

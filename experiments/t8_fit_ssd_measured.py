@@ -1,6 +1,6 @@
 """T8 probe: fit the SSD-queue model to the NEW iostat measurement.
 
-Measured (results/measured_santa_cruz_36gb_ssd.json, cap143, n=256, idle box):
+Measured (results/measured_m4max_36gb_ssd.json, cap143, n=256, idle box):
   12.71 tok/s, 1786 MB/s physical disk reads during decode,
   140.5 MB/token (idle-subtracted), ~10.7k IOPS, avg IO 171 KB.
 
@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import sim_paging as sp
 
 ROOT = Path("/tmp/moefit-lab/repo")
-MEAS = json.load(open(ROOT / "results/measured_santa_cruz_36gb_ssd.json"))
+MEAS = json.load(open(ROOT / "results/measured_m4max_36gb_ssd.json"))
 D_MB, MBPS, KBIO = MEAS["decode_disk_MB_per_token"], MEAS["decode_disk_MBps"], MEAS["decode_avg_KB_per_io"]
 C = 18.1
 

@@ -9,7 +9,7 @@ for layer L+d is topk(softmax(W_{L+d} @ x_L)) - computable the moment layer
 L's MoE input exists, i.e. ~d layers before L+d's demand reads.
 
 Decode positions only (T==1 calls) to bound memory; prefill is not stored.
-Runs on a Mac that can hold the model (the 128 GB MBP); never on Santa Cruz.
+Runs on a Mac that can hold the model (the 128 GB MBP); never on M4 Max 36 GB.
 
 usage: ~/.hermes/cache/scratch/omlxenv/bin/python3 experiments/capture_xlayer.py \
           --n-prompts 8 --max-tokens 160 --out ~/.hermes/cache/scratch/xlayer.npz

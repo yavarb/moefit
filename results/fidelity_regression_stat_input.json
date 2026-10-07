@@ -1,7 +1,7 @@
 {
  "kind": "T3 input to T7's cycle-3 statistical audit (not a replacement audit)",
  "facts_for_the_audit": {
-  "token_counts": "ALL 17 regression points have tokens=256 (verified across regress1/2, ssd_tok_run2/4, anchor_Repea/Count, measured_santa_cruz_36gb_ssd). The shared-denominator concern (ms/tok and MB/tok both divide by tok/s) is MOOT for this dataset: with N constant, regressing T/256 on B/256 is the T-on-B regression scaled by 1/256 \u2014 slope/intercept scale, r2 and residual structure are unchanged, no correlated-error coupling.",
+  "token_counts": "ALL 17 regression points have tokens=256 (verified across regress1/2, ssd_tok_run2/4, anchor_Repea/Count, measured_m4max_36gb_36gb_ssd). The shared-denominator concern (ms/tok and MB/tok both divide by tok/s) is MOOT for this dataset: with N constant, regressing T/256 on B/256 is the T-on-B regression scaled by 1/256 \u2014 slope/intercept scale, r2 and residual structure are unchanged, no correlated-error coupling.",
   "ols_reproduction": "slope 0.2883 +/- 0.0534 ms/MB, intercept 39.25 +/- 8.37 ms (matches the reported 39.2 +/- 8.4)."
  },
  "honest_statistical_strength_of_my_cycle12_claim": {

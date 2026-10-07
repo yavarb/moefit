@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "experiments" / "score_dbuf_aba.py"
 
 
-def blob(tpss, prompt="abc123", tokens=1024, host="santacruz",
+def blob(tpss, prompt="abc123", tokens=1024, host="M4 Max 36 GB",
          model="qwen4", max_tokens=1024, finish="stop"):
     return dict(
         label="t", kind="measured", timestamp="x", host=host,

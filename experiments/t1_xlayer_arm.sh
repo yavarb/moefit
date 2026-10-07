@@ -1,5 +1,5 @@
 #!/bin/bash
-# T1 guarded cross-layer fetch arm on Santa Cruz. GUARDED per T4 runbook:
+# T1 guarded cross-layer fetch arm on M4 Max 36 GB. GUARDED per T4 runbook:
 # refuses on any live SLOT_LOCK_*, holds SLOT_LOCK_T1 (trap-removed), installs
 # the T1 file (superset of LIP-v3 d9850d99; all flags default off), restarts ONCE
 # with MOEFIT_XLAYER_D=1 (OMLX_ADMISSION unset), verify-gates, runs flag-toggle

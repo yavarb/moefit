@@ -1,7 +1,7 @@
 """T6 local analysis A: routing-traffic characterization + mechanism headroom.
 
 Complements T1 (gap_report: sim 36.6 vs silicon 13.0 tok/s at matched
-cap=143, 49.6 ms/tok unexplained) and T3 (fidelity_santa_cruz.py: constant
+cap=143, 49.6 ms/tok unexplained) and T3 (fidelity_m4max_36gb.py: constant
 calibration). This answers traffic-side questions that decide WHICH
 mechanism can close what:
 
@@ -37,7 +37,7 @@ Algorithm (exact, per layer, O(T*K*log T)):
 SIMULATED on the synthetic traces (results/traces_synth, fitted to the real
 router traces per calibration.json: overall prior14 fit 0.188 vs target
 0.187). No silicon numbers are invented here; the only measured reference
-is results/measured_santa_cruz_36gb.json (13.0 tok/s @ cap=143).
+is results/measured_m4max_36gb.json (13.0 tok/s @ cap=143).
 
 usage: python3 experiments/analysis_t6_traffic_headroom.py [--eval-sub 8000]
 writes results/analysis_t6_traffic_headroom.json (+ misses npy)
@@ -128,7 +128,7 @@ def main():
     T = gold.shape[0]
     res = {"kind": "SIMULATED", "traces": "results/traces_synth (holdout)",
            "eval_tokens": int(T), "cap": a.cap,
-           "silicon_ref": "measured_santa_cruz_36gb.json: 13.0 tok/s @ cap 143"}
+           "silicon_ref": "measured_m4max_36gb.json: 13.0 tok/s @ cap 143"}
     print(f"eval tokens={T}", flush=True)
 
     # ---- one sweep per layer: D + per-token misses at cap -------------

@@ -1,6 +1,6 @@
 {
  "sim_source": "serial:lru@cap143+hr",
- "silicon_source": "results/measured_santa_cruz_36gb_ssd.json",
+ "silicon_source": "results/measured_m4max_36gb_ssd.json",
  "tps": {
   "sim": 11.9,
   "silicon": 12.71,

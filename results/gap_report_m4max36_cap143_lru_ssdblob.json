@@ -1,6 +1,6 @@
 {
  "sim_source": "results/sim_paging_matched_cap143.json#lru/cap143",
- "silicon_source": "results/measured_santa_cruz_36gb_ssd.json",
+ "silicon_source": "results/measured_m4max_36gb_ssd.json",
  "tps": {
   "sim": 36.6,
   "silicon": 12.71,

@@ -9,7 +9,7 @@ from moefit.metrics import (validate_record, sim_record_from_row,
                             format_gap_report)
 
 SILICON_FIXTURE = dict(
-    kind="measured", host="santacruz", ram_gib=36.0, model="m",
+    kind="measured", host="M4 Max 36 GB", ram_gib=36.0, model="m",
     timestamp="t", git_commit="c", decode_tps_median=13.0,
     decode_tps_min=12.2, decode_tps_max=13.1, ttft_s_median=0.68,
     omlx_version="0.7.0",
@@ -58,7 +58,7 @@ def test_silicon_record_and_gap():
 
 
 SILICON_SSD_FIXTURE = dict(
-    kind="measured", host="santacruz", timestamp="t", max_tokens=256,
+    kind="measured", host="M4 Max 36 GB", timestamp="t", max_tokens=256,
     decode_tps=12.71, ttft_s=6.67, n_decode_samples=19,
     decode_disk_MBps=1785.7, decode_disk_MB_per_token=140.5,
     decode_iops=10746.0, decode_avg_KB_per_io=171.4,
@@ -171,7 +171,7 @@ def test_coalescing_detection_and_inadmissible_verdict():
     assert not signature_from_silicon_record(clean_rec)["verdict"].startswith(
         "inadmissible")
     # oMLX-style coalescing caught by usage-vs-chunk COUNT evidence even
-    # when the chunk gaps look smooth (measured on Santa Cruz: 86
+    # when the chunk gaps look smooth (measured on M4 Max 36 GB: 86
     # chunks / 256 tokens) — the burst detector alone would miss this
     omlx_blob = dict(SILICON_FIXTURE)
     omlx_blob["runs"] = [dict(tokens=256, decode_tps=12.7, ttft_s=0.5,

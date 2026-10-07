@@ -1,4 +1,4 @@
-"""M1 silicon A/B: LRU-insert vs BIP vs DIP on ONE oMLX process (Santa Cruz).
+"""M1 silicon A/B: LRU-insert vs BIP vs DIP on ONE oMLX process (M4 Max 36 GB).
 
 Owner: silicon_dbuf (T9). Runs only after design_inventor's DIP patch is code-green.
 

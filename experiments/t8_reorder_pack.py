@@ -29,7 +29,7 @@ def main():
         with tempfile.TemporaryDirectory(dir=os.environ['TMPDIR'], prefix='t8_reorder_') as tmp:
             p, q = Path(tmp)/'base', Path(tmp)/'ordered'
             order = list(range(16)); random.Random(731).shuffle(order)
-            m = build_pack('/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp', p, range(16))
+            m = build_pack('~/models/Qwen3.8-Flash-Next-oQ4e-mtp', p, range(16))
             start = time.perf_counter(); reordered = reorder_pack(p, q, order)
             build_s = time.perf_counter()-start
             a, b = ExpertPack(p), ExpertPack(q)

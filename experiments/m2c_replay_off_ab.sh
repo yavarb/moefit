@@ -1,5 +1,5 @@
 #!/bin/bash
-# M2c tiny-net correlator replay-OFF (F_L ablated) silicon A/B on Santa Cruz / MBP.
+# M2c tiny-net correlator replay-OFF (F_L ablated) silicon A/B on M4 Max 36 GB / MBP.
 # Decision (prereg t5_m2c_attribution_prereg.json + owner bar):
 #   median Δtps >= +1.5  → KEEP correlator signal (falsifies instance-precision wash)
 #   median Δtps <  +1.5  → DROP as exact-replay leak (GLM +32% caveat)

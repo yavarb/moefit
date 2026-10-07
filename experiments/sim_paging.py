@@ -15,7 +15,7 @@ the DRAM term is the full 701 MiB/token plus prefetched bytes landing.
 Coupled steady state per token (default --time-model serial):
   compute_ms = (floor + 701 MiB + async) / (DRAM_BW * DRAM_EFF)
   stream_ms  = sum_layers(A + B*k | k>0) + install*misses + L*sync
-               (A=0.20, B=0.52, install=0.30, sync=0.122 ms; Santa Cruz
+               (A=0.20, B=0.52, install=0.30, sync=0.122 ms; M4 Max 36 GB
                microbench). tok/s = 1000 / (compute_ms + stream_ms).
   Legacy --time-model bandwidth keeps max(compute, bytes/SSD_BW).
 
@@ -278,8 +278,8 @@ def _times(spec, sync_mb, async_mb):
 
 
 # ---- serial-latency time model (T3, 2026-10-07) -------------------------
-# MEASURED on Santa Cruz (M4 Max 36 GB, oMLX 0.7.0) by lead_silicon,
-# results/microbench_expert_reads_santa_cruz.json (commit 463c856):
+# MEASURED on M4 Max 36 GB ( oMLX 0.7.0) by lead_silicon,
+# results/microbench_expert_reads_m4max_36gb.json (commit 463c856):
 #   per-layer-step k-miss cold reads (9 preads/expert, 12 threads):
 #     k=1..4 -> 0.72/1.26/1.78/2.28 ms  ~= IO_A + IO_B * k
 #   host->slot install 0.27-0.35 ms/expert; tiny per-layer device sync 0.12 ms
@@ -289,13 +289,13 @@ def _times(spec, sync_mb, async_mb):
 # overlaps across layers). Validated out of sample at 3 measured points
 # (results/fidelity_serial_validate.json): steady cap143 12.1 vs measured
 # 12.7/13.0 tok/s, cap92 8.9 vs 7.8 (crowded), cold 16-token transient
-# 5.0 vs 6.43. Constants are Santa-Cruz-specific: applying this model to
+# 5.0 vs 6.43. Constants are M4 Max 36 GB-specific: applying this model to
 # other tiers is EXTRAPOLATION until their constants are measured.
 SERIAL_IO_A_MS = 0.20
 SERIAL_IO_B_MS = 0.52
 SERIAL_INSTALL_MS = 0.30
 SERIAL_SYNC_MS = 0.122
-# 36 GB M4 Max is the 410 GB/s DRAM bin (Santa Cruz). usable=0.75*36-3.
+# 36 GB M4 Max is the 410 GB/s DRAM bin (M4 Max 36 GB). usable=0.75*36-3.
 TIERS["36GB-M4M36"] = dict(dram=410.0, ssd=7.4, usable=24.0)
 
 
@@ -417,7 +417,7 @@ def main():
                     default="legacy")
     ap.add_argument("--time-model", choices=("serial", "bandwidth"),
                     default="serial",
-                    help="serial (default): Santa Cruz microbench A+B*k + "
+                    help="serial (default): M4 Max 36 GB microbench A+B*k + "
                          "install + sync, no compute/stream overlap. "
                          "bandwidth: legacy max(compute, bytes/ssd) model.")
     ap.add_argument("--hit-refresh", action="store_true", default=True,

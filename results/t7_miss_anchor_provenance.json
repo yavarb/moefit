@@ -3,8 +3,8 @@
   "model_tag": "Astra gpt-6",
   "kind": "derived provenance audit, NOT new silicon measurement",
   "source_sha256": {
-    "results/measured_santa_cruz_36gb_ssd.json": "52d1e2fc4aa9801164edd1f25576e9d927f524276aaef0817e7c4263290caeae",
-    "results/gap_santa_cruz.json": "1f06b690e3a1d2b627231c3c96d4efc396862333ee40da0b39ed870024692e74",
+    "results/measured_m4max_36gb_ssd.json": "52d1e2fc4aa9801164edd1f25576e9d927f524276aaef0817e7c4263290caeae",
+    "results/gap_m4max_36gb.json": "1f06b690e3a1d2b627231c3c96d4efc396862333ee40da0b39ed870024692e74",
     "results/design_omlx_exact.json": "94b3bf9f9cf4a76fd28e83744900850596b4bbf764a5899c6fc8da78aff1b79f"
   },
   "measured": {
@@ -42,7 +42,7 @@
     "caveat": "Assumes all disk traffic is expert reads, consistent byte units, complete expert payloads, no read amplification or unrelated IO."
   },
   "provenance": [
-    "gap_santa_cruz.py: lru_misses(gold, cap), then M.sum(1).mean() -> sim_miss_experts_per_token.",
+    "gap_m4max_36gb.py: lru_misses(gold, cap), then M.sum(1).mean() -> sim_miss_experts_per_token.",
     "t8_pagecache_capacity_probe.json: 140.5 measured / 158.8 simulated -> 0.885, not an independent measured fraction.",
     "Inverting that derived fraction to claim measured ~57.4 misses returns the input simulation by construction.",
     "design_omlx_exact.json labels itself simulated; its measured_anchor has throughput and physical bytes, not logical miss counts."

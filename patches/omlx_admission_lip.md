@@ -106,7 +106,7 @@ V2: insert after the 64 oldest entries (margin > window 48, well below
 the cap-143 hot core) — the in-flight expert survives its own gather
 burst while remaining in the next-victim class. Composed file
 patches/omlx_t2_sidecar_plus_lip.py md5 c704058a3378731c4629578a72861ae7
-(deployed on Santa Cruz; box reconciler independently reached the same
+(deployed on M4 Max 36 GB; box reconciler independently reached the same
 diagnosis: "KeyError in _glu_routes slot_of until demotion is moved
 after _ensure_ids install loop"). LIP retries on the box are FORBIDDEN
 by the reconciler until this fix is run under a coordinated window.

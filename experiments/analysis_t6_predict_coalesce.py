@@ -42,7 +42,7 @@ import sim_paging as sp  # noqa: E402
 CAP = 143
 L, K, E = sp.L, sp.K, sp.E
 WARM = 200
-# measured constants (Santa Cruz, lead_silicon 463c856)
+# measured constants (M4 Max 36 GB, lead_silicon 463c856)
 IO_A = 0.20
 IO_B = 0.52
 INSTALL = 0.30

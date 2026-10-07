@@ -38,7 +38,7 @@ def main():
             result['initial_idle_Bps']=gate()
             with tempfile.TemporaryDirectory(dir=os.environ['TMPDIR'],prefix='t8_phys_') as td:
                 path=Path(td)/'pack'
-                m=build_pack('/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp',path,range(64))
+                m=build_pack('~/models/Qwen3.8-Flash-Next-oQ4e-mtp',path,range(64))
                 reader=ExpertPack(path)
                 try:
                     fcntl.fcntl(reader.fd,48,1)

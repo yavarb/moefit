@@ -1,6 +1,6 @@
 """T3 fidelity, part 2: LRU hit-refresh bug impact + per-miss cost model.
 
-Two questions this cycle, both against the measured Santa Cruz point
+Two questions this cycle, both against the measured M4 Max 36 GB point
 (13.0 tok/s = 76.92 ms/token, cap=143 experts/layer, synth traces):
 
 1. HIT-REFRESH BUG. The shipped simulate() counts a hit

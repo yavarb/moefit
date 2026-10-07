@@ -2,8 +2,7 @@
 
 Runs sim_paging.simulate with want_misses=True on LOCKED traces for one
 policy config, then applies the MEASURED serial-latency constants
-(moefit.metrics.SERIAL_CONSTANTS_MEASURED, from lead_silicon's Santa
-Cruz microbench, results/gap_santa_cruz.json) to predict realistic
+(moefit.metrics.SERIAL_CONSTANTS_MEASURED, from lead_silicon's M4 Max 36 GB microbench, results/gap_m4max_36gb.json) to predict realistic
 tok/s for oMLX-like serial miss resolution. This is the tool that makes
 any design's miss-count reduction measurable in silicon-realistic
 units, instead of the optimistic bandwidth-overlap model.
@@ -78,7 +77,7 @@ def main():
         served=round(srv, 3), sync_mb_per_tok=round(sync_mb, 1),
         async_mb_per_tok=round(async_mb, 1),
         serial_model=ser,
-        note=("serial constants MEASURED on Santa Cruz (oMLX resolve "
+        note=("serial constants MEASURED on M4 Max 36 GB (oMLX resolve "
               "discipline, not SSD ceiling; drive does 3.8-5.6 GB/s). "
               "compute_ms is ASSUMED. Prediction is SIMULATED."),
     )

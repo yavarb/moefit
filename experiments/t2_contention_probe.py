@@ -16,7 +16,7 @@ If decode tok/s drops by << the background share, the idle window is real
 reads contend (T7 pessimistic bound). Background reads are random experts,
 so they never help the decode: this measures pure interference cost.
 
-usage (on Santa Cruz, omlx python for nothing; stdlib only):
+usage (on M4 Max 36 GB, omlx python for nothing; stdlib only):
   python3 t2_contention_probe.py MODEL_DIR --budget 50 --max-tokens 512
 """
 import argparse, fcntl, json, os, random, struct, subprocess, threading, time

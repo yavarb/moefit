@@ -18,7 +18,7 @@ def main():
     with open('/tmp/moefit-lab/state/local_ssd_bench.lock','a') as lock:
         fcntl.flock(lock,fcntl.LOCK_EX)
         with tempfile.TemporaryDirectory(dir=os.environ['TMPDIR'],prefix='t8_hybrid_') as tmp:
-            model='/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp'
+            model='~/models/Qwen3.8-Flash-Next-oQ4e-mtp'
             path=Path(tmp)/'pack';m=build_pack(model,path,range(16))
             store=HybridExpertPack(model,path)
             def source(eid):

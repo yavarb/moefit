@@ -4,7 +4,7 @@
   "lifecycle": "Cold reset for each prompt; all requested resident hits refreshed before installing misses",
   "accounting": "143 equal-sized expert payloads total per layer, never 143+16. Metadata and transfer staging not modeled.",
   "route_array_sha256": "1a5ce55ab3a41949ca6a49ff4f3f67665648ed6c8bec5376cae2828c8aeb49ff",
-  "input_path": "/Users/yb/.hermes/cache/scratch/xlayer.npz",
+  "input_path": "~/.hermes/cache/scratch/xlayer.npz",
   "self_tests": {
     "single_access_equalities": 10000,
     "batch_equalities": 2000,

@@ -8,7 +8,7 @@ This prices it with the committed constants — NO new simulation, deterministic
 arithmetic, all provenance in-line:
 
 Per issued speculative read (52/token budget, T2 contention probe a853292):
-  contention cost  = 0.073..0.198 ms/expert  (MEASURED, Santa Cruz)
+  contention cost  = 0.073..0.198 ms/expert  (MEASURED, M4 Max 36 GB)
 Per CONFIRMED spec (an averted demand miss):
   saving           = 0.52 ms (DB-ON basis, T4 Amendment 2 0af86e7, provisional)
                    or 0.82 ms (serial basis, model)

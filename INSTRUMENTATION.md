@@ -11,8 +11,8 @@ reduces to `kind` ("sim"|"silicon"), `tps`, `residency`, `footprint_gib`,
 `expert_gib_resident`, per-term ms, `source` provenance. `validate_record`
 checks it. Measured constants used by the serial model live in
 `SERIAL_CONSTANTS_MEASURED` (io A=0.20 + B=0.52*k ms per layer-step,
-install 0.30 ms/expert, sync 0.122 ms/layer — measured on Santa Cruz by
-lead_silicon, results/gap_santa_cruz.json; compute_ms is the model's one
+install 0.30 ms/expert, sync 0.122 ms/layer — measured on M4 Max 36 GB by
+lead_silicon, results/gap_m4max_36gb.json; compute_ms is the model's one
 ASSUMED term).
 
 ## Producing measured data (silicon)
@@ -40,11 +40,11 @@ runs-based (bench), chunk-timestamped (collector), iostat flat keys.
 # bandwidth-model row vs measured record (shows both accountings)
 python3 experiments/gap_report.py --sim results/sim_paging_matched_cap143.json \
     --tier 48GB-M4M --mode lru --cap 143 \
-    --measured results/measured_santa_cruz_36gb.json
+    --measured results/measured_m4max_36gb.json
 
 # silicon-realistic serial-model sim side in one command
 python3 experiments/gap_report.py --serial --cap 143 --mode lru \
-    --tier 36GB-M4M36 --measured results/measured_santa_cruz_36gb_ssd.json
+    --tier 36GB-M4M36 --measured results/measured_m4max_36gb_ssd.json
 ```
 
 `gap_report` emits: tok/s ratio, residency/footprint alignment, sim
@@ -83,12 +83,12 @@ counters are still unmeasured.
 No-refresh contrast: 10.56 tok/s.
 Equivalent implementation inside the sim: `sim_paging.solve_policy_serial`.
 
-## Anchors (measured, Santa Cruz 36GB idle)
+## Anchors (measured, M4 Max Studio 36 GB idle)
 
 - 13.0 tok/s median @ residency 0.28 (cap143), footprint 22.61 GB
-  (results/measured_santa_cruz_36gb.json, commit c1ca86b).
+  (results/measured_m4max_36gb.json, commit c1ca86b).
 - 12.71 tok/s n=256, 140.5 MB/tok physical SSD reads @ 1785.7 MB/s,
-  10.7k IOPS @ 171 KB/IO (results/measured_santa_cruz_36gb_ssd.json).
+  10.7k IOPS @ 171 KB/IO (results/measured_m4max_36gb_ssd.json).
 - Sim reproduction: serial model + hit-refresh LRU + compute 18.1 ms →
   12.75 tok/s; with the 36GB-bin compute term 24.1 ms → 11.9.
   Compute term on the 36GB box is the remaining unmeasured knob.

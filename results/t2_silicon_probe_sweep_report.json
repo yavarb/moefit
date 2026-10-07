@@ -1,7 +1,7 @@
 {
   "kind": "measured_summary",
   "label": "T2 silicon probe + residency n>=1024 @resid0.28",
-  "host": "santacruz",
+  "host": "m4max-36gb",
   "timestamp_et": "2026-10-06 23:24 ET",
   "residency": 0.28,
   "cap_experts_per_layer": 143,

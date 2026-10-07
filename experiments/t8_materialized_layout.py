@@ -50,7 +50,7 @@ def main():
         fcntl.flock(lock,fcntl.LOCK_EX)
         with tempfile.TemporaryDirectory(dir=os.environ['TMPDIR'],prefix='t8_materialized_') as tmp:
             p,q=Path(tmp)/'identity',Path(tmp)/'learned'
-            m=build_pack('/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp',p,selected)
+            m=build_pack('~/models/Qwen3.8-Flash-Next-oQ4e-mtp',p,selected)
             reorder_pack(p,q,order)
             a,b=ExpertPack(p),ExpertPack(q)
             try:

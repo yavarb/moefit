@@ -4,8 +4,8 @@ Usage:
   python3 experiments/gap_report.py \
       --sim results/sim_paging_matched_143.json --tier 48GB-M4M \
       --mode lru --cap 143 \
-      --measured results/measured_santa_cruz_36gb.json \
-      [--out results/gap_report_santacruz36_cap143.json]
+      --measured results/measured_m4max_36gb.json \
+      [--out results/gap_report_m4max3636_cap143.json]
 
 Produces a canonical gap report (see moefit/metrics.py schema):
   - tok/s sim vs silicon with ratio and gap %
@@ -53,7 +53,7 @@ def main():
     ap.add_argument("--no-hit-refresh", dest="hit_refresh",
                     action="store_false")
     ap.add_argument("--measured", required=True,
-                    help="measured_santa_cruz_*.json blob")
+                    help="measured_m4max_36gb_*.json blob")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
     if a.serial:

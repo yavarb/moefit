@@ -1,7 +1,7 @@
 {
  "kind": "simulated (re-priced with measured contention constants)",
  "source_artifact": "results/design_spec_pagein.json (commit 245eb87)",
- "contention_provenance": "T2 t2_contention_probe (a853292), Santa Cruz MEASURED: +4.1..+10.7 ms/tok at 54-56 bg experts/tok on ~15.5 tps decode",
+ "contention_provenance": "T2 t2_contention_probe (a853292), M4 Max 36 GB MEASURED: +4.1..+10.7 ms/tok at 54-56 bg experts/tok on ~15.5 tps decode",
  "bg_cost_ms_per_expert": [
   0.0732,
   0.1981

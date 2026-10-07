@@ -1,12 +1,12 @@
 {
  "kind": "simulated",
- "time_model": "serial-latency (measured Santa Cruz constants)",
+ "time_model": "serial-latency (measured M4 Max 36 GB constants)",
  "traces": "synth beta2.0/shift0.3/seed0 holdout, warmup 200, hit_refresh=True (oMLX ExpertCache)",
  "measured_anchor": {
   "cap143_lru_measured": "12.7-13.0",
   "cap92_lru_measured_crowded": 7.8
  },
- "note": "lru=true-LRU via hit_refresh; prior=static build-frequency hot set + LRU half. 48GB rows EXTRAPOLATE Santa-Cruz-measured IO/install/sync constants.",
+ "note": "lru=true-LRU via hit_refresh; prior=static build-frequency hot set + LRU half. 48GB rows EXTRAPOLATE M4 Max 36 GB-measured IO/install/sync constants.",
  "rows": [
   {
    "tps": 8.8,

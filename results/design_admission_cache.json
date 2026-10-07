@@ -2,7 +2,7 @@
  "kind": "simulated",
  "traces": "/private/tmp/moefit-lab/repo/results/traces_synth",
  "holdout_sha256_12": "f8262a526f8c",
- "cost_model": "serial-latency, measured Santa Cruz constants (gap_santa_cruz.py); compute_ms assumed",
+ "cost_model": "serial-latency, measured M4 Max 36 GB constants (gap_m4max_36gb.py); compute_ms assumed",
  "rows": [
   {
    "cap": 92,

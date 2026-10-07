@@ -1,4 +1,4 @@
-"""Santa Cruz physical-SSD coalescer ON vs OFF. Darwin F_NOCACHE + disk0 byte deltas.
+"""M4 Max 36 GB physical-SSD coalescer ON vs OFF. Darwin F_NOCACHE + disk0 byte deltas.
 Synthetic full-materialized fixture (no page-cache claim). NOT LLM decode.
 """
 import fcntl, hashlib, json, os, plistlib, platform, random, statistics, subprocess, sys, tempfile, time
@@ -33,7 +33,7 @@ def disk_read_bytes():
 
 def main():
     assert sys.platform == 'darwin'
-    out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / 'results/silicon_proof_three/t6_physical_coalescer.json'
+    out = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / 'results/t6_physical_coalescer.json'
     out.parent.mkdir(parents=True, exist_ok=True)
     rng = random.Random(6501)
     E, C, size, n_batches, batch_e = 512, 9, 65536, 96, 10
@@ -102,7 +102,7 @@ def main():
     clear_margin = ratio_phys is not None and ratio_phys >= 1.25
     verdict = 'PASS' if (phys_ok and clear_margin) else ('FAIL_CACHE_ONLY' if not phys_ok else 'FAIL_NO_MARGIN')
     report = dict(
-        kind='MEASURED Santa Cruz physical-SSD coalescer microbench (synthetic fixture)',
+        kind='MEASURED M4 Max 36 GB physical-SSD coalescer microbench (synthetic fixture)',
         host=platform.node(), platform=platform.platform(),
         cache_controls='F_NOCACHE=1, F_RDAHEAD=0, fsync+F_FULLFSYNC write',
         physical_source='IOBlockStorageDriver disk0 Bytes (Read)',

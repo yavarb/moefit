@@ -1,5 +1,5 @@
 """T4: pre-registered ON/OFF silicon prediction for the double-buffer /
-staged-install design (for silicon_dbuf T9 to test on Santa Cruz).
+staged-install design (for silicon_dbuf T9 to test on M4 Max 36 GB).
 
 Fixed BEFORE any T9 run executes (same discipline as T3's protocol):
 the expected gain band, the measurement protocol, and the decision
@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 # MEASURED inputs (no invention):
-# - n=1024 idle baseline on Santa Cruz @0.28 (design_inventor a853292):
+# - n=1024 idle baseline on M4 Max 36 GB @0.28 (design_inventor a853292):
 #   15.55 tok/s median, 102.6 MB/tok physical SSD.
 BASE_TPS = 15.55
 BASE_MB_PER_TOK = 102.6
@@ -133,7 +133,7 @@ out = dict(
                             "arm.")),
     amendment2=dict(
         registered="2026-10-08 ~05:35 ET, BEFORE any T9 A/B/A data exists",
-        trigger=("T9's source read of the INSTALLED Santa Cruz file "
+        trigger=("T9's source read of the INSTALLED M4 Max 36 GB file "
                  "(Homebrew oMLX 0.7.0, md5 d420b305): the staged-install "
                  "machinery is NOT merely present - it is ON BY DEFAULT "
                  "(IO pool default 12 workers, read-ahead window 4*12=48, "
@@ -173,7 +173,7 @@ out = dict(
                          logical_misses_interval=[round(MISSES_FLOOR, 1),
                                                    round(MISSES_CEIL, 1)],
                          steps_frac_bounds=STEPS_FRAC_BOUNDS,
-                         note="all inputs measured on Santa Cruz; the "
+                         note="all inputs measured on M4 Max 36 GB; the "
                               "steps-fraction bracket is structural "
                               "(synth 0.569), not tuned"),
     mechanism_delta=("ON (staged): exposed install = inst * missing-"

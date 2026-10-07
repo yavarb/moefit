@@ -1,4 +1,4 @@
-"""T1 guarded cross-layer fetch A/B/A on Santa Cruz (stdlib only).
+"""T1 guarded cross-layer fetch A/B/A on M4 Max 36 GB (stdlib only).
 
 Server must run patches/omlx_t1_xlayer.py with MOEFIT_XLAYER_D=1 in its env
 (all other flags default off). Arms toggle ONLY the flag file /tmp/omlx_xlayer_on;
@@ -104,7 +104,7 @@ def main():
             os.remove(FLAG)
     sc = [r for r in rows if r["arm"] != "A0" and "ABORTED" not in r]
     pairs = [(x, y) for x, y in zip(sc, sc[1:]) if not x["flag_on"] and y["flag_on"]]
-    res = dict(kind="MEASURED Santa Cruz T1 xlayer A/B/A (flag toggle, no restart)", pid=pid0,
+    res = dict(kind="MEASURED M4 Max 36 GB T1 xlayer A/B/A (flag toggle, no restart)", pid=pid0,
                rows=rows,
                paired_tps=[round(y["tps"] - x["tps"], 2) for x, y in pairs],
                paired_wait_ms=[round(y["demand_wait_ms_per_tok"] - x["demand_wait_ms_per_tok"], 2) for x, y in pairs],

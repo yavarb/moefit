@@ -1,5 +1,5 @@
 #!/bin/bash
-# M1 silicon A/B (LRU-insert vs BIP vs DIP) on Santa Cruz. Owner: silicon_dbuf (T9).
+# M1 silicon A/B (LRU-insert vs BIP vs DIP) on M4 Max 36 GB. Owner: silicon_dbuf (T9).
 # STAGED ONLY: runs after design_inventor posts DIP code-green + file md5.
 #   DIPFILE=/tmp/omlx_m1_dip.py DIPMD5=<md5> bash m1_dip_arm.sh
 # Guards (T4 runbook): refuses on any SLOT_LOCK_*, on prefetch flags, on !=1 omlx-server,

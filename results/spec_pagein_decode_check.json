@@ -1,6 +1,6 @@
 {
  "kind": "simulated (signal-level check on REAL decode routes)",
- "trace": "/Users/yb/.hermes/cache/scratch/xlayer.npz \u2014 T1 capture, 8 prompts x 161 decode tokens x 48 layers",
+ "trace": "~/.hermes/cache/scratch/xlayer.npz \u2014 T1 capture, 8 prompts x 161 decode tokens x 48 layers",
  "signal": "decayed route-COUNT history (x0.7 per 4 tok); count variant of 6b359d4's score-based signal (within 0.1-2.3% on synth)",
  "positions_scored": 1280,
  "hist1_precision_pct": {

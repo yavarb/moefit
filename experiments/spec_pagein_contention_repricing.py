@@ -12,7 +12,7 @@ This script applies that measured cost to the measured waste counts in
 results/design_spec_pagein.json (no re-simulation; deterministic arithmetic
 on committed artifacts). Output: results/design_spec_pagein_contention.json.
 
-Honesty: contention constants are MEASURED (Santa Cruz, t2_contention_probe);
+Honesty: contention constants are MEASURED (M4 Max 36 GB, t2_contention_probe);
 waste/hit counts are SIM (locked synth holdout); baseline 15.55 tps is
 MEASURED n=1024. The re-priced tps bands are therefore SIM-re-priced-by-
 measured-constants, not measured silicon numbers.
@@ -36,7 +36,7 @@ MISS_COST_MS = 0.82
 # DB-ON basis (T4 Amendment 2, 0af86e7): staged install ON by default on the box;
 # if install is overlapped under fetch, an averted miss pays io-only on the critical path.
 MISS_COST_MS_DBON = 0.52
-# Measured n=1024 baseline on Santa Cruz @0.28 (t2_silicon report): 15.55 tps
+# Measured n=1024 baseline on M4 Max 36 GB @0.28 (t2_silicon report): 15.55 tps
 BASE_TPS_MEASURED = 15.55
 BASE_MS_MEASURED = 1000.0 / BASE_TPS_MEASURED
 
@@ -76,7 +76,7 @@ def main():
     out = {
         "kind": "simulated (re-priced with measured contention constants)",
         "source_artifact": "results/design_spec_pagein.json (commit 245eb87)",
-        "contention_provenance": "T2 t2_contention_probe (a853292), Santa Cruz MEASURED: "
+        "contention_provenance": "T2 t2_contention_probe (a853292), M4 Max 36 GB MEASURED: "
         "+4.1..+10.7 ms/tok at 54-56 bg experts/tok on ~15.5 tps decode",
         "bg_cost_ms_per_expert": [round(BG_COST_MS_LO, 4), round(BG_COST_MS_HI, 4)],
         "miss_cost_ms": {"serial_basis": MISS_COST_MS, "db_on_basis": MISS_COST_MS_DBON,

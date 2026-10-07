@@ -20,13 +20,13 @@ MECHANISM (what an oMLX ExpertCache hook would do, per decode token)
   Installs of speculative experts run on the background lane (staged install,
   T4-style), so they are charged to the lane, not to the critical path.
 
-COST MODEL (measured Santa Cruz constants)
+COST MODEL (measured M4 Max 36 GB constants)
   demand: per layer with k misses  A + B*k  read + INSTALL*k  (critical path)
   sync 0.122 ms/layer; compute C ms/token spread evenly over 48 layers.
   background lane: BG_MS read + INSTALL per speculative expert (k=4 random
   chunk 4.85 GB/s) and, per background expert, a CONTEND_MS critical-path
-  penalty (design_inventor measured 0.08-0.2 ms/bg expert on Santa Cruz).
-Cache: per-layer true LRU with hit refresh = Santa Cruz oMLX 0.7.0 ExpertCache
+  penalty (design_inventor measured 0.08-0.2 ms/bg expert on M4 Max 36 GB).
+Cache: per-layer true LRU with hit refresh = M4 Max 36 GB oMLX 0.7.0 ExpertCache
 (source-verified by design_inventor 23:55). Cache is retained across prompts
 (concatenated, server-like); first WARM tokens of the whole stream unscored.
 

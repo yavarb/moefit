@@ -7,7 +7,7 @@
   },
   "measured_snapshot": {
     "kind": "measured",
-    "host": "santacruz",
+    "host": "m4max-36gb",
     "timestamp": "2026-10-06T20:01:36-0700",
     "experts": 24576,
     "fully_cached": 683,

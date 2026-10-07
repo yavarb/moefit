@@ -1,8 +1,8 @@
 """T3 fidelity, part 3: validate lead_silicon's serial-latency model
 OUT OF SAMPLE against two additional measured points.
 
-Model under test (experiments/gap_santa_cruz.py, commit 463c856, all
-constants MEASURED on Santa Cruz except compute):
+Model under test (experiments/gap_m4max_36gb.py, commit 463c856, all
+constants MEASURED on M4 Max 36 GB except compute):
     tok_ms = COMPUTE_MS + sum_layers(A + B*k if k>0) + INSTALL_MS*misses
              + 48*SYNC_MS
     A=0.20, B=0.52, INSTALL=0.30, SYNC=0.122 ms (microbench, F_NOCACHE)
@@ -14,11 +14,11 @@ vs measured 12.71/13.0; cap=92 -> 8.9 vs crowded 7.8.
 This script adds three independent checks (no new silicon, uses only
 already-measured numbers):
   1. COLD-START TRANSIENT: the first bench (results/
-     measured_santa_cruz_36gb.json) ran a 16-token warmup from a cold
+     measured_m4max_36gb.json) ran a 16-token warmup from a cold
      ExpertCache at 6.43 tok/s (155.5 ms/token). Replay true-LRU from
      EMPTY caches and predict that transient.
   2. STEADY-STATE reproduction at cap=143 with warmup (sanity vs
-     gap_santa_cruz's 12.1) using an independently validated replica.
+     gap_m4max_36gb's 12.1) using an independently validated replica.
   3. COMPUTE-TERM SENSITIVITY: COMPUTE_MS is the model's largest
      unmeasured knob. Sweep it over {18.1 (sim DRAM_EFF@546 GB/s),
      23.2 (assumed), 24.2 (sim DRAM_EFF@410 GB/s)} and see which
@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "experiments"))
 import sim_paging as sp  # noqa: E402
 
-# measured constants (results/microbench_expert_reads_santa_cruz.json)
+# measured constants (results/microbench_expert_reads_m4max_36gb.json)
 IO_A_MS, IO_B_MS = 0.20, 0.52
 INSTALL_MS, SYNC_MS = 0.30, 0.122
 COMPUTE_ASSUMED = 23.2
@@ -51,7 +51,7 @@ def lru_misses(gold, cap):
     """True-LRU per-layer misses, from EMPTY caches. (T, L) int array.
 
     Mirrors oMLX ExpertCache semantics = hit refreshes (move_to_end).
-    Same dynamics as gap_santa_cruz.lru_misses; kept independent here.
+    Same dynamics as gap_m4max_36gb.lru_misses; kept independent here.
     """
     caches = [OrderedDict() for _ in range(sp.L)]
     M = np.zeros(gold.shape[:2], np.int32)

@@ -1,4 +1,4 @@
-"""Sim<->silicon gap at the measured Santa Cruz operating point.
+"""Sim<->silicon gap at the measured M4 Max 36 GB operating point.
 
 Replays the (synthetic, calibrated) holdout router traces through an LRU
 cache that mirrors oMLX 0.7.0's ExpertCache (per layer, plain LRU, no
@@ -11,7 +11,7 @@ Two time models are compared against measured tok/s:
   serial_latency (this file): per token
       compute_ms + sum over layers with misses of (A + B*k)   # IO, serial
       + misses * install_ms + L * sync_ms
-      A, B, install_ms, sync_ms are MEASURED on Santa Cruz by
+      A, B, install_ms, sync_ms are MEASURED on M4 Max 36 GB by
       experiments/microbench_expert_reads.py (F_NOCACHE preads, 12 threads,
       9 slabs/expert, 2.765 MB/expert).
 
@@ -19,7 +19,7 @@ compute_ms is NOT measured on the 36 GB box (it cannot hold the model); it is
 the 128 GB measured 57.4 tok/s (17.4 ms) scaled by DRAM bandwidth 546->410
 GB/s. That scaling is an assumption.
 
-usage: python3 experiments/gap_santa_cruz.py
+usage: python3 experiments/gap_m4max_36gb.py
 """
 import argparse, json, sys
 from collections import OrderedDict
@@ -33,7 +33,7 @@ import sim_paging as sp  # noqa: E402
 EXPERT_MB = 67.95e3 / (48 * 512)   # 2.765 MB, oMLX log; microbench agrees
 SSD_GBPS = 7.4
 COMPUTE_MS = 1000 / 57.4 * 546 / 410   # 23.2 ms; assumption, see docstring
-# microbench_expert_reads.py on Santa Cruz 2026-10-06 (cold, F_NOCACHE):
+# microbench_expert_reads.py on M4 Max 36 GB 2026-10-06 (cold, F_NOCACHE):
 # per-layer k-miss read latency: k=1 0.72, k=2 1.26, k=3 1.78, k=4 2.28 ms
 IO_A_MS, IO_B_MS = 0.20, 0.52
 INSTALL_MS = 0.30    # np.frombuffer -> mx.array -> slot write (0.27-0.35)
@@ -63,8 +63,8 @@ def lru_misses(gold, cap):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--traces-dir", default=str(ROOT / "results/traces_synth"))
-    ap.add_argument("--measured", default=str(ROOT / "results/measured_santa_cruz_36gb_ssd.json"))
-    ap.add_argument("--out", default=str(ROOT / "results/gap_santa_cruz.json"))
+    ap.add_argument("--measured", default=str(ROOT / "results/measured_m4max_36gb_ssd.json"))
+    ap.add_argument("--out", default=str(ROOT / "results/gap_m4max_36gb.json"))
     a = ap.parse_args()
 
     _, hl, _ = sp.load_split(Path(a.traces_dir) / "holdout.npz")
@@ -106,7 +106,7 @@ def main():
     out = dict(kind="simulated_vs_measured",
                note="synthetic calibrated traces (results/traces_synth); "
                     "compute_ms is an assumption (128GB measured, BW-scaled); "
-                    "IO/install/sync constants measured on Santa Cruz",
+                    "IO/install/sync constants measured on M4 Max 36 GB",
                constants=dict(expert_MB=round(EXPERT_MB, 3), ssd_GBps=SSD_GBPS,
                               io_A_ms=IO_A_MS, io_B_ms=IO_B_MS,
                               install_ms=INSTALL_MS, sync_ms=SYNC_MS),

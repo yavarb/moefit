@@ -1,5 +1,5 @@
 #!/bin/bash
-# T9 DB-isolating arm for Santa Cruz (silicon_dbuf).
+# T9 DB-isolating arm for M4 Max 36 GB (silicon_dbuf).
 #
 # OMLX_MOE_OFFLOAD_IO_BATCH=1 keeps the 12-worker pool (slab-parallel reads +
 # the decode overlap path stay ON) but shrinks the read-ahead window to one
@@ -8,7 +8,7 @@
 #   ON(default, 15.72) - BATCH1  = the pure double-buffer / staged-install term
 # which is the quantity T4's sim (+1.15) and prereg (+0.33..+1.10) priced.
 #
-# Usage on Santa Cruz (only when the box is idle and the queue owner agrees):
+# Usage on M4 Max 36 GB (only when the box is idle and the queue owner agrees):
 #   bash /tmp/moefit-bench/t9_batch1_arm.sh
 # It restarts omlx with IO_BATCH=1, runs 3x n=1024 on the same 80-token prompt
 # with the current repo collector (carries prompt_sha256), snapshots T2's
@@ -61,7 +61,7 @@ restart OMLX_MOE_OFFLOAD_IO_BATCH=1
 cp /tmp/omlx_moe_stats.json "$B/t9_b1_stats0.json" 2>/dev/null || true
 /usr/bin/python3 "$B/collect_silicon_run.py" --url "$URL" --model "$MODEL" --max-tokens 1024 --runs 3 \
   --label "T9 DB-isolating arm: OMLX_MOE_OFFLOAD_IO_BATCH=1 (workers 12, overlap on) n1024" \
-  --host santacruz --ram-gib 36 --out "$B/t9_batch1_C.json"
+  --host m4max-36gb --ram-gib 36 --out "$B/t9_batch1_C.json"
 sleep 2; cp /tmp/omlx_moe_stats.json "$B/t9_b1_stats1.json" 2>/dev/null || true
 grep -m1 "wrapped 48 layers" "$LOG" || true
 /usr/bin/python3 -c 'import json,sys;d=json.load(open(sys.argv[1]));t=[r["tokens"] for r in d["runs"]];print("tokens",t,"tps",[r["decode_tps"] for r in d["runs"]]);sys.exit(0 if all(x>=1024 for x in t) else 1)' "$B/t9_batch1_C.json" || echo "WARNING: incomplete run(s) - arm not scoreable"

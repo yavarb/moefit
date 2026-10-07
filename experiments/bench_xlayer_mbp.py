@@ -1,18 +1,18 @@
 """MEASURED A/B of T1 guarded cross-layer expert fetch inside the real oMLX
-ExpertCache (patches/omlx_t1_xlayer.py), on the MBP (not Santa Cruz).
+ExpertCache (patches/omlx_t1_xlayer.py), on the MBP (not M4 Max 36 GB).
 
 Setup, per arm:
   * real checkpoint, oMLX 0.7.0 offload code (stock d420b305 + T2 sidecar
     counters + T3 LIP (off) + T1 xlayer hunk), residency 0.28 (cap 143)
   * F_NOCACHE on every shard fd + msync(MS_INVALIDATE) of all shards before
-    each arm  ->  every miss is a physical SSD read (Santa Cruz's page cache
+    each arm  ->  every miss is a physical SSD read (M4 Max 36 GB's page cache
     held only 2.3 GB of experts, so this is the faithful regime)
   * all 48 ExpertCaches reset to empty before each arm (identical cold start)
   * same prompt, greedy, n tokens; arms alternate OFF/ON/OFF/ON...
 Reports decode tok/s (first->last token wall clock), logical hits/misses per
 token, xl issued/used/ready/wasted, and checks output text identity.
 
-usage: PYTHONPATH=/Users/yb/projects/omlx-ref? (not needed) \
+usage: PYTHONPATH=~/projects/omlx-ref? (not needed) \
   ~/.hermes/cache/scratch/omlxenv/bin/python3 experiments/bench_xlayer_mbp.py \
      --pairs 3 --max-tokens 512 --out results/t1_xlayer_mbp_ab.json
 """
@@ -136,7 +136,7 @@ def main():
     import statistics as st
     on = [r["decode_tps"] for r in rows if r["arm"] == "ON"]
     of = [r["decode_tps"] for r in rows if r["arm"] == "OFF"]
-    res = dict(kind="MEASURED on MBP (M-series, 128 GB) with F_NOCACHE + UBC drop; NOT Santa Cruz",
+    res = dict(kind="MEASURED on MBP (M-series, 128 GB) with F_NOCACHE + UBC drop; NOT M4 Max 36 GB",
                prompt=item.get("id"), residency=a.residency, cap=caches[0].capacity,
                max_tokens=a.max_tokens, d=off._XL_D, tau=off._XL_TAU, max_per_layer=off._XL_MAX,
                rows=rows, median_off=st.median(of), median_on=st.median(on),

@@ -1,5 +1,5 @@
 """design=idle-window prefetch (+ sidecar-Belady), scored under the MEASURED
-serial-latency model of oMLX 0.7.0 on Santa Cruz (gap_santa_cruz.py).
+serial-latency model of oMLX 0.7.0 on M4 Max 36 GB (gap_m4max_36gb.py).
 
 Observation (lead_silicon, measured): oMLX resolves expert misses serially per
 layer: per token  compute + sum_layers_with_miss(A + B*k) + misses*install +
@@ -43,7 +43,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "experiments"))
 import sim_paging as sp  # noqa: E402
-import gap_santa_cruz as gs  # noqa: E402
+import gap_m4max_36gb as gs  # noqa: E402
 
 L, K, E = sp.L, sp.K, sp.E
 BW_BG_GBPS = 4.85            # measured k=4 step rate (microbench)

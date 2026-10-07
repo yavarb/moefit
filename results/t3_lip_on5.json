@@ -2,7 +2,7 @@
  "label": "T3 LIP ON v3 (post-loop demotion, OMLX_ADMISSION=1) n1024",
  "kind": "measured",
  "timestamp": "2026-10-06T21:35:57-0700",
- "host": "santacruz",
+ "host": "m4max-36gb",
  "ram_gib": 36.0,
  "model": "Qwen3.8-Flash-Next-oQ4e-mtp",
  "max_tokens": 1024,

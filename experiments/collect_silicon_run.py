@@ -1,20 +1,20 @@
 """Collect an instrumented silicon decode run from an omlx/OpenAI-style
 chat-completions endpoint and emit the canonical measured blob.
 
-Plain stdlib (urllib) so it can run on Santa Cruz without pip installs.
+Plain stdlib (urllib) so it can run on M4 Max 36 GB without pip installs.
 
 Per-token instrumentation: every streamed chunk gets a monotonic
 timestamp; per-token gaps are derived by dividing each inter-chunk gap
 by the tokens the chunk carried (from stream_options
 include_usage / chunk content len). The output blob is the same shape
-as results/measured_santa_cruz_36gb.json PLUS per-run `per_token_ms` /
+as results/measured_m4max_36gb.json PLUS per-run `per_token_ms` /
 `chunk_ts_s` / `chunk_tokens`, which moefit/metrics.silicon_record_from_
 measured turns into p50/p90/p95/p99 tok-gap stats.
 
 usage:
   python3 collect_silicon_run.py --url http://127.0.0.1:8000/v1/chat/completions \
       --model Qwen3.8-Flash-Next-oQ4e-mtp --max-tokens 128 --runs 3 \
-      --out results/measured_<label>.json --label "santacruz 36GB idle"
+      --out results/measured_<label>.json --label "M4 Max 36 GB 36GB idle"
 NOTE: decode_tps from chunk counting can undercount when the server
 coalesces chunks; usage.completion_tokens (requested via
 stream_options) is authoritative when present. The decode interval
@@ -88,7 +88,7 @@ def one_run(url, model, prompt, max_tokens, timeout):
                     txt = (delta.get("content")
                            or delta.get("reasoning_content") or "")
                     # count 1 text chunk = 1 sample; oMLX coalesces
-                    # (~3 tok/chunk measured on Santa Cruz, 86/256), so
+                    # (~3 tok/chunk measured on M4 Max 36 GB, 86/256), so
                     # per_token_ms may be CHUNK gaps — gap_granularity
                     # says which; usage tokens stay authoritative
                     n_tok = 1 if txt else 0

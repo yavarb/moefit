@@ -46,7 +46,7 @@
  },
  "amendment2": {
   "registered": "2026-10-08 ~05:35 ET, BEFORE any T9 A/B/A data exists",
-  "trigger": "T9's source read of the INSTALLED Santa Cruz file (Homebrew oMLX 0.7.0, md5 d420b305): the staged-install machinery is NOT merely present - it is ON BY DEFAULT (IO pool default 12 workers, read-ahead window 4*12=48, decode-overlap path default 1; workers<=1 = serial).",
+  "trigger": "T9's source read of the INSTALLED M4 Max 36 GB file (Homebrew oMLX 0.7.0, md5 d420b305): the staged-install machinery is NOT merely present - it is ON BY DEFAULT (IO pool default 12 workers, read-ahead window 4*12=48, decode-overlap path default 1; workers<=1 = serial).",
   "consequence": "ARM SEMANTICS FLIP: the 15.55 tok/s n=1024 baseline IS the DB-ON arm. ON = stock default env; OFF = OMLX_MOE_OFFLOAD_IO_WORKERS=1 (serial). The A/B/A measures the DB's realized contribution by REMOVAL.",
   "predicted": "OFF-arm tps = 1000/(64.31 + saving): the saving bands below are UNCHANGED in magnitude, but they now describe ON-minus-OFF with ON pinned at the measured 15.55 (not above it): OFF predicted 14.58-15.24 @install 0.18; ON-OFF = +0.33..+1.10 as before.",
   "rules_unchanged": "The original decision rules apply verbatim with ON=default/OFF=serial labels, EXCEPT the WASH branch gains a decisive second reading (see wash_reading).",
@@ -66,7 +66,7 @@
    0.4,
    0.8
   ],
-  "note": "all inputs measured on Santa Cruz; the steps-fraction bracket is structural (synth 0.569), not tuned"
+  "note": "all inputs measured on M4 Max 36 GB; the steps-fraction bracket is structural (synth 0.569), not tuned"
  },
  "mechanism_delta": "ON (staged): exposed install = inst * missing-steps; OFF (stock oMLX): inst * logical misses. Predicted saving = inst * misses * (1 - steps_frac).",
  "predictions": {

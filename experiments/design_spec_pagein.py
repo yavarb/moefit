@@ -45,7 +45,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "experiments"))
 import sim_paging as sp  # noqa: E402
-import gap_santa_cruz as gs  # noqa: E402
+import gap_m4max_36gb as gs  # noqa: E402
 
 L, K, E = sp.L, sp.K, sp.E
 EXPERT_MB = gs.EXPERT_MB

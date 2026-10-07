@@ -83,7 +83,7 @@ cd "$BENCH"
 /usr/bin/python3 t9_collect.py --url http://127.0.0.1:8000/v1/chat/completions \
   --model "$MODEL" --max-tokens 1024 --runs 3 \
   --label "T3 LIP ON v3 (post-loop demotion, OMLX_ADMISSION=1) n1024" \
-  --host santacruz --ram-gib 36 --out t3_lip_on5.json
+  --host m4max-36gb --ram-gib 36 --out t3_lip_on5.json
 
 echo "=== snapshot ON counters (new process: full window from 0) ==="
 sleep 3

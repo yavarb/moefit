@@ -3,7 +3,7 @@ the silicon-validated serial-latency model vs the shipped bandwidth model.
 
 Why: the 48 GB silicon milestone is still framed as "confirm 54.8 tok/s
 sim @prior/192" (swarm retro carry-forward). That 54.8 is a BANDWIDTH-model
-number; the serial model — validated at 3 measured points on Santa Cruz
+number; the serial model — validated at 3 measured points on M4 Max 36 GB
 (cold transient 5.0 vs 6.43, steady cap143 12.1-12.75 vs 12.7-13.0, cap92
 8.9 vs 7.8) — prices the same operating point very differently. This
 table tells T1/T5 what to actually expect from the 48 GB run, so the
@@ -11,7 +11,7 @@ milestone isn't scored against an artifact.
 
 HONEST FLAGS:
 - Serial constants (IO A=0.20/B=0.52 ms per layer-step, install 0.30
-  ms/expert, sync 0.122 ms/layer) were MEASURED on Santa Cruz (M4 Max
+  ms/expert, sync 0.122 ms/layer) were MEASURED on M4 Max 36 GB (M4 Max
   36 GB, oMLX 0.7.0). Applying them to OTHER tiers is EXTRAPOLATION;
   a 48 GB M4 Max likely has a faster SSD but the serial-resolve
   discipline (oMLX, not the drive) is the same software.
@@ -77,7 +77,7 @@ def main():
                     extrapolated_serial_constants=(tier != "36GB-M4M36"),
                 ))
     out = dict(kind="simulated",
-               note="serial constants measured on Santa Cruz only; "
+               note="serial constants measured on M4 Max 36 GB only; "
                     "non-36GB rows are extrapolations of the oMLX "
                     "serial-resolve discipline, not of the drive. "
                     "compute_ms per tier = bandwidth-model DRAM term.",

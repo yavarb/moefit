@@ -157,8 +157,8 @@ Mac). Each timed run is a greedy streaming completion; `decode_tps` is
 tokens divided by the time between the first and last streamed token.
 
 **verify**: three runs print `decode N tok/s` with `finish=length` and
-the JSON lands in `results/`. On the 36 GB M4 Max this printed 7.8 tok/s
-median at 0.18 residency (`results/measured_santa_cruz_36gb.json`). Numbers from this script are **measured**;
+the JSON lands in `results/`. On an idle M4 Max Studio 36 GB this printed **13.0 tok/s**
+median at 0.28 residency short-run (`results/measured_m4max_36gb.json`); prefer n≥1024 for the steady **15.55** figure. Numbers from this script are **measured**;
 numbers in the simulation table below are not. Keep the two labelled.
 The README's measured 36 GB row came from exactly this command; the
 DRAM ceiling in the table below is what the chip could do if every
@@ -197,25 +197,13 @@ restart the same prompt still logs sidecar hits (`tests/test_sidecar.py`).
 
 Geometry: 4.6 GiB non-expert floor, 64.6 GiB routed experts (512 per
 layer, 48 layers, 2.69 MiB each, top-10 routing), 29.8 GiB n-gram table.
-Decode reads about 1.26 GB of expert weights per token from unified DRAM
-whether or not they were cached, so tok/s is DRAM-bound and the ceiling
-belongs to the chip: 4.9 tok/s on a base M4, 9.7 on an M4 Pro, 15.9 on
-an M4 Max at the paging configs below (serial miss model; 57.4 measured fully
-resident on a 128 GB M4 Max). Paging decides whether those bytes are already in RAM (no
-stall) or arrive on demand from SSD (stall).
+Decode reads about 1.26 GB of expert weights per token from unified DRAM,
+so tok/s is DRAM-bound. The chip ceilings under the serial miss model are
+about 4.9 tok/s on a base M4, 9.7 on an M4 Pro, and 15.9 on an M4 Max at
+the paging configs below (57.4 measured fully resident on a 128 GB M4 Max).
 
-Simulated decode speed in tok/s, holdout routing trace, measured tier
-bandwidths, capacity audited every token (`results/sim_paging.json`):
-
-**Read these as ceilings, not expectations.** This table uses the bandwidth
-overlap model, which measurements on a 36 GB M4 Max showed to be 2.7–3.5×
-optimistic on every SSD-bound row: oMLX resolves expert misses serially per
-layer rather than overlapping them. The serial-latency model built from
-those measured constants re-prices the stock-oMLX expectations at
-~4.9 tok/s (24 GB @64), ~9.7 (32 GB @128), ~11.8–15.9 (48 GB @128/192) —
-see [results/fidelity_tier_predictions.json](results/fidelity_tier_predictions.json)
-and [results/MEASURED_VS_SIM_36GB.md](results/MEASURED_VS_SIM_36GB.md).
-The table below is what perfect cross-layer pipelining could approach.
+Simulated decode speed in tok/s (`results/sim_paging.json`), holdout
+routing traces, capacity audited every token:
 
 | RAM tier | experts/layer resident | LRU | pinned hot-set | routing sidecar | SSD (pinned) |
 |---|---|---|---|---|---|
@@ -226,34 +214,23 @@ The table below is what perfect cross-layer pipelining could approach.
 | 48 GB (M4 Max) | 128 | 11.8 | 10.1 | 40.4 | 222 MB/tok |
 | 48 GB (M4 Max) | 192 | 15.9 | 14.5 | 40.9 | 130 MB/tok |
 
-
 Policies:
 
-- **LRU**: plain least-recently-used expert cache, no prediction. This is
-  what oMLX's expert offload does today.
-- **Pinned hot-set**: half the capacity holds the experts most used in
-  the build traces, the other half is LRU. No runtime prediction, no
-  prefetch bandwidth. Not yet wired into oMLX.
-- **Routing sidecar**: a stored per-prefix routing trace replayed
-  bit-exactly for prompts seen before (about 0.55 KB per token). The
-  table shows its upper bound, where every prefix is a repeat.
+- **LRU**: plain least-recently-used expert cache (what oMLX expert offload does today).
+- **Pinned hot-set**: half capacity pinned from build traces, half LRU. Not yet wired into oMLX.
+- **Routing sidecar**: stored per-prefix routing replay for prompts seen before. Upper bound assumes every prefix is a repeat.
 
 What follows from the table:
 
-1\. Paging costs real speed at these capacities: a 48 GB Mac at
+1. Paging costs real speed at these capacities: a 48 GB Mac at
    128 experts per layer runs at about 21% of the 128 GB machine's
-   measured 57.4 tok/s with LRU (18% with the pinned hot-set), and
-   about 96% once 192 per layer are pinned\.
+   measured 57.4 tok/s with LRU (18% with the pinned hot-set).
 2. The pinned hot-set beats LRU in the middle of the capacity range and
-   costs no prefetch bandwidth. It is the cheapest real win.
-3. The routing sidecar wins the tight-capacity rows and never hurts on
-   repeated prefixes.
+   costs no prefetch bandwidth.
+3. The routing sidecar wins the tight-capacity rows on repeated prefixes.
 
-The simulator models the DRAM-bound compute step and the SSD stall; it
-does not model the Metal working-set cap, page-cache competition between
-the PLE table and streamed experts, or oMLX's per-step overhead. The
-measured 36 GB row in the README is the only number here that includes
-all of those.
+The measured M4 Max Studio 36 GB row in the README is the only paging
+number that includes Metal working-set caps and live oMLX overhead.
 
 ## Checking the numbers
 

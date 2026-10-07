@@ -43,7 +43,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "experiments"))
 import sim_paging as sp
 
-# measured microbench constants (results/microbench_expert_reads_santa_cruz.json)
+# measured microbench constants (results/microbench_expert_reads_m4max_36gb.json)
 IO_A_MS, IO_B_MS = 0.20, 0.52
 INSTALL_MS, SYNC_MS = 0.30, 0.122
 L = sp.L

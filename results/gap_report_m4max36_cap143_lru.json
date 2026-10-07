@@ -1,6 +1,6 @@
 {
  "sim_source": "results/sim_paging_matched_cap143.json#lru/cap143",
- "silicon_source": "results/measured_santa_cruz_36gb.json",
+ "silicon_source": "results/measured_m4max_36gb.json",
  "tps": {
   "sim": 12.9,
   "silicon": 13.0,
@@ -32,8 +32,8 @@
   },
   "hit_refresh": true,
   "sources": [
-   "results/microbench_expert_reads_santa_cruz.json",
-   "results/measured_santa_cruz_36gb.json"
+   "results/microbench_expert_reads_m4max_36gb.json",
+   "results/measured_m4max_36gb.json"
   ]
  }
 }

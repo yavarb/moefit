@@ -1,6 +1,6 @@
 {
-  "kind": "MEASURED local Darwin file-read microbenchmark, synthetic fixture; NOT Santa Cruz/LLM",
-  "host": "ybs-MacBook-Pro-2.local",
+  "kind": "MEASURED local Darwin file-read microbenchmark, synthetic fixture; NOT M4 Max 36 GB/LLM",
+  "host": "mbp-128gb",
   "platform": "macOS-27.0-arm64-arm-64bit",
   "fixture_bytes": 301989888,
   "experts": 512,

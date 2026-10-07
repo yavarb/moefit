@@ -1,8 +1,8 @@
 """design=admission-cache: frequency-aware admission / eviction for the oMLX
 per-layer expert cache, scored under the MEASURED serial-latency cost model.
 
-Why: lead_silicon showed (results/gap_santa_cruz.json, microbench measured on
-Santa Cruz) that oMLX resolves misses serially per layer:
+Why: lead_silicon showed (results/gap_m4max_36gb.json, microbench measured on
+M4 Max 36 GB) that oMLX resolves misses serially per layer:
     token_ms = compute + sum_layers_with_miss (A + B*k) + misses*install + L*sync
 so at 36 GB every avoided miss saves ~0.82 ms (0.52 IO + 0.30 install) and
 every layer-step without any miss saves another 0.20 ms. The cache policy is
@@ -41,7 +41,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "experiments"))
 import sim_paging as sp  # noqa: E402
-import gap_santa_cruz as gs  # noqa: E402  (measured constants)
+import gap_m4max_36gb as gs  # noqa: E402  (measured constants)
 
 L, K, E = sp.L, sp.K, sp.E
 
@@ -270,8 +270,8 @@ def main():
                 row["miss_vs_lru"] = round(miss / base["miss_per_tok"], 3)
             rows.append(row); print(json.dumps(row), flush=True)
     out = dict(kind="simulated", traces=str(tdir), holdout_sha256_12=sha,
-               cost_model="serial-latency, measured Santa Cruz constants "
-                          "(gap_santa_cruz.py); compute_ms assumed",
+               cost_model="serial-latency, measured M4 Max 36 GB constants "
+                          "(gap_m4max_36gb.py); compute_ms assumed",
                rows=rows)
     Path(a.out).write_text(json.dumps(out, indent=1)); print("wrote", a.out)
 

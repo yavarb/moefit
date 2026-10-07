@@ -2,7 +2,7 @@
  "label": "T9 dbuf ON (stock 0.7.0 IO_WORKERS=12 default) n1024",
  "kind": "measured",
  "timestamp": "2026-10-06T20:48:25-0700",
- "host": "santacruz",
+ "host": "m4max-36gb",
  "ram_gib": 36.0,
  "model": "Qwen3.8-Flash-Next-oQ4e-mtp",
  "max_tokens": 1024,

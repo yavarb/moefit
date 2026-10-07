@@ -1,6 +1,6 @@
 {
  "kind": "measured",
- "host": "santacruz",
+ "host": "m4max-36gb",
  "timestamp": "2026-10-06T20:20:15-0700",
  "max_tokens": 1024,
  "tokens": 1024,

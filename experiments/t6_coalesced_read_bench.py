@@ -90,7 +90,7 @@ def main():
         finally:
             os.close(fd)
     med={m:statistics.median(r['useful_GBps'] for r in rows if r['method']==m) for m in methods}
-    result={'kind':'MEASURED local Darwin file-read microbenchmark, synthetic fixture; NOT Santa Cruz/LLM',
+    result={'kind':'MEASURED local Darwin file-read microbenchmark, synthetic fixture; NOT M4 Max 36 GB/LLM',
             'host':platform.node(),'platform':platform.platform(),
             'fixture_bytes':E*C*size,'experts':E,'components':C,'component_bytes':size,
             'batch_experts':10,'batches':len(batches),'workers':4,

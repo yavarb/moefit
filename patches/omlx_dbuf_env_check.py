@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """T4 handoff to silicon_dbuf (T9): staged-install INVENTORY + TOGGLE.
 
-Run THIS FIRST on the target box (Santa Cruz, before any restart):
+Run THIS FIRST on the target box (M4 Max 36 GB, before any restart):
 
   python3 omlx_dbuf_env_check.py            # inventories the live server's file
   python3 omlx_dbuf_env_check.py --file PATH  # any copy of moe_expert_offload.py
@@ -186,7 +186,7 @@ def main():
               "Case A (verbatim upstream block + anchors).")
     print()
     print("Reference md5s known to the lab:")
-    print("  d420b305...  Homebrew 0.7.0 on Santa Cruz (true-LRU "
+    print("  d420b305...  Homebrew 0.7.0 on M4 Max 36 GB (true-LRU "
           "ExpertCache, design_inventor source-read; machinery ON "
           "by default per T9)")
     print("  61ead257...  omlxenv local copy (windowed staged install, "

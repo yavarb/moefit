@@ -6,7 +6,7 @@ SCORER = ROOT / "experiments" / "score_lip_aba.py"
 
 
 def blob(tps, tok=1024, ph="abc123"):
-    return {"host": "santacruz", "model": "m", "prompt_sha256": ph,
+    return {"host": "m4max-36gb", "model": "m", "prompt_sha256": ph,
             "runs": [{"decode_tps": t, "tokens": tok, "finish_reason": "stop",
                       "stream_integrity": {"problems": []}} for t in tps]}
 

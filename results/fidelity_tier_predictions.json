@@ -1,6 +1,6 @@
 {
  "kind": "simulated",
- "note": "serial constants measured on Santa Cruz only; non-36GB rows are extrapolations of the oMLX serial-resolve discipline, not of the drive. compute_ms per tier = bandwidth-model DRAM term.",
+ "note": "serial constants measured on M4 Max 36 GB only; non-36GB rows are extrapolations of the oMLX serial-resolve discipline, not of the drive. compute_ms per tier = bandwidth-model DRAM term.",
  "rows": [
   {
    "tier": "24GB-M4",

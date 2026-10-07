@@ -1,6 +1,6 @@
 """Measure physical SSD read bytes per decoded token on a running oMLX server.
 
-Runs on the Mac that serves the model (e.g. Santa Cruz). Samples `iostat -d -w 1`
+Runs on the Mac that serves the model (e.g. M4 Max 36 GB). Samples `iostat -d -w 1`
 for the boot disk while issuing one greedy streaming chat completion, then
 attributes disk reads inside the decode window to decode.
 

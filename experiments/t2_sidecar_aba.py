@@ -1,4 +1,4 @@
-"""T2 sidecar replay-prefetch A/B/A on the merged oMLX patch (Santa Cruz).
+"""T2 sidecar replay-prefetch A/B/A on the merged oMLX patch (M4 Max 36 GB).
 
 Arms (same prompt, greedy, n tokens):
   A0  flag OFF: warm + record the replay script (not scored)

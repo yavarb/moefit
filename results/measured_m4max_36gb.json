@@ -1,0 +1,93 @@
+{
+  "label": "measured on M4 Max Studio 36 GB (idle, 0.28 residency)",
+  "kind": "measured",
+  "timestamp": "2026-10-06T19:49:01-0700",
+  "host": "m4max-36gb",
+  "chip": "Apple M4 Max",
+  "ram_gib": 36.0,
+  "macos": "27.0",
+  "server_url": "http://127.0.0.1:8000",
+  "model": "Qwen3.8-Flash-Next-oQ4e-mtp",
+  "max_tokens": 128,
+  "runs": [
+    {
+      "tokens": 128,
+      "count_source": "usage.completion_tokens",
+      "streamed_deltas": 44,
+      "ttft_s": 0.201,
+      "decode_s": 10.386,
+      "decode_tps": 12.23,
+      "wall_s": 10.588,
+      "wall_tps": 12.09,
+      "finish_reason": "length",
+      "prompt_tokens": 88,
+      "sample": "\nWe need answer user's request: \"Write a long, detailed essay on the history of unified memory architectures in personal computers, from early shared-memory des"
+    },
+    {
+      "tokens": 128,
+      "count_source": "usage.completion_tokens",
+      "streamed_deltas": 45,
+      "ttft_s": 0.68,
+      "decode_s": 9.72,
+      "decode_tps": 13.07,
+      "wall_s": 10.401,
+      "wall_tps": 12.31,
+      "finish_reason": "length",
+      "prompt_tokens": 88,
+      "sample": "\nWe need answer user's request: \"Write a long, detailed essay on the history of unified memory architectures in personal computers, from early shared-memory des"
+    },
+    {
+      "tokens": 128,
+      "count_source": "usage.completion_tokens",
+      "streamed_deltas": 45,
+      "ttft_s": 0.687,
+      "decode_s": 9.785,
+      "decode_tps": 12.98,
+      "wall_s": 10.473,
+      "wall_tps": 12.22,
+      "finish_reason": "length",
+      "prompt_tokens": 88,
+      "sample": "\nWe need answer user's request: \"Write a long, detailed essay on the history of unified memory architectures in personal computers, from early shared-memory des"
+    }
+  ],
+  "decode_tps_median": 13.0,
+  "decode_tps_min": 12.23,
+  "decode_tps_max": 13.07,
+  "ttft_s_median": 0.68,
+  "warmup": {
+    "tokens": 16,
+    "count_source": "usage.completion_tokens",
+    "streamed_deltas": 9,
+    "ttft_s": 4.67,
+    "decode_s": 2.334,
+    "decode_tps": 6.43,
+    "wall_s": 7.005,
+    "wall_tps": 2.28,
+    "finish_reason": "length",
+    "prompt_tokens": 88,
+    "sample": "\nWe need answer user's request: \"Write a long, detailed essay on the"
+  },
+  "method": "greedy streaming chat completion; decode_tps = (tokens-1) / (time from first to last streamed token); wall clock on the client",
+  "notes": "oMLX 0.7.0 expert offload, PLE on SSD, MTP off, memory-guard aggressive, max-concurrent 1; idle box (~85% free before load after stopping other heavy apps / prior omlx); resident fraction 0.28 (~143 of 512 experts/layer); omlx loaded actual 22.61 GB (18.98 GB of 67.95 GB expert tables resident); during decode free% ~18-19",
+  "omlx_version": "0.7.0",
+  "omlx_model_settings": {
+    "moe_expert_offload_enabled": true,
+    "moe_expert_offload_resident_fraction": 0.28,
+    "mtp_enabled": false,
+    "qwen4_ple_ssd_offload": true
+  },
+  "git_commit": "f20bdd3",
+  "memory_during_run": {
+    "before_load_free_pct": 85,
+    "during_run_free_pct": "18-19",
+    "omlx_actual_gb": 22.61,
+    "omlx_local_estimate_gb": 23.77,
+    "omlx_full_model_gb": 103.94,
+    "expert_tables_total_gb": 67.95,
+    "expert_tables_resident_gb": 18.98,
+    "omlx_log_residency_pct": 28.0,
+    "resident_experts_per_layer_approx": 143,
+    "process_rss_peak_mb": 3615.0,
+    "note": "Apple Silicon Metal working set is not fully reflected in process RSS; prefer omlx actual GB"
+  }
+}

@@ -12,7 +12,7 @@ layer L+1 issues gate_{L+2}(x_{L+1}) (higher recall, lead ~1 layer) for any
 confident candidates not already in flight. Same guards (tau, max per stage,
 separate pool, held-not-installed, cancel on wrong route).
 
-Cost models (both SIM, constants from measured Santa Cruz numbers):
+Cost models (both SIM, constants from measured M4 Max 36 GB numbers):
   PAR (DB-ON, the default silicon path): layer stall if any uncovered miss =
       R1 + R_extra*(k_uncov-1); covered experts must have LANDED (lane model:
       4 bg threads, BG_MS per expert, layer time T_LAYER).

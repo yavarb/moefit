@@ -14,7 +14,7 @@
   "install_ms_per_expert_batched": 0.28,
   "tiny_sync_ms": 0.108,
   "kind": "measured",
-  "host": "santacruz",
+  "host": "m4max-36gb",
   "timestamp": "2026-10-06T20:18:44-0700",
   "method": "microbench_expert_reads.py F_NOCACHE; omlxenv; server idle-loaded",
   "label": "T2 silicon probe re-confirm"

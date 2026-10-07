@@ -1,6 +1,6 @@
 """Canonical run-record metrics for moefit-lab.
 
-Every sim or silicon (Santa Cruz) result should be reducible to a
+Every sim or silicon (M4 Max 36 GB) result should be reducible to a
 `RunRecord` dict so sim↔silicon gaps are compared field-to-field instead
 of by eyeballing prose in result JSONs.
 
@@ -22,7 +22,7 @@ Record schema (all keys optional except kind, tps, source):
   stream_ms_per_tok    SSD-bound term
   limiter              "compute" | "stream" | None
   config      free-form dict: policy/mode/cap/tier/throttle or omlx settings
-  host        e.g. "santacruz", "local-sim"
+  host        e.g. "M4 Max 36 GB", "local-sim"
   measured_at timestamp string
   git_commit  commit of the code (sim) or of the runtime (silicon)
 
@@ -94,7 +94,7 @@ def sim_record_from_row(row: dict, tier: str, source: str) -> dict:
 
 
 def silicon_record_from_measured(path_or_dict, source: str) -> dict:
-    """Normalize a measured_santa_cruz_*.json blob to a RunRecord."""
+    """Normalize a measured_m4max_36gb_*.json blob to a RunRecord."""
     import json
     from pathlib import Path
     d = path_or_dict if isinstance(path_or_dict, dict) \
@@ -146,7 +146,7 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
             # direct coalescing evidence, two forms: chunk_tokens>1
             # (server declares multi-token chunks) or usage tokens >
             # streamed text chunks (oMLX: 86 chunks/256 tok measured on
-            # Santa Cruz — per-run count is authoritative)
+            # M4 Max 36 GB — per-run count is authoritative)
             multi = bool(r.get("chunk_tokens")
                          and any(t > 1 for t in r["chunk_tokens"]))
             ntok, nchunks = r.get("tokens"), r.get("streamed_deltas")
@@ -240,7 +240,7 @@ def latency_stats_from_deltas(delta_ms) -> dict:
                 mean=round(statistics.fmean(d), 2), max=round(d[-1], 2))
 
 
-# Measured on Santa Cruz by lead_silicon (results/gap_santa_cruz.json,
+# Measured on M4 Max 36 GB by lead_silicon (results/gap_m4max_36gb.json,
 # commit 463c856): per-layer-step miss-resolution latency is
 # A + B*k ms for k missed experts; install is per-expert; sync is per
 # layer-step. Drive microbench: 3.8-5.6 GB/s on the same pattern, so
@@ -361,7 +361,7 @@ def signature_from_silicon_record(rec: dict) -> dict:
 
     If the record carries tok_gap_coalesced (normalizer flag: SSE chunk
     coalescing detected — burst gaps and/or usage tokens > streamed text
-    chunks; oMLX itself coalesces ~3 tok/chunk measured on Santa Cruz,
+    chunks; oMLX itself coalesces ~3 tok/chunk measured on M4 Max 36 GB,
     86 chunks/256 tok), the verdict becomes "inadmissible (chunk
     coalescing ...)": a coalesced stream misattributes per-token time
     and can flip the shape thresholds (astra_local_exp probe, T8). This

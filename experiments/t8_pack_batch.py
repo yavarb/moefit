@@ -33,7 +33,7 @@ def main():
         fcntl.flock(lock, fcntl.LOCK_EX)
         with tempfile.TemporaryDirectory(dir=os.environ['TMPDIR'], prefix='t8_packbatch_') as tmp:
             path = Path(tmp)/'pack'
-            m = build_pack('/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp', path, range(16))
+            m = build_pack('~/models/Qwen3.8-Flash-Next-oQ4e-mtp', path, range(16))
             pack = ExpertPack(path)
             try:
                 rng = random.Random(203)
