@@ -18,8 +18,10 @@ def run(*extra):
 
 def test_wash_with_counters():
     with tempfile.TemporaryDirectory() as d:
-        w = lambda n, o: (lambda p: (json.dump(o, open(p, "w")), p))(
-            os.path.join(d, n))
+        def w(n, o):
+            p = os.path.join(d, n)
+            json.dump(o, open(p, "w"))
+            return p
         off = w("off.json", blob([15.50, 15.55, 15.60]))
         on = w("on.json", blob([15.55, 15.60, 15.65]))
         s0 = w("s0.json", {"hits": 1000, "misses": 5000, "tokens": 0, "t": 1})
