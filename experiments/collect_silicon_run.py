@@ -105,10 +105,14 @@ def one_run(url, model, prompt, max_tokens, timeout):
                         finish_reason = ch[0]["finish_reason"]
     except (ConnectionError, http.client.IncompleteRead,
             urllib.error.URLError) as exc:
-        # truncated stream (connection reset / incomplete read):
-        # keep the descriptive data, mark the run damaged — never a
-        # clean positive throughput (T8: abrupt EOF reported 12.50)
-        integrity_problems.append(f"stream_interrupted ({type(exc).__name__})")
+        # truncated stream: keep the descriptive data, mark the run
+        # damaged — never a clean positive throughput (T8: abrupt EOF
+        # reported 12.50). EXCEPTION: a reset AFTER the stream already
+        # completed ([DONE] seen + recognized finish) is a tolerable
+        # end-of-transport artifact, not damage — the run is complete.
+        if not (done_seen or finish_reason in ("stop", "length")):
+            integrity_problems.append(
+                f"stream_interrupted ({type(exc).__name__})")
     wall = time.monotonic() - t0
     # stream integrity (T8 stream-integrity probe, production form):
     # a benchmark run is ELIGIBLE only with a recognized finish, the
