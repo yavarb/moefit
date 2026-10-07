@@ -1,0 +1,138 @@
+{
+  "kind": "MEASURED CPU routing metadata only, not decode",
+  "trials": [
+    {
+      "original": 0.132066833,
+      "original_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ],
+      "fast": 0.11645966699999999,
+      "fast_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ]
+    },
+    {
+      "fast": 0.11732408300000002,
+      "fast_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ],
+      "original": 0.1316037080000001,
+      "original_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ]
+    },
+    {
+      "original": 0.12882583300000006,
+      "original_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ],
+      "fast": 0.117653958,
+      "fast_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ]
+    },
+    {
+      "fast": 0.11833520800000019,
+      "fast_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ],
+      "original": 0.12933508299999996,
+      "original_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ]
+    },
+    {
+      "original": 0.13221033299999996,
+      "original_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ],
+      "fast": 0.119170416,
+      "fast_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ]
+    },
+    {
+      "fast": 0.11764733300000008,
+      "fast_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ],
+      "original": 0.1313376249999998,
+      "original_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ]
+    },
+    {
+      "original": 0.131593375,
+      "original_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ],
+      "fast": 0.11542054200000029,
+      "fast_stats": [
+        137280,
+        6864,
+        0,
+        3981120,
+        137280
+      ]
+    }
+  ],
+  "positions_per_trial": 2860,
+  "layers": 48,
+  "hit_rate": 1.0,
+  "original_positions_per_s": 21733.616908905937,
+  "fast_positions_per_s": 24309.943345677017,
+  "speedup": 1.1185410807400107,
+  "caveat": "Warm full-repeat workload; tiny-cache cold fallback correctness also tested, not its speed. No namespace-prebinding retained: preserves O(1) metadata fork."
+}

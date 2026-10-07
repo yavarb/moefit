@@ -201,6 +201,14 @@ class LayeredReplaySession:
             raise RuntimeError('layers must execute once in ascending order')
         # tuple tag cannot equal the bytes namespace of whole-token entries.
         key = ((self.namespace, self.layers, int(layer)), self.prefix)
+        # Hits need no callback adapter or repeated membership/value lookup.
+        entry = self.cache.entries.get(key) if self.enabled else None
+        if entry is not None:
+            self.cache.hits += 1
+            self.cache.entries.move_to_end(key)
+            self.next_layer += 1
+            value = entry[0]
+            return value.indices[0], value.weights[0], True
         def wrapped():
             indices, weights = compute()
             return np.asarray(indices)[None, :], np.asarray(weights)[None, :]
