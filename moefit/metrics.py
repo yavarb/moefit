@@ -104,6 +104,17 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
     setg = d.get("omlx_model_settings", {})
     tpss = [r["decode_tps"] for r in runs]
     import statistics
+    lat = {}
+    all_gaps = []
+    for i, r in enumerate(runs):
+        gaps = r.get("per_token_ms")
+        if gaps is None and r.get("chunk_ts_s") and r.get("chunk_tokens"):
+            ts, cts = r["chunk_ts_s"], r["chunk_tokens"]
+            gaps = [1000.0 * (b - a) / max(t, 1)
+                    for a, b, t in zip(ts, ts[1:], cts[1:])]
+        if gaps:
+            lat[r.get("run", i)] = latency_stats_from_deltas(gaps)
+            all_gaps.extend(gaps)
     rec = dict(
         kind="silicon",
         source=source,
@@ -129,11 +140,37 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
         measured_at=d.get("timestamp"),
         git_commit=d.get("git_commit"),
     )
+    if all_gaps:
+        rec["tok_gap_ms"] = latency_stats_from_deltas(all_gaps)
+        rec["tok_gap_ms_per_run"] = lat
     if rec["tps"] is None:
         raise ValueError(f"no decode_tps in measured record {source}")
     errs = validate_record(rec)
     assert not errs, f"bad silicon record: {errs}"
     return rec
+
+
+def latency_stats_from_deltas(delta_ms) -> dict:
+    """Per-token decode latency distribution from streamed deltas.
+
+    `delta_ms` = list of inter-chunk gaps in ms (first delta after TTFT
+    through the last). SSE servers coalesce chunks, so divide by the
+    tokens per chunk when known; the caller supplies per-TOKEN gaps.
+    Returns p50/p90/p95/p99/mean/max in ms, usable as RunRecord fields
+    `tok_gap_ms_*` so silicon records carry a distribution, not just a
+    median tok/s.
+    """
+    import statistics
+    d = sorted(float(x) for x in delta_ms if x >= 0)
+    if not d:
+        raise ValueError("empty delta list")
+    n = len(d)
+
+    def pct(p):
+        i = min(int(round(p / 100.0 * (n - 1))), n - 1)
+        return round(d[i], 2)
+    return dict(n=n, p50=pct(50), p90=pct(90), p95=pct(95), p99=pct(99),
+                mean=round(statistics.fmean(d), 2), max=round(d[-1], 2))
 
 
 def gap_report(sim: dict, silicon: dict) -> dict:

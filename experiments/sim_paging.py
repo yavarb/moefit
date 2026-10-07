@@ -54,6 +54,9 @@ ROOT = Path(__file__).resolve().parents[1]
 # 4.6 GiB, total 99.0 GiB on disk. An earlier revision halved packed
 # tensors (dtype-table default of 2 bytes instead of U32=4).
 EXPERT_MIB = 2.69
+# module-level default so simulate(mode="prior") does not NameError when
+# no per-layer prior/persist mix is requested (set by callers that want one)
+pin_counts = None
 L, K, E = 48, 10, 512
 GOLD_MIB = L * K * EXPERT_MIB      # expert bytes consumed per token
 FLOOR_MIB = 4.6 * 1024             # resident non-expert footprint
@@ -107,12 +110,18 @@ def per_layer_caps(cap):
 
 
 def simulate(gold, picks, prior_rank, cap, mode, pick, async_allow,
-             audit=True):
+             audit=True, avail=None, pin_counts=None):
     """One pass with hard capacity: res[li] never exceeds caps[li] experts.
     pin[li] = predicted experts pinned for token t+1 (free SSD slots up to
     async_allow). Non-pinned residents evicted LRU. sync = expert read at
     hit time (stalls); async = read at prefetch time (hidden by design,
     charged to SSD).
+
+    mode="sidecar_probe" (hybrid): avail is a per-token bool array; when
+    avail[t+1] is True the routing sidecar has the answer and gold is
+    pinned exactly (like sidecar); otherwise the PLE probe picks fill the
+    gap (like probe with `pick` slots). Models a prefix-cache sidecar that
+    only covers part of the traffic.
 
     LRU bookkeeping: each resident carries (last-use token, insertion
     sequence). The victim is the non-pinned resident with the smallest
@@ -133,6 +142,8 @@ def simulate(gold, picks, prior_rank, cap, mode, pick, async_allow,
     dyn_cap = [max(c - n_pf_slot, 4) for c in caps]
     if mode == "prior":
         dyn_cap = [max(c // 2, 4) for c in caps]   # pin the other half
+        if pin_counts is not None:                 # per-layer prior/persist mix
+            dyn_cap = [max(c - int(p), 4) for c, p in zip(caps, pin_counts)]
 
     def set_ts(li, e, ts):
         old = lru[li].get(e)
