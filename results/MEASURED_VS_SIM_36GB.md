@@ -157,16 +157,21 @@ two independent implementations agree exactly
 (`sim_paging.solve_policy_serial` vs `moefit/metrics.serial_model_from_misses`,
 breakdown identical 18.1/37.0/17.5/5.9 ms, 58.3 misses/token). With this,
 the residual is closed: geometry, policy, and time model all reproduce the
-silicon operating point from measured constants. **Caveat resolved
-(cycle 13)**: the compute term is no longer assumed — with mincore
-rejecting page-cache absorption, real logical misses are 140.5/2.765 =
-**50.8/token**, and feeding that REAL miss count through the serial model
-gives **12.87 tok/s with compute 24.1 ms (the 410 GB/s DRAM bin — the
-physically correct chip)** vs measured 12.71–13.07, while the earlier
-"18.1 fits best" was an artifact compensating for synth-trace miss
-overstatement (T3, commit a61a035). Two consequences: (a) synth
-overstates misses at cap143 by ~15% (58.3 vs 50.8), so every synth-based
-serial prediction is ~0.8–1.1 tok/s conservative; (b) 48 GB (546 GB/s bin)
+silicon operating point from measured constants. **Compute term resolved
+— with an honesty caveat (cycle 13)**: with mincore rejecting page-cache
+absorption, real logical misses are 140.5/2.765 = **50.8/token**, and
+feeding that REAL miss count through the serial model gives **12.52–12.87
+tok/s with compute 24.1 ms (the 410 GB/s DRAM bin — the physically
+correct chip)** vs measured 12.71–13.07, while compute 18.1 overshoots at
+13.54–13.95 — non-overlapping bands over the mincore-bounded miss
+interval. The earlier "18.1 fits best" was an artifact compensating for
+synth-trace miss overstatement (T3, commits a61a035 + af10b16). "Resolved"
+means best-supported, not statistically certified: the regression
+intercept alone does not separate 18.1 from 24.1 (fixed terms 0.39 vs
+1.10 σ below it); a second residency point or direct logical-miss
+counters would settle it. Two consequences: (a) synth overstates misses
+at cap143 by ~15% (58.3 vs 50.8), so every synth-based serial
+prediction is ~0.8–1.1 tok/s conservative; (b) 48 GB (546 GB/s bin)
 keeps compute 18.1 in its tier table. Constants remain
 Santa-Cruz-specific — other machines need their own microbench.
 
