@@ -1,0 +1,43 @@
+{
+ "kind": "simulated (replay)",
+ "real_trace": "results/traces/holdout.npz (p0_code_py_review2, 144 tok, cold-only, single prompt \u2014 NOT a steady anchor)",
+ "cap": 143,
+ "routing_shape": {
+  "real": {
+   "cross_position_repeat_all_layers": 0.36456866197183097,
+   "repeat_layer_min": 0.04507042253521127,
+   "repeat_layer_max": 0.5535211267605634,
+   "cross_token_repeat_frac_L0": 0.04507042253521127
+  },
+  "synth": {
+   "cross_position_repeat_all_layers": 0.34994131455399063,
+   "repeat_layer_min": 0.19788732394366199,
+   "repeat_layer_max": 0.5302816901408451,
+   "cross_token_repeat_frac_L0": 0.27183098591549293
+  }
+ },
+ "cold_window_cap143": {
+  "real": {
+   "tokens": 143,
+   "lru_miss_per_tok_cold": 97.6013986013986,
+   "lru_miss_first16": 232.0,
+   "omlx_miss_per_tok_cold": 96.83916083916084,
+   "omlx_miss_first16": 232.0,
+   "serial_cold16_tps_lru": 4.4683551091172315,
+   "serial_cold16_tps_omlx": 4.4683551091172315
+  },
+  "synth_first143": {
+   "tokens": 143,
+   "lru_miss_per_tok_cold": 71.81818181818181,
+   "lru_miss_first16": 196.6875,
+   "omlx_miss_per_tok_cold": 71.4895104895105,
+   "omlx_miss_first16": 196.6875,
+   "serial_cold16_tps_lru": 5.132422927046458,
+   "serial_cold16_tps_omlx": 5.132422927046458
+  }
+ },
+ "measured_reference": {
+  "warmup_16tok_tps": 6.43,
+  "steady_cap143_tps": "12.71-13.07 (NOT comparable: this trace is cold+single-prompt)"
+ }
+}
