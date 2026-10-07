@@ -1,0 +1,56 @@
+{
+ "model_constants": {
+  "io_A_ms": 0.2,
+  "io_B_ms": 0.52,
+  "install_ms": 0.3,
+  "sync_ms": 0.122
+ },
+ "compute_ms_candidates": {
+  "assumed_546to410_scaled": 23.2,
+  "sim_dram_eff_at_546": 18.1,
+  "sim_dram_eff_at_410": 24.1
+ },
+ "cold_transient_cap143": {
+  "measured_warmup_16tok_tps": 6.43,
+  "measured_warmup_16tok_ms": 155.5,
+  "predicted_first16_mean_ms": 199.8,
+  "predicted_first16_tps": 5.0,
+  "predicted_first16_range_ms": [
+   139.3,
+   432.3
+  ],
+  "predicted_first128_mean_tps": 10.3,
+  "predicted_steady_tps_warmup200": 12.1,
+  "all_miss_floor_tps": 2.3,
+  "note": "warmup ran from a cold server (4.7 s cold load); synth holdout rows are a different prompt, so this is a ballpark test of the transient, not a matched-config one."
+ },
+ "steady_state": {
+  "cap143": {
+   "predicted_tps": 12.1,
+   "measured_tps": "12.71 / 13.0",
+   "misses_per_token": 57.4,
+   "frac_layer_steps_with_miss": 0.69
+  },
+  "cap92": {
+   "predicted_tps": 8.9,
+   "measured_tps": "7.8 (crowded)",
+   "misses_per_token": 91.8,
+   "frac_layer_steps_with_miss": 0.866
+  }
+ },
+ "compute_sensitivity_cap143": {
+  "assumed_23.2": {
+   "compute_ms": 23.2,
+   "predicted_tps": 12.1
+  },
+  "sim_dram_eff_546_18.1": {
+   "compute_ms": 18.1,
+   "predicted_tps": 12.9
+  },
+  "sim_dram_eff_410_24.2": {
+   "compute_ms": 24.1,
+   "predicted_tps": 11.9
+  },
+  "measured": "12.71 (256-tok iostat run) / 13.0 (median of 3 x 128)"
+ }
+}

@@ -1,0 +1,83 @@
+{
+ "measured": {
+  "decode_tps_median": 13.0,
+  "ms_per_token": 76.92,
+  "cap_per_layer": 143
+ },
+ "geometry": {
+  "sim_expert_mib": 2.69,
+  "omlex_per_expert_mib": 2.637,
+  "expert_size_gap_pct": -1.98,
+  "sim_footprint_gib_at_cap143": 22.63,
+  "omlex_footprint_gb": 22.61,
+  "omlex_resident_gb_from_0.28": 18.98,
+  "omlex_resident_gb_log": 18.98
+ },
+ "compute_floor": {
+  "dram_mb_per_tok": 5438.4,
+  "compute_ms": 18.13,
+  "compute_bound_tps": 55.2
+ },
+ "policies_at_cap143": {
+  "lru": {
+   "mode": "lru",
+   "served": 0.84,
+   "sync_mb_per_tok": 206.8,
+   "async_mb_per_tok": 0.0,
+   "predict_tps_at_ssd7.4": 36.6,
+   "predict_tps_at_ssd3.0": 14.8,
+   "implied_ssd_gbps_for_13tps": 2.63,
+   "served_needed_at_ssd7.4": 0.549
+  },
+  "prior": {
+   "mode": "prior",
+   "served": 0.815,
+   "sync_mb_per_tok": 238.7,
+   "async_mb_per_tok": 0.0,
+   "predict_tps_at_ssd7.4": 31.7,
+   "predict_tps_at_ssd3.0": 12.9,
+   "implied_ssd_gbps_for_13tps": 3.03,
+   "served_needed_at_ssd7.4": 0.549
+  },
+  "sidecar": {
+   "mode": "sidecar",
+   "served": 0.841,
+   "sync_mb_per_tok": 205.1,
+   "async_mb_per_tok": 0.0,
+   "predict_tps_at_ssd7.4": 36.9,
+   "predict_tps_at_ssd3.0": 15.0,
+   "implied_ssd_gbps_for_13tps": 2.61,
+   "served_needed_at_ssd7.4": 0.549
+  },
+  "static_first_143": {
+   "mode": "static_first_143",
+   "served": 0.287,
+   "sync_mb_per_tok": 920.8,
+   "async_mb_per_tok": 0.0,
+   "predict_tps_at_ssd7.4": 8.2,
+   "predict_tps_at_ssd3.0": 3.3,
+   "implied_ssd_gbps_for_13tps": 11.69,
+   "served_needed_at_ssd7.4": 0.549
+  },
+  "static_last_143": {
+   "mode": "static_last_143",
+   "served": 0.284,
+   "sync_mb_per_tok": 924.3,
+   "async_mb_per_tok": 0.0,
+   "predict_tps_at_ssd7.4": 8.2,
+   "predict_tps_at_ssd3.0": 3.3,
+   "implied_ssd_gbps_for_13tps": 11.74,
+   "served_needed_at_ssd7.4": 0.549
+  }
+ },
+ "headline_gap": {
+  "sim_pinned_cap128_tps_48gb_tier": 29.1,
+  "measured_omlx_cap143_tps": 13.0,
+  "ratio": 2.24
+ },
+ "ple_sensitivity": {
+  "sim_assumes_mb_per_tok": 0.3,
+  "ple_mb_per_tok_that_reconciles_lru@7.4gbps": 376.1,
+  "note": "PLE n-gram table is ~29.8 GiB on SSD; per-token gather size is unmeasured \u2014 candidate instrumentation target."
+ }
+}
