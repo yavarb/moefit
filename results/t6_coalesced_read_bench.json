@@ -1,0 +1,128 @@
+{
+  "kind": "MEASURED local Darwin file-read microbenchmark, synthetic fixture; NOT Santa Cruz/LLM",
+  "host": "ybs-MacBook-Pro-2.local",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "fixture_bytes": 301989888,
+  "experts": 512,
+  "components": 9,
+  "component_bytes": 65536,
+  "batch_experts": 10,
+  "batches": 96,
+  "workers": 4,
+  "cache_controls": "F_NOCACHE=1, F_RDAHEAD=0(disable), fsync+F_FULLFSYNC after writing",
+  "caveat": "OS cache-bypass requested; SSD/controller cache and concurrent host activity uncontrolled. No physical iostat attribution.",
+  "workload_sha256": "a5ecee8df7f6623e1ade5e1b112b28acc87f6441a4ce4216189785f9df732817",
+  "rows": [
+    {
+      "rep": 0,
+      "method": "individual",
+      "seconds": 0.102859708,
+      "useful_GBps": 5.504886714241888,
+      "issued_GBps": 5.504886714241888,
+      "read_amplification": 1.0,
+      "planned_reads": 8640,
+      "batch_p50_ms": 1.056041500000049,
+      "checksum": 1107061
+    },
+    {
+      "rep": 0,
+      "method": "adjacent",
+      "seconds": 0.11147312499999995,
+      "useful_GBps": 5.0795296175647735,
+      "issued_GBps": 5.0795296175647735,
+      "read_amplification": 1.0,
+      "planned_reads": 8496,
+      "batch_p50_ms": 1.152562499999954,
+      "checksum": 1107061
+    },
+    {
+      "rep": 0,
+      "method": "lanes",
+      "seconds": 0.053099958,
+      "useful_GBps": 10.663493180164096,
+      "issued_GBps": 10.663493180164096,
+      "read_amplification": 1.0,
+      "planned_reads": 8496,
+      "batch_p50_ms": 0.5463540000000267,
+      "checksum": 1107061
+    },
+    {
+      "rep": 1,
+      "method": "adjacent",
+      "seconds": 0.11267512499999999,
+      "useful_GBps": 5.025342017592616,
+      "issued_GBps": 5.025342017592616,
+      "read_amplification": 1.0,
+      "planned_reads": 8496,
+      "batch_p50_ms": 1.1620420000000298,
+      "checksum": 1107061
+    },
+    {
+      "rep": 1,
+      "method": "lanes",
+      "seconds": 0.05396224999999988,
+      "useful_GBps": 10.493095450986594,
+      "issued_GBps": 10.493095450986594,
+      "read_amplification": 1.0,
+      "planned_reads": 8496,
+      "batch_p50_ms": 0.5634164999999136,
+      "checksum": 1107061
+    },
+    {
+      "rep": 1,
+      "method": "individual",
+      "seconds": 0.10136970900000009,
+      "useful_GBps": 5.585801178535488,
+      "issued_GBps": 5.585801178535488,
+      "read_amplification": 1.0,
+      "planned_reads": 8640,
+      "batch_p50_ms": 1.0391455000000605,
+      "checksum": 1107061
+    },
+    {
+      "rep": 2,
+      "method": "lanes",
+      "seconds": 0.05381541700000003,
+      "useful_GBps": 10.521725400734137,
+      "issued_GBps": 10.521725400734137,
+      "read_amplification": 1.0,
+      "planned_reads": 8496,
+      "batch_p50_ms": 0.5620210000000236,
+      "checksum": 1107061
+    },
+    {
+      "rep": 2,
+      "method": "individual",
+      "seconds": 0.10389533399999995,
+      "useful_GBps": 5.450014145967328,
+      "issued_GBps": 5.450014145967328,
+      "read_amplification": 1.0,
+      "planned_reads": 8640,
+      "batch_p50_ms": 1.0557290000000608,
+      "checksum": 1107061
+    },
+    {
+      "rep": 2,
+      "method": "adjacent",
+      "seconds": 0.11943845800000008,
+      "useful_GBps": 4.740776542845183,
+      "issued_GBps": 4.740776542845183,
+      "read_amplification": 1.0,
+      "planned_reads": 8496,
+      "batch_p50_ms": 1.1913335000000025,
+      "checksum": 1107061
+    }
+  ],
+  "median_useful_GBps": {
+    "individual": 5.504886714241888,
+    "adjacent": 5.025342017592616,
+    "lanes": 10.521725400734137
+  },
+  "relative_to_individual": {
+    "individual": 1.0,
+    "adjacent": 0.9128874540853629,
+    "lanes": 1.911342766330324
+  },
+  "verified": "5 full-byte batch equality cases per coalescer, checksum equality all9 trials, empty planner and EOF handling",
+  "scratch_removed": true
+}
