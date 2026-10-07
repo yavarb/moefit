@@ -58,7 +58,16 @@ def main():
         tier = TIER_OF[re.match(r"\d+ GB", cells[0]).group()]
         cap = int(num(cells[1]))
         for col, cell in zip(header[2:], cells[2:]):
-            mode = COL_MODE[col]
+            if col == "SSD (pinned)":
+                want_ssd = rows[(cap, "prior")][f"ssdMB_{tier}"]
+                got_ssd = num(cell)
+                if got_ssd is not None and int(got_ssd) != int(want_ssd):
+                    problems.append(f"SETUP SSD(pinned) {cells[0]} cap={cap}: "
+                                    f"doc {got_ssd} JSON {want_ssd}")
+                continue
+            mode = COL_MODE.get(col)
+            if mode is None:
+                continue
             want = rows[(cap, mode)][f"tps_{tier}"]
             got = num(cell)
             if got != want:
