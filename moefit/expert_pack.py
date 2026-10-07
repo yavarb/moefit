@@ -57,9 +57,13 @@ def build_pack(model_dir, output, ids, layer=0, alignment=16384) -> dict:
     for x in c:
         offsets.append(dict(x, pack_offset=cursor))
         cursor += x['size']
-    handles = {x['file']: os.open(x['file'], os.O_RDONLY) for x in c}
+    handles = {}
     hashes = {}
     try:
+        # Open each shard once, and include partial acquisition in cleanup.
+        for x in c:
+            if x['file'] not in handles:
+                handles[x['file']] = os.open(x['file'], os.O_RDONLY)
         with open(output, 'xb') as out:
             for eid in ids:
                 data = b''.join(exact_pread(handles[x['file']], x['size'], x['offset']+eid*x['size']) for x in c)

@@ -1,0 +1,32 @@
+{
+  "scope": "Executed real descriptors on tiny synthetic extents; no bandwidth/decode claim.",
+  "baseline_revision": "75db8cf",
+  "baseline": {
+    "opens": 9,
+    "closes": 3,
+    "leaks": 6,
+    "error": null
+  },
+  "fixed": {
+    "opens": 3,
+    "closes": 3,
+    "leaks": 0,
+    "error": null
+  },
+  "open_failure": {
+    "opens": 1,
+    "closes": 1,
+    "leaks": 0,
+    "error": "OSError"
+  },
+  "short_read": {
+    "opens": 3,
+    "closes": 3,
+    "leaks": 0,
+    "error": "EOFError"
+  },
+  "repeated_builds": 20,
+  "repeated_leaks": 0,
+  "identical_pack_and_manifest": true,
+  "caveat": "Short-write/read failures may still leave partial destination; this change only fixes source descriptor lifetime."
+}
