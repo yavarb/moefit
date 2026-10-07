@@ -32,6 +32,10 @@ def main():
             fcntl.fcntl(fd,48,1); fcntl.fcntl(fd,45,0)
         a=disk(); t=time.perf_counter(); time.sleep(1); b=disk()
         idle=(b-a)/(time.perf_counter()-t)
+        # Operational isolation guard, not a statistical attribution guarantee.
+        # Refuse substantial background reads rather than subtracting them later.
+        if idle > 50_000_000:
+            raise RuntimeError(f'SSD slot not idle: {idle/1e6:.1f} MB/s background reads')
         rng=random.Random(6025)
         random_batches=[(i%48,rng.sample(range(512),10)) for i in range(384)]
         sequential_batches=[(i%48,list(range((i//48)*10,(i//48)*10+10))) for i in range(384)]
