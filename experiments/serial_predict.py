@@ -40,9 +40,11 @@ def main():
     ap.add_argument("--compute-ms", type=float, default=18.1,
                     help="ASSUMED compute ms/token (18.1 = DRAM_EFF@546)")
     ap.add_argument("--hit-refresh", action="store_true",
-                    help="true-LRU hit refresh (oMLX 0.7.0 ExpertCache "
-                         "semantics; wired into simulate() as of commit "
-                         "9cd94bd). Without it the sim is FIFO-ish and "
+                    help="true-LRU hit refresh. NOTE: oMLX 0.7.0 "
+                         "ExpertCache is actually decayed-count "
+                         "eviction (design_omlx_exact.py); on synth "
+                         "traces the two differ <1% in serial tps. "
+                         "Without the flag the sim is FIFO-ish and "
                          "overstates misses (76.9 vs 58.3/tok at cap143).")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
