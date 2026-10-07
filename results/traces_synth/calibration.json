@@ -1,0 +1,406 @@
+{
+ "config": {
+  "beta": 2.0,
+  "shift": 0.3,
+  "seed": 0,
+  "build_rows": 3747,
+  "holdout_rows": 2882,
+  "n_build": 17,
+  "n_holdout": 13,
+  "feat_dim": 256,
+  "feat_noise": 1.0,
+  "out_dir": "/tmp/synth_b2.0_s0.3"
+ },
+ "per_layer": {
+  "0": {
+   "s": 0.633,
+   "p": 0.0,
+   "prior14_target": 0.1276,
+   "prior14_fit": 0.138,
+   "prev_target": 0.06412213740457953,
+   "prev_fit": 0.186
+  },
+  "1": {
+   "s": 0.642,
+   "p": 0.009,
+   "prior14_target": 0.1325,
+   "prior14_fit": 0.14,
+   "prev_target": 0.20291464260930134,
+   "prev_fit": 0.246
+  },
+  "2": {
+   "s": 0.727,
+   "p": 0.024,
+   "prior14_target": 0.1589,
+   "prior14_fit": 0.154,
+   "prev_target": 0.22959750173490878,
+   "prev_fit": 0.251
+  },
+  "3": {
+   "s": 0.895,
+   "p": 0.156,
+   "prior14_target": 0.2227,
+   "prior14_fit": 0.214,
+   "prev_target": 0.3920194309507289,
+   "prev_fit": 0.416
+  },
+  "4": {
+   "s": 0.883,
+   "p": 0.123,
+   "prior14_target": 0.218,
+   "prior14_fit": 0.211,
+   "prev_target": 0.31387925052047466,
+   "prev_fit": 0.366
+  },
+  "5": {
+   "s": 0.691,
+   "p": 0.047,
+   "prior14_target": 0.1467,
+   "prior14_fit": 0.145,
+   "prev_target": 0.2757113115891769,
+   "prev_fit": 0.236
+  },
+  "6": {
+   "s": 0.639,
+   "p": 0.065,
+   "prior14_target": 0.1334,
+   "prior14_fit": 0.124,
+   "prev_target": 0.2735947258848042,
+   "prev_fit": 0.293
+  },
+  "7": {
+   "s": 0.627,
+   "p": 0.04,
+   "prior14_target": 0.1283,
+   "prior14_fit": 0.136,
+   "prev_target": 0.2604788341429589,
+   "prev_fit": 0.184
+  },
+  "8": {
+   "s": 0.912,
+   "p": 0.122,
+   "prior14_target": 0.2262,
+   "prior14_fit": 0.226,
+   "prev_target": 0.4274115197779315,
+   "prev_fit": 0.285
+  },
+  "9": {
+   "s": 0.914,
+   "p": 0.261,
+   "prior14_target": 0.2251,
+   "prior14_fit": 0.222,
+   "prev_target": 0.42081887578070837,
+   "prev_fit": 0.454
+  },
+  "10": {
+   "s": 0.875,
+   "p": 0.167,
+   "prior14_target": 0.208,
+   "prior14_fit": 0.209,
+   "prev_target": 0.3781748785565586,
+   "prev_fit": 0.271
+  },
+  "11": {
+   "s": 0.911,
+   "p": 0.2,
+   "prior14_target": 0.2143,
+   "prior14_fit": 0.216,
+   "prev_target": 0.3914642609299095,
+   "prev_fit": 0.411
+  },
+  "12": {
+   "s": 0.817,
+   "p": 0.008,
+   "prior14_target": 0.1829,
+   "prior14_fit": 0.2,
+   "prev_target": 0.26013185287994584,
+   "prev_fit": 0.231
+  },
+  "13": {
+   "s": 0.857,
+   "p": 0.249,
+   "prior14_target": 0.2075,
+   "prior14_fit": 0.19,
+   "prev_target": 0.3682512144344216,
+   "prev_fit": 0.48
+  },
+  "14": {
+   "s": 0.816,
+   "p": 0.109,
+   "prior14_target": 0.1856,
+   "prior14_fit": 0.184,
+   "prev_target": 0.34590562109646167,
+   "prev_fit": 0.378
+  },
+  "15": {
+   "s": 0.978,
+   "p": 0.371,
+   "prior14_target": 0.2551,
+   "prior14_fit": 0.233,
+   "prev_target": 0.5115891741845933,
+   "prev_fit": 0.47
+  },
+  "16": {
+   "s": 0.845,
+   "p": 0.29,
+   "prior14_target": 0.1985,
+   "prior14_fit": 0.185,
+   "prev_target": 0.4520818875780711,
+   "prev_fit": 0.431
+  },
+  "17": {
+   "s": 0.808,
+   "p": 0.153,
+   "prior14_target": 0.1918,
+   "prior14_fit": 0.188,
+   "prev_target": 0.35843164469118827,
+   "prev_fit": 0.405
+  },
+  "18": {
+   "s": 0.721,
+   "p": 0.077,
+   "prior14_target": 0.1548,
+   "prior14_fit": 0.167,
+   "prev_target": 0.2536086051353248,
+   "prev_fit": 0.383
+  },
+  "19": {
+   "s": 0.72,
+   "p": 0.121,
+   "prior14_target": 0.1621,
+   "prior14_fit": 0.167,
+   "prev_target": 0.3670367800138807,
+   "prev_fit": 0.292
+  },
+  "20": {
+   "s": 0.77,
+   "p": 0.167,
+   "prior14_target": 0.1624,
+   "prior14_fit": 0.174,
+   "prev_target": 0.362873004857739,
+   "prev_fit": 0.355
+  },
+  "21": {
+   "s": 0.643,
+   "p": 0.067,
+   "prior14_target": 0.137,
+   "prior14_fit": 0.133,
+   "prev_target": 0.29455239417071727,
+   "prev_fit": 0.284
+  },
+  "22": {
+   "s": 0.561,
+   "p": 0.0,
+   "prior14_target": 0.1133,
+   "prior14_fit": 0.117,
+   "prev_target": 0.1678001387925059,
+   "prev_fit": 0.188
+  },
+  "23": {
+   "s": 0.979,
+   "p": 0.159,
+   "prior14_target": 0.2277,
+   "prior14_fit": 0.246,
+   "prev_target": 0.407598889659959,
+   "prev_fit": 0.38
+  },
+  "24": {
+   "s": 0.888,
+   "p": 0.09,
+   "prior14_target": 0.2166,
+   "prior14_fit": 0.219,
+   "prev_target": 0.3883067314365035,
+   "prev_fit": 0.334
+  },
+  "25": {
+   "s": 0.949,
+   "p": 0.182,
+   "prior14_target": 0.2135,
+   "prior14_fit": 0.24,
+   "prev_target": 0.3889312977099227,
+   "prev_fit": 0.415
+  },
+  "26": {
+   "s": 0.87,
+   "p": 0.061,
+   "prior14_target": 0.2137,
+   "prior14_fit": 0.218,
+   "prev_target": 0.3511103400416384,
+   "prev_fit": 0.347
+  },
+  "27": {
+   "s": 0.881,
+   "p": 0.164,
+   "prior14_target": 0.2104,
+   "prior14_fit": 0.203,
+   "prev_target": 0.3622137404580153,
+   "prev_fit": 0.344
+  },
+  "28": {
+   "s": 0.817,
+   "p": 0.032,
+   "prior14_target": 0.1842,
+   "prior14_fit": 0.196,
+   "prev_target": 0.2645385149201969,
+   "prev_fit": 0.307
+  },
+  "29": {
+   "s": 0.852,
+   "p": 0.045,
+   "prior14_target": 0.1988,
+   "prior14_fit": 0.189,
+   "prev_target": 0.350936849410134,
+   "prev_fit": 0.336
+  },
+  "30": {
+   "s": 0.783,
+   "p": 0.13,
+   "prior14_target": 0.1699,
+   "prior14_fit": 0.161,
+   "prev_target": 0.3311936155447606,
+   "prev_fit": 0.39
+  },
+  "31": {
+   "s": 0.934,
+   "p": 0.3,
+   "prior14_target": 0.2372,
+   "prior14_fit": 0.243,
+   "prev_target": 0.4911172796668969,
+   "prev_fit": 0.423
+  },
+  "32": {
+   "s": 0.835,
+   "p": 0.183,
+   "prior14_target": 0.1978,
+   "prior14_fit": 0.184,
+   "prev_target": 0.45159611380985387,
+   "prev_fit": 0.43
+  },
+  "33": {
+   "s": 0.769,
+   "p": 0.151,
+   "prior14_target": 0.1669,
+   "prior14_fit": 0.16,
+   "prev_target": 0.3484038861901476,
+   "prev_fit": 0.315
+  },
+  "34": {
+   "s": 0.741,
+   "p": 0.011,
+   "prior14_target": 0.1603,
+   "prior14_fit": 0.146,
+   "prev_target": 0.2599930603747425,
+   "prev_fit": 0.231
+  },
+  "35": {
+   "s": 0.774,
+   "p": 0.141,
+   "prior14_target": 0.1779,
+   "prior14_fit": 0.174,
+   "prev_target": 0.37630117973629473,
+   "prev_fit": 0.355
+  },
+  "36": {
+   "s": 0.817,
+   "p": 0.244,
+   "prior14_target": 0.1885,
+   "prior14_fit": 0.181,
+   "prev_target": 0.4034004163775155,
+   "prev_fit": 0.338
+  },
+  "37": {
+   "s": 0.776,
+   "p": 0.08,
+   "prior14_target": 0.1727,
+   "prior14_fit": 0.17,
+   "prev_target": 0.32810548230395714,
+   "prev_fit": 0.258
+  },
+  "38": {
+   "s": 0.659,
+   "p": 0.0,
+   "prior14_target": 0.1268,
+   "prior14_fit": 0.134,
+   "prev_target": 0.19302567661346476,
+   "prev_fit": 0.238
+  },
+  "39": {
+   "s": 0.98,
+   "p": 0.235,
+   "prior14_target": 0.2456,
+   "prior14_fit": 0.243,
+   "prev_target": 0.47862595419847404,
+   "prev_fit": 0.419
+  },
+  "40": {
+   "s": 0.884,
+   "p": 0.331,
+   "prior14_target": 0.2065,
+   "prior14_fit": 0.218,
+   "prev_target": 0.4663428174878555,
+   "prev_fit": 0.431
+  },
+  "41": {
+   "s": 0.847,
+   "p": 0.136,
+   "prior14_target": 0.1838,
+   "prior14_fit": 0.193,
+   "prev_target": 0.38594725884802367,
+   "prev_fit": 0.349
+  },
+  "42": {
+   "s": 0.721,
+   "p": 0.007,
+   "prior14_target": 0.1413,
+   "prior14_fit": 0.175,
+   "prev_target": 0.25145732130465204,
+   "prev_fit": 0.214
+  },
+  "43": {
+   "s": 0.903,
+   "p": 0.228,
+   "prior14_target": 0.2179,
+   "prior14_fit": 0.22,
+   "prev_target": 0.42827897293546086,
+   "prev_fit": 0.355
+  },
+  "44": {
+   "s": 0.801,
+   "p": 0.076,
+   "prior14_target": 0.1798,
+   "prior14_fit": 0.176,
+   "prev_target": 0.3582928521859833,
+   "prev_fit": 0.343
+  },
+  "45": {
+   "s": 0.873,
+   "p": 0.144,
+   "prior14_target": 0.2043,
+   "prior14_fit": 0.214,
+   "prev_target": 0.36946564885496197,
+   "prev_fit": 0.315
+  },
+  "46": {
+   "s": 0.861,
+   "p": 0.15,
+   "prior14_target": 0.1989,
+   "prior14_fit": 0.21,
+   "prev_target": 0.3268563497571138,
+   "prev_fit": 0.339
+  },
+  "47": {
+   "s": 0.943,
+   "p": 0.009,
+   "prior14_target": 0.2259,
+   "prior14_fit": 0.222,
+   "prev_target": 0.28258154059680957,
+   "prev_fit": 0.205
+  }
+ },
+ "overall": {
+  "prior14_target": 0.18665833333333334,
+  "prior14_fit": 0.1876111111111111,
+  "prev_target": 0.3420223224612548,
+  "prev_fit": 0.33145833333333335
+ }
+}

@@ -35,20 +35,15 @@ Prefetch throttle (--throttle):
             window after sync misses, so async reads stay hidden. Models
             an adaptive prefetcher. See tests/test_sim_throttle.py.
 
-Capacity allocation across layers (--alloc):
-  uniform : every layer holds C experts (shipped table)
-  hetero  : the same total budget 48*C is split across layers by a greedy
-            allocator on per-layer LRU hit curves measured on the BUILD
-            split, then evaluated on holdout. Each layer gets at least
-            MIN_LAYER_CAP so pinned slots never exceed capacity.
-
-Capacity is audited every token: no layer may hold more than its cap.
+simulate() accepts either one capacity for every layer (the shipped
+table) or a list of 48 per-layer capacities (used by
+experiments/hetero_alloc.py). Capacity is audited every token: no layer
+may hold more than its cap, or the simulator raises.
 
 usage: .venv/bin/python experiments/sim_paging.py
-       .venv/bin/python experiments/sim_paging.py --alloc hetero --out results/sim_paging_hetero.json
+       .venv/bin/python experiments/sim_paging.py --traces-dir results/traces_synth --out results/sim_paging_synth.json
 """
 import argparse, heapq, json
-from collections import OrderedDict
 from pathlib import Path
 import numpy as np
 
@@ -58,7 +53,6 @@ L, K, E = 48, 10, 512
 GOLD_MIB = L * K * EXPERT_MIB
 FLOOR_MIB = 2900.0
 PLE_STREAM_MIB = 0.3
-MIN_LAYER_CAP = 16          # >= largest pin budget (12) + 4 dynamic slots
 
 TIERS = {
     "24GB-M4":  dict(dram=135.0, ssd=5.0, usable=15.0),
@@ -270,59 +264,6 @@ def solve_policy(gold, picks, prior_rank, cap, mode, pick, spec,
     return srv_f, sync_mb, async_mb, t, c_ms, st_ms
 
 
-# ---------------- heterogeneous per-layer capacity ----------------
-
-CAP_GRID = (4, 8, 12, 16, 24, 32, 48, 64, 96, 128, 160, 192, 256,
-            320, 384, 448, 512)
-
-
-def lru_hit_curve(rows, grid=CAP_GRID):
-    """hits at each cap for a plain per-access LRU over rows [T,K]."""
-    out = []
-    for c in grid:
-        od = OrderedDict()
-        hits = 0
-        for row in rows:
-            for e in row:
-                e = int(e)
-                if e in od:
-                    hits += 1
-                    od.move_to_end(e)
-                else:
-                    od[e] = None
-                    if len(od) > c:
-                        od.popitem(last=False)
-        out.append(hits)
-    return out
-
-
-def allocate_caps(build_lay, total, grid=CAP_GRID, step=4,
-                  min_cap=MIN_LAYER_CAP, max_cap=E):
-    """Greedy: give `step` experts at a time to the layer whose LRU hit
-    curve (linearly interpolated between grid points) gains most."""
-    curves = {li: lru_hit_curve(build_lay[li], grid) for li in range(L)}
-
-    def hits(li, c):
-        return float(np.interp(c, grid, curves[li]))
-
-    caps = [min_cap] * L
-    budget = total - sum(caps)
-    assert budget >= 0, "total budget below 48 * MIN_LAYER_CAP"
-    while budget >= step:
-        best, best_gain = None, -1.0
-        for li in range(L):
-            if caps[li] + step > max_cap:
-                continue
-            g = hits(li, caps[li] + step) - hits(li, caps[li])
-            if g > best_gain:
-                best, best_gain = li, g
-        if best is None:
-            break
-        caps[best] += step
-        budget -= step
-    return caps, curves
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--eval-sub", type=int, default=8000)
@@ -332,18 +273,16 @@ def main():
     ap.add_argument("--traces-dir", default=str(ROOT / "results/traces"))
     ap.add_argument("--throttle", choices=("legacy", "compute"),
                     default="legacy")
-    ap.add_argument("--alloc", choices=("uniform", "hetero"),
-                    default="uniform")
     ap.add_argument("--out", default=None,
                     help="output JSON; defaults to results/sim_paging.json "
                          "only for the shipped configuration")
     a = ap.parse_args()
 
     default_cfg = (a.traces_dir == str(ROOT / "results/traces")
-                   and a.throttle == "legacy" and a.alloc == "uniform")
+                   and a.throttle == "legacy")
     out_path = Path(a.out) if a.out else (
         ROOT / "results/sim_paging.json" if default_cfg
-        else ROOT / f"results/sim_paging_{a.alloc}_{a.throttle}.json")
+        else ROOT / f"results/sim_paging_{a.throttle}.json")
 
     tdir = Path(a.traces_dir)
     bf, bl, bT = load_split(tdir / "build.npz")
@@ -362,26 +301,17 @@ def main():
 
     out = []
     for cap in [int(x) for x in a.caps.split(",")]:
-        caps = cap
-        alloc_info = {}
-        if a.alloc == "hetero":
-            caps, _ = allocate_caps({li: bl[li][:bT] for li in range(L)},
-                                    cap * L)
-            alloc_info = dict(alloc="hetero", caps_per_layer=caps,
-                              caps_min=min(caps), caps_max=max(caps))
-            print(f"cap={cap}: hetero caps min={min(caps)} max={max(caps)} "
-                  f"sum={sum(caps)}", flush=True)
         for P in sorted(picks_map):
             for mode in modes:
                 p = P if mode == "probe" else 0
                 row = dict(cap=cap, mode=mode, probe_picks=P,
-                           throttle=a.throttle, **alloc_info)
+                           throttle=a.throttle)
                 for tier, spec in TIERS.items():
                     need_gib = FLOOR_MIB / 1024 + cap * L * EXPERT_MIB / 1024
                     if need_gib > spec["usable"]:
                         continue
                     srv_f, sync_mb, async_mb, t, c_ms, st_ms = \
-                        solve_policy(gold, picks_map[P], prior_rank, caps,
+                        solve_policy(gold, picks_map[P], prior_rank, cap,
                                      mode, p, spec, throttle=a.throttle)
                     row[f"served_{tier}"] = round(srv_f, 3)
                     row[f"tps_{tier}"] = round(t, 1)
@@ -389,8 +319,7 @@ def main():
                     row[f"st_{tier}"] = round(st_ms, 1)
                     row[f"ssdMB_{tier}"] = round(sync_mb + async_mb, 0)
                 out.append(row)
-                print(json.dumps({k: v for k, v in row.items()
-                                  if k != "caps_per_layer"}), flush=True)
+                print(json.dumps(row), flush=True)
     out_path.write_text(json.dumps(out, indent=1))
     print("wrote", out_path)
 
