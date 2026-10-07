@@ -1,0 +1,88 @@
+2026-10-06 21:20:27,390 - omlx.settings - INFO - Saved settings to /Users/yb/.omlx/settings.json
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+2026-10-06 21:20:28,177 - omlx.scheduler - INFO - ChunkedKVCache patch: methods already present upstream, skipped: size
+2026-10-06 21:20:28,243 - omlx.server - INFO - CORS origins: ['*']
+2026-10-06 21:20:28,243 - omlx.model_settings - INFO - Loaded settings for 1 models
+2026-10-06 21:20:28,256 - omlx.model_discovery - INFO - Discovered model: Qwen3.8-Flash-Next-oQ4e-mtp (type: vlm, engine: vlm, size: 103.94GB, text-only: 103.07GB)
+2026-10-06 21:20:28,256 - omlx.engine_pool - INFO - Discovered 1 models
+2026-10-06 21:20:28,256 - omlx.server_metrics - INFO - Loaded all-time stats from /Users/yb/.omlx/stats.json
+2026-10-06 21:20:28,257 - omlx.server - INFO - Server initialized with 1 models
+2026-10-06 21:20:28,257 - omlx.server - INFO - Default model: Qwen3.8-Flash-Next-oQ4e-mtp
+2026-10-06 21:20:28,257 - omlx.server - INFO - Memory guard tier: aggressive (guard on)
+2026-10-06 21:20:28,257 - omlx.server - INFO - Default max tokens: 32768
+2026-10-06 21:20:28,258 - omlx.server - INFO - HF Downloader initialized
+2026-10-06 21:20:28,258 - omlx.server - INFO - ModelScope SDK not installed, MS downloader disabled
+2026-10-06 21:20:28,258 - omlx.server - INFO - oQ Quantizer initialized
+2026-10-06 21:20:28,259 - omlx.server - INFO - HF Uploader initialized
+INFO:     Started server process [29583]
+INFO:     Waiting for application startup.
+2026-10-06 21:20:28,274 - omlx.process_memory_enforcer - WARNING - Metal cap (28.1GB, Apple max_recommended_working_set_size) is below the oMLX static ceiling (34.5GB); leaving Apple's default Metal cap active because iogpu.wired_limit_mb is unset. Raise it with: sudo sysctl iogpu.wired_limit_mb=35020
+2026-10-06 21:20:28,274 - omlx.process_memory_enforcer - INFO - Process memory enforcer started (tier=aggressive, ceiling=27.8GB, interval=1.0s)
+INFO:     Application startup complete.
+2026-10-06 21:20:28,437 - omlx.engine_pool - WARNING - Qwen4-Exp PLE forced to SSD for Qwen3.8-Flash-Next-oQ4e-mtp: resident 59.1GB leaves no room to serve prompts under the 30.2GB memory ceiling (mmap needs 25.5GB). Decode will be roughly 2.5x slower than a resident load.
+2026-10-06 21:20:28,447 - omlx.engine_pool - INFO - Loading model: Qwen3.8-Flash-Next-oQ4e-mtp
+2026-10-06 21:20:28,451 - omlx.engine_pool - WARNING - Qwen4-Exp PLE forced to SSD for Qwen3.8-Flash-Next-oQ4e-mtp: resident 59.1GB leaves no room to serve prompts under the 30.2GB memory ceiling (mmap needs 25.5GB). Decode will be roughly 2.5x slower than a resident load.
+2026-10-06 21:20:28,472 - omlx.utils.model_loading - INFO - M5 sorted gather_qmm reroute installed (issue #2267)
+2026-10-06 21:20:28,496 - omlx.patches.mlx_vlm_qwen4_exp_compat - INFO - Qwen4-Exp mlx-vlm compatibility patch applied
+2026-10-06 21:20:28,496 - omlx.utils.model_loading - INFO - Qwen4-Exp mlx-vlm compatibility patch applied for /Users/yb/.omlx/models/Qwen3.8-Flash-Next-oQ4e-mtp
+2026-10-06 21:20:28,497 - omlx.patches.mlx_vlm_qwen4_exp_compat - INFO - Qwen4-Exp PLE mode for /Users/yb/.omlx/models/Qwen3.8-Flash-Next-oQ4e-mtp: mmap
+2026-10-06 21:20:28,544 - omlx.engine.vlm - INFO - qwen4_exp pre-quantization sanitize active for Qwen3.8-Flash-Next-oQ4e-mtp
+2026-10-06 21:20:28,659 - mlx_vlm.models.qwen4_exp.qwen4_exp - INFO - Enabled Qwen4-Exp hyper-connection optimizations: 91 exact hybrid projection pairs, 97 compiled decode paths
+2026-10-06 21:20:29,049 - omlx.patches.moe_expert_offload - INFO - moe expert offload: wrapped 48 layers at 28.0% residency (expert tables: 67.95 GB total, 18.98 GB resident)
+2026-10-06 21:20:30,332 - omlx.engine.vlm - INFO - moe expert offload active (48 layers): skipping gate/up fusion on the VLM path
+2026-10-06 21:20:30,332 - omlx.engine.vlm - INFO - Vision feature cache enabled (SSD: /Users/yb/.omlx/cache/vision_features)
+2026-10-06 21:20:31,171 - omlx.scheduler - INFO - Loaded 1 additional EOS token(s) from generation_config.json: {248044}
+2026-10-06 21:20:31,171 - omlx.scheduler - INFO - Enlarging paged cache block_size=256 to 2048 for ArraysCache hybrid model (reduces boundary snapshot overhead)
+2026-10-06 21:20:31,173 - omlx.scheduler - INFO - Decode KV cache materialization interval set to 256 tokens
+2026-10-06 21:20:31,173 - omlx.memory_monitor - INFO - MemoryMonitor initialized (estimator-only, eviction disabled)
+2026-10-06 21:20:31,186 - omlx.memory_monitor - INFO - Model info set: 48 layers (12 KVCache), 2 KV heads, 24 Q heads, 256 head_dim. Estimated memory per 64-token block: 1.71 MB, KV override 27.28 KB/tok
+2026-10-06 21:20:31,187 - omlx.scheduler - INFO - paged SSD-only mode: max_blocks=100000, block_size=2048 tokens
+2026-10-06 21:20:31,187 - omlx.cache.paged_cache - INFO - PagedCacheManager initialized: block_size=2048, initial_blocks=256, max_blocks=100000, max_tokens=204800000
+2026-10-06 21:20:31,187 - omlx.cache.paged_ssd_cache - INFO - Scanning SSD cache directory: /Users/yb/.omlx/cache
+2026-10-06 21:20:31,194 - omlx.cache.paged_ssd_cache - INFO - SSD cache scan complete: scanned=15, indexed=15, errors=0, total_size=1.64 GB, gdn_sidecars=15, gdn_size=1.62 GB
+2026-10-06 21:20:31,194 - omlx.cache.paged_ssd_cache - INFO - PagedSSDCacheManager initialized: dir=/Users/yb/.omlx/cache, max_size=209.54 GB, auto_size=True, existing_files=15, disk_free=417.44 GB, cache_used=1.64 GB, incompatible_files=0
+2026-10-06 21:20:31,194 - omlx.cache.paged_cache - INFO - paged SSD cache manager connected to PagedCacheManager
+2026-10-06 21:20:31,194 - omlx.cache.prefix_cache - INFO - Indexed 15 tail blocks from SSD cache
+2026-10-06 21:20:31,194 - omlx.cache.prefix_cache - INFO - PagedSSDCacheManager connected to BlockAwarePrefixCache
+2026-10-06 21:20:31,194 - omlx.scheduler - INFO - paged SSD cache enabled: cache_dir=/Users/yb/.omlx/cache, max_size=209.54 GB, block_size=2048 tokens
+2026-10-06 21:20:31,195 - omlx.scheduler - INFO - paged SSD cache enabled: /Users/yb/.omlx/cache, block_size=2048, max_blocks=100000
+2026-10-06 21:20:31,195 - omlx.engine_core - INFO - Engine started
+2026-10-06 21:20:31,196 - omlx.patches.sdpa256_attention - INFO - sdpa256 attention patch applied (head_dim=256 prefill, kv_len>=8192, always force bounded for qualifying calls (#2025))
+2026-10-06 21:20:31,201 - omlx.patches.qwen35_gdn_prework - INFO - mlx-vlm Qwen3.5 GDN q/k normalization follows mlx-lm normalize_qk
+2026-10-06 21:20:31,201 - omlx.patches.qwen35_gdn_verify_fused - INFO - GDN verify replay commit patch applied
+2026-10-06 21:20:31,201 - omlx.patches.qwen35_gdn_prework - INFO - Qwen fused GDN prework patch applied
+2026-10-06 21:20:31,202 - omlx.patches.qwen35_verify_sdpa_split - INFO - Qwen3.5/3.6 verify-width causal vector attention patch applied
+2026-10-06 21:20:31,202 - omlx.patches.qwen35_gdn_chunked - INFO - Qwen3.5/3.6 GDN prefill kernel patch applied (Metal, impl=pipelined, min_t=64)
+2026-10-06 21:20:31,205 - omlx.patches.qwen35_moe_router - INFO - Qwen MoE fused router top-k patch applied
+2026-10-06 21:20:31,206 - omlx.patches.qwen35_moe_routed_decode - INFO - Qwen MoE fused routed-expert decode patch applied
+2026-10-06 21:20:31,206 - omlx.patches.qwen35_ragged_decode - INFO - qwen3_5 ragged decode threadgroup fallback patch applied
+2026-10-06 21:20:31,212 - omlx.cache.paged_ssd_cache - INFO - PagedSSDCacheManager updated layer cache signature (48 layers, 2 unique types, turboquant_kv_bits=None, cachelist_subtypes=no, numerics=gdn-qk-norm-2)
+2026-10-06 21:20:31,271 - omlx.engine.vlm - INFO - VLM tool calling enabled: parser=qwen3_coder
+2026-10-06 21:20:31,275 - omlx.engine.vlm - INFO - VLMBatchedEngine loaded: /Users/yb/.omlx/models/Qwen3.8-Flash-Next-oQ4e-mtp
+2026-10-06 21:20:31,285 - omlx.engine_pool - INFO - Loaded model: Qwen3.8-Flash-Next-oQ4e-mtp (actual: 22.71GB, local estimate: 23.77GB, full model: 103.94GB, total: 23.77GB)
+2026-10-06 21:20:31,286 - omlx.engine.vlm - INFO - Structured output requires xgrammar. Reinstall with: brew reinstall omlx --with-grammar
+2026-10-06 21:20:31,318 - omlx.scheduler - INFO - Enabled boundary cache snapshots for stateful non-sliceable cache layers
+2026-10-06 21:20:31,920 - omlx.scheduler - INFO - Reserved QSA indexer capacity for 53 tokens across 12 caches
+2026-10-06 21:20:31,930 - mlx_vlm.models.qwen4_exp.language - INFO - PLE gather-ahead active: next prefill chunk rows are gathered during the current chunk
+2026-10-06 21:20:31,931 - omlx.scheduler - INFO - Prefill lm_head skip enabled: chunk logits are discarded, vocabulary projection deferred to first decode step.
+2026-10-06 21:20:38,495 - omlx.scheduler - INFO - Qwen4 prefill pricing route corrected after execution: rid=54c0af51-d343-4d8d-9012-11d100ec5143 predicted=gathered actual=mask_dense query=48 kv_len=0
+2026-10-06 21:20:38,878 - omlx.patches.qwen35_gdn_prework - INFO - Qwen4 fused B1/T1 GDN decode prework and norm-gate engaged
+2026-10-06 21:20:39,972 - omlx.scheduler - INFO - Using boundary cache snapshot for 54c0af51-d343-4d8d-9012-11d100ec5143: storing 48/61 tokens (tail terminal, 0 intermediate snapshots)
+2026-10-06 21:20:39,976 - omlx.scheduler - INFO - Cache phase timings: cleanup_finished_sync=1.2ms/1, prefix_cache_lookup=0.1ms/1, store_cache_main_boundary=8.2ms/1, store_cache_main_collect=0.0ms/1, store_cache_main_dispatch=2.8ms/1, store_cache_worker_sync=0.2ms/1
+2026-10-06 21:20:39,977 - omlx.server - INFO - Chat completion: model=Qwen3.8-Flash-Next-oQ4e-mtp, 8 tokens in 8.67s (8.6 tok/s), prompt: 53, finish_reason=length, max_tokens=8, request_max_tokens=8, stream_model_ttft=7.74s, stream_visible_ttft=7.86s
+2026-10-06 21:20:39,993 - omlx.scheduler - INFO - Reserved QSA indexer capacity for 80 tokens across 12 caches
+2026-10-06 21:20:39,997 - omlx.patches.qwen35_gdn_prework - INFO - Qwen4 fused GDN prefill prework and norm-gate engaged
+2026-10-06 21:20:48,809 - omlx.scheduler - INFO - Qwen4 prefill pricing route corrected after execution: rid=8aaf1ccd-66bb-4ec4-a2a0-873c1777d5f5 predicted=gathered actual=mask_dense query=75 kv_len=0
+2026-10-06 21:21:59,444 - omlx.scheduler - INFO - Using boundary cache snapshot for 8aaf1ccd-66bb-4ec4-a2a0-873c1777d5f5: storing 75/1104 tokens (tail terminal, 0 intermediate snapshots)
+2026-10-06 21:21:59,447 - omlx.scheduler - INFO - Cache phase timings: cleanup_finished_sync=1.2ms/2, prefix_cache_lookup=0.2ms/2, store_cache_main_boundary=28.7ms/2, store_cache_main_collect=0.0ms/2, store_cache_main_dispatch=5.3ms/2, store_cache_worker_sync=0.2ms/1
+2026-10-06 21:21:59,449 - omlx.server - INFO - Chat completion: model=Qwen3.8-Flash-Next-oQ4e-mtp, 1024 tokens in 79.46s (14.6 tok/s), prompt: 80, finish_reason=length, max_tokens=1024, request_max_tokens=1024, stream_model_ttft=9.53s, stream_visible_ttft=9.53s
+2026-10-06 21:21:59,468 - omlx.scheduler - INFO - Prefix cache restore for d00636ba-26e2-4250-91d9-28bad8ab996c: source=paged cached=75 suffix=5 blocks=1 lookup=0.049ms reconstruct=3.948ms promote=True
+2026-10-06 21:21:59,469 - omlx.scheduler - INFO - Reserved QSA indexer capacity for 80 tokens across 12 caches
+2026-10-06 21:22:00,245 - omlx.scheduler - INFO - Qwen4 prefill pricing route corrected after execution: rid=d00636ba-26e2-4250-91d9-28bad8ab996c predicted=gathered actual=mask_dense query=4 kv_len=75
+2026-10-06 21:23:07,914 - omlx.scheduler - INFO - Cache phase timings: cleanup_finished_sync=1.3ms/3, prefix_cache_lookup=0.2ms/3, prefix_cache_reconstruct=3.9ms/1, store_cache_main_boundary=28.7ms/3, store_cache_main_collect=0.0ms/2, store_cache_main_dispatch=5.3ms/2, store_cache_worker_sync=0.3ms/2
+2026-10-06 21:23:07,915 - omlx.server - INFO - Chat completion: model=Qwen3.8-Flash-Next-oQ4e-mtp, 1024 tokens in 68.45s (15.2 tok/s), prompt: 80, finish_reason=length, max_tokens=1024, request_max_tokens=1024, stream_model_ttft=1.01s, stream_visible_ttft=1.01s
+2026-10-06 21:23:07,951 - omlx.scheduler - INFO - Prefix cache restore for 340318aa-1ff9-4ee8-aba3-e0e7fa11ed37: source=paged cached=75 suffix=5 blocks=1 lookup=0.044ms reconstruct=20.445ms promote=True
+2026-10-06 21:23:07,952 - omlx.scheduler - INFO - Reserved QSA indexer capacity for 80 tokens across 12 caches
+2026-10-06 21:23:08,744 - omlx.scheduler - INFO - Qwen4 prefill pricing route corrected after execution: rid=340318aa-1ff9-4ee8-aba3-e0e7fa11ed37 predicted=gathered actual=mask_dense query=4 kv_len=75
+2026-10-06 21:24:21,548 - omlx.scheduler - INFO - Cache phase timings: cleanup_finished_sync=1.3ms/4, prefix_cache_lookup=0.3ms/4, prefix_cache_reconstruct=24.4ms/2, store_cache_main_boundary=28.7ms/4, store_cache_main_collect=0.0ms/2, store_cache_main_dispatch=5.3ms/2, store_cache_worker_sync=0.3ms/2
+2026-10-06 21:24:21,549 - omlx.server - INFO - Chat completion: model=Qwen3.8-Flash-Next-oQ4e-mtp, 1024 tokens in 73.62s (14.1 tok/s), prompt: 80, finish_reason=length, max_tokens=1024, request_max_tokens=1024, stream_model_ttft=1.04s, stream_visible_ttft=1.05s
