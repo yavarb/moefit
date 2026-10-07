@@ -54,3 +54,43 @@ band) -> c704058a flags-off ~= stock at tps level; caveat closes.
 Below band by more than run noise (sd ~0.16-0.8) -> re-examine the
 BATCH1 arm against a stock-file rerun. NOT an arm; NOT scored by
 score_dbuf_aba.py; single-run supporting evidence only.
+
+## CLOSURE (cycle 39, later same day): SUPERSEDED BY STATIC VERIFICATION — caveat CLOSED
+
+The dynamic spot-check became moot before it ran: while I was probing,
+T3 landed LIP v3 (d9850d99, commit 92111bd, demotion-after-loop per the
+cycle-36 anchors) and ran their cycle-49 arm; the 21:36:11 PT restart I
+observed was their post-arm default restore. My probe (15.78 tps,
+1 run, 1024 tokens) therefore measured d9850d99-default, NOT
+c704058a — DISCARDED as the registered closer (also: ambient env by
+my own runbook rule 3; though T3's restore created it, I did not).
+
+The stronger instrument ran instead — a STATIC gate-diff:
+
+- c704058a content recovered from box staging /tmp/omlx_t2_sidecar_plus_lip.py
+  (byte-identical to git 468a6ac) vs 214e8823 (git 7ea2d1e).
+- The ENTIRE 214e8823 -> c704058a delta is 21 diff lines, all inside
+  _install's LIP insertion block (installed-file lines 494-509), which
+  is guarded by `self._admit and self._miss_hist.get(e,0)==1 and not
+  self.free`, with `self._admit = os.environ.get("OMLX_ADMISSION","0")=="1"`
+  (line 435).
+- My BATCH1 arm restart set its own env (`env OMLX_MOE_OFFLOAD_IO_BATCH=1
+  nohup omlx serve ...`) from a clean script environment: OMLX_ADMISSION
+  unset -> _admit=False -> the entire changed region was DEAD CODE
+  during the arm. c704058a flags-off is byte-for-byte 214e8823 flags-off
+  ON EVERY EXECUTED LINE of my arm, and 214e8823 flags-off was already
+  verified tps-indistinguishable from stock.
+- Corroboration: no KeyError crash during the arm (LIP inactive — it
+  crashes when active), warm-arm tps (14.63/15.17/14.10) consistent
+  with the registered IO_BATCH=1 semantics.
+
+VERDICT: the BATCH1 file-provenance caveat is CLOSED BY CONSTRUCTION.
+The scored record (de11012) stands as scored; the ON/OFF family and the
+BATCH1 arm are behaviorally same-file (flags-off) for every line each
+arm executed. The queued dynamic spot-check is RETIRED.
+
+Incidental (not the registered closer, single run, on T3's post-arm
+default restore of d9850d99): 15.78 tps / 1024 tokens / ttft 7.94 s —
+inside the ON-family band [15.52, 16.63]. Handing to T3 as a free
+flags-off data point for their v3 file (their arm, their
+interpretation).
