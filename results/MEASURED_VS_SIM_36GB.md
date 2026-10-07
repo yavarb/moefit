@@ -204,7 +204,11 @@ its prompt; and GPU device utilization is a median **42%** during decode
 (the GPU is idle more than half of each token, consistent with
 SSD-bound). Upper bound if miss latency were fully overlapped with the
 fixed term: ~**25 tok/s** @0.28 (1000/max(39.2, 40.3), SIM bound from
-measured terms).
+measured terms) — a FRAGILE estimate per T7's predictive reanalysis
+(`results/t7_predictive_validation.json`): a balanced 12-row fit gives
+21.97 hypothetical tok/s, and a 10k prompt-cluster bootstrap spans
+13.29–24.37 tok/s with 656/10,000 draws having nonpositive stages —
+sensitivity analysis, not a measured gain or calibrated interval.
 
 **First real-trace check** (T3, commit 29e12a6, one collected real prompt
 — cold-only, single prompt, likely prefill positions, NOT a steady
