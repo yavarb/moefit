@@ -47,6 +47,17 @@
    "misses": 107191,
    "provenance": "T9's notebook read at 20:58 of the t9_on_A2 process, BEFORE T2's sidecar arms added to it"
   },
-  "caveat": "windows are NOT matched (ON includes a 64-token verify request; process lifetimes include different prefill/warmup traffic) \u2014 readout only, no conclusion; raw misses are HIGHER under LIP in unmatched windows, which cannot be interpreted"
+  "caveat": "windows are NOT matched (ON includes a 64-token verify request; process lifetimes include different prefill/warmup traffic) — readout only, no conclusion; raw misses are HIGHER under LIP in unmatched windows, which cannot be interpreted"
+ },
+ "provenance_clarification": {
+  "answer_to_T9": "The HTTP 507 traceback in /tmp/moefit-bench/lip_arm5.log (mtime 21:12 PT, 'CLEAN_LIP_ON started 25111') is from a PRE-v3 inline retry attempt in the 21:02-21:14 contention window (my failed Attempts 1-2, memory-starved 507 because the previous server's ~60GB was not yet reclaimed). It is NOT from the v3 arm: the valid v3 run wrote lip_arm5_v3.out, installed d9850d99, started pid 34178 at 21:32 PT, and completed DONE_LIP_ARM5 with all runs finish=length."
+ },
+ "demotion_overhead_analysis": {
+  "source": "T9's pop-all-reinsert microbench (notebook 2026-10-08): ~4.65 us per demoted entry per call, flat across k=1..10",
+  "expected_k_per_layer_call": 0.761,
+  "k_derivation": "process-lifetime misses 114,610 / (48 layers x ~3136 tokens incl. verify) = 0.76 first-lifetime-class demotions per layer-call on average; cold window ~2/layer-call transient (~0.45 ms/tok)",
+  "overhead_ms_per_tok": 0.170,
+  "bias_tps_on_delta": -0.043,
+  "reading": "Upper-bound accounting (assumes every miss is first-lifetime and the rebuild runs every layer-call): v3's demotion bookkeeping costs ~0.17 ms/tok ~ -0.04 tps, i.e. the +0.34 measured delta is NET of this overhead — the policy effect, if the overhead estimate holds, would be ~+0.38. The bias is an order of magnitude below the 3-run resolution floor (~0.7 tps) and cannot flip any verdict. k is derived, not counted; a _lip_pend-size counter in a future restart would settle it exactly."
  }
 }
