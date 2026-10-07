@@ -145,7 +145,7 @@ class LayeredReplaySession:
             raise RuntimeError('plan before executing layer0')
         if max_bytes < 0:
             raise ValueError('negative byte budget')
-        if not self.enabled:
+        if not self.enabled or max_bytes == 0:
             return ()
         plan = []
         used = 0
@@ -166,6 +166,8 @@ class LayeredReplaySession:
                 if used + size <= max_bytes:
                     plan.append((layer, expert, int(size)))
                     used += size
+                    if used == max_bytes:
+                        return tuple(plan)
         return tuple(plan)
 
     def route(self, layer, compute):

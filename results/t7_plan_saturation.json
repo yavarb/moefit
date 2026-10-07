@@ -1,0 +1,71 @@
+{
+  "kind": "MEASURED CPU metadata plan benchmark, NOT LLM/SSD",
+  "positions": 143,
+  "trials": [
+    {
+      "reference": {
+        "seconds": 0.017800166999999978,
+        "size_callback_calls": 50329,
+        "planned": 7436
+      },
+      "fast": {
+        "seconds": 0.0038702090000000133,
+        "size_callback_calls": 7436,
+        "planned": 7436
+      }
+    },
+    {
+      "fast": {
+        "seconds": 0.0038955410000000024,
+        "size_callback_calls": 7436,
+        "planned": 7436
+      },
+      "reference": {
+        "seconds": 0.017905249999999984,
+        "size_callback_calls": 50329,
+        "planned": 7436
+      }
+    },
+    {
+      "reference": {
+        "seconds": 0.017818916999999934,
+        "size_callback_calls": 50329,
+        "planned": 7436
+      },
+      "fast": {
+        "seconds": 0.0038199999999999346,
+        "size_callback_calls": 7436,
+        "planned": 7436
+      }
+    },
+    {
+      "fast": {
+        "seconds": 0.0038286669999999523,
+        "size_callback_calls": 7436,
+        "planned": 7436
+      },
+      "reference": {
+        "seconds": 0.01810624999999999,
+        "size_callback_calls": 50329,
+        "planned": 7436
+      }
+    },
+    {
+      "reference": {
+        "seconds": 0.017758042000000085,
+        "size_callback_calls": 50329,
+        "planned": 7436
+      },
+      "fast": {
+        "seconds": 0.0037147919999999113,
+        "size_callback_calls": 7436,
+        "planned": 7436
+      }
+    }
+  ],
+  "baseline_plans_per_s": 8025.179083554884,
+  "fast_plans_per_s": 37349.81391695903,
+  "speedup": 4.654078560501646,
+  "validation": "143 exact uniform-plan equalities +143 nonuniform-size equalities +143 zero-budget checks",
+  "caveat": "Short-circuit assumes positive byte sizes and pure size callback. Does not validate unused candidates after budget fills. Same route selection; no scheduling or IO change."
+}
