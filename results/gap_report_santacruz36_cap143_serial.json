@@ -1,0 +1,37 @@
+{
+ "sim_source": "serial:lru@cap143+hr",
+ "silicon_source": "results/measured_santa_cruz_36gb_ssd.json",
+ "tps": {
+  "sim": 11.9,
+  "silicon": 12.71,
+  "ratio": 0.936,
+  "gap_pct": -6.4
+ },
+ "residency": null,
+ "footprint_gib": null,
+ "expert_gib_resident": null,
+ "ttft_s": null,
+ "sim_terms_ms": {
+  "compute": 24.1,
+  "stream": null,
+  "limiter": "serial"
+ },
+ "ssd_measured": {
+  "mb_per_tok": 140.5,
+  "mbps": 1785.7,
+  "iops": 10746.0,
+  "io_kb": 171.4,
+  "disk_ms_per_tok": 78.7,
+  "silicon_ms_per_tok": 78.7,
+  "residual_ms_per_tok": -0.0
+ },
+ "serial_model": {
+  "tps": 11.9,
+  "compute_ms": 24.1,
+  "io_ms": 36.5,
+  "install_ms": 17.2,
+  "sync_ms": 5.9,
+  "misses_per_tok": 57.4,
+  "served": 0.879
+ }
+}
