@@ -1,0 +1,77 @@
+{
+ "kind": "pre-registered prediction",
+ "design": "within-layer double-buffer / staged expert install (T4, commits 56fdb43/4475d05)",
+ "owner": "T4 glm_instrumentation; silicon execution T9 silicon_dbuf",
+ "measured_inputs": {
+  "base_tps_n1024": 15.55,
+  "base_ms_per_tok": 64.31,
+  "base_mb_per_tok": 102.6,
+  "expert_mb": 2.765,
+  "logical_misses_interval": [
+   37.1,
+   39.5
+  ],
+  "steps_frac_bounds": [
+   0.4,
+   0.8
+  ],
+  "note": "all inputs measured on Santa Cruz; the steps-fraction bracket is structural (synth 0.569), not tuned"
+ },
+ "mechanism_delta": "ON (staged): exposed install = inst * missing-steps; OFF (stock oMLX): inst * logical misses. Predicted saving = inst * misses * (1 - steps_frac).",
+ "predictions": {
+  "eval_each_0.18": {
+   "saving_ms_lo": 1.34,
+   "saving_ms_hi": 4.26,
+   "on_tps_band": [
+    15.88,
+    16.65
+   ],
+   "delta_tps_band": [
+    0.33,
+    1.1
+   ]
+  },
+  "batched_0.28": {
+   "saving_ms_lo": 2.08,
+   "saving_ms_hi": 6.63,
+   "on_tps_band": [
+    16.07,
+    17.34
+   ],
+   "delta_tps_band": [
+    0.52,
+    1.79
+   ]
+  },
+  "microbench_0.30": {
+   "saving_ms_lo": 2.23,
+   "saving_ms_hi": 7.11,
+   "on_tps_band": [
+    16.11,
+    17.48
+   ],
+   "delta_tps_band": [
+    0.56,
+    1.93
+   ]
+  }
+ },
+ "protocol": {
+  "runs": "A/B/A matched pairs, >=3 pairs, SAME prompt each pair (prompt variance is 10.2-13.1 tok/s at n=256 - the matched design cancels it)",
+  "n": "n>=1024 per run (T8 ramp: n=256 understates; anti-rule: n<1024 FORBIDS scoring)",
+  "blobs": "collector blobs with runs[*].tokens + finish_reason + stream_integrity (score_silicon_run.py gates)",
+  "idle": "idle box; report GPU util; no oMLX restart between arms",
+  "cite": "every number cites prompt + residency"
+ },
+ "decision_rules": [
+  "ON beats OFF by >= 0.30 tps (median over >=3 matched pairs, same-prompt deltas) -> staged install TRANSFERS to silicon.",
+  "|delta| < 0.30 tps -> WASH: consistent with the small-install regime (0.18 ms/expert makes the theoretical band +0.3..+1.1); NOT a falsification of the mechanism - repeat at a colder cache state where k/step is larger before concluding.",
+  "ON < OFF by > 0.30 tps -> the install stream CONTENTS with compute/demand IO: falsifies the zero-contention assumption of the staged model (T2's contention probe measured 0.08-0.2 ms/expert interference for background IO - the realized cost may eat the saving).",
+  "Any arm with n<1024, missing counts, or integrity problems: SCORING REFUSED (the fail-closed scorer enforces this mechanically)."
+ ],
+ "notes": [
+  "Prediction band at the best-measured install (0.18): +0.3..+1.1 tok/s on a 15.55 baseline - SMALL; a decisive ON/OFF test needs matched A/B/A pairs, and a null result there does not falsify the mechanism (the same patch under sidecar-prefetch bursts is predicted worth +7.6 tps, commit 4475d05).",
+  "Honest caveat: the steps-fraction on real n=1024 decode is unmeasured; the [0.4, 0.8] bracket is the band over which the prediction holds, and a measured ON/OFF delta outside the band constrains the steps-fraction itself - either outcome is informative.",
+  "No silicon run of this design exists; all numbers above are predictions from measured constants."
+ ]
+}
