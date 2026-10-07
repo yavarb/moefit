@@ -1,0 +1,175 @@
+{
+  "kind": "MEASURED constructed causal CPU model, not LLM decode or attention KV",
+  "prefix_tokens": 48,
+  "branches": 2,
+  "continuation_tokens": 64,
+  "layers": 8,
+  "trials": [
+    {
+      "recompute": {
+        "seconds": 0.015976040999999996,
+        "branches": [
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          },
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          }
+        ]
+      },
+      "replay": {
+        "seconds": 0.011203500000000005,
+        "branches": [
+          {
+            "hits": 256,
+            "routers": 0,
+            "experts": 256
+          },
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          }
+        ]
+      }
+    },
+    {
+      "replay": {
+        "seconds": 0.011121207999999994,
+        "branches": [
+          {
+            "hits": 256,
+            "routers": 0,
+            "experts": 256
+          },
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          }
+        ]
+      },
+      "recompute": {
+        "seconds": 0.015881333999999997,
+        "branches": [
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          },
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          }
+        ]
+      }
+    },
+    {
+      "recompute": {
+        "seconds": 0.016184666999999986,
+        "branches": [
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          },
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          }
+        ]
+      },
+      "replay": {
+        "seconds": 0.011489958999999994,
+        "branches": [
+          {
+            "hits": 256,
+            "routers": 0,
+            "experts": 256
+          },
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          }
+        ]
+      }
+    },
+    {
+      "replay": {
+        "seconds": 0.01116433299999997,
+        "branches": [
+          {
+            "hits": 256,
+            "routers": 0,
+            "experts": 256
+          },
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          }
+        ]
+      },
+      "recompute": {
+        "seconds": 0.016248708999999972,
+        "branches": [
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          },
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          }
+        ]
+      }
+    },
+    {
+      "recompute": {
+        "seconds": 0.016515957999999997,
+        "branches": [
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          },
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          }
+        ]
+      },
+      "replay": {
+        "seconds": 0.011767958999999995,
+        "branches": [
+          {
+            "hits": 256,
+            "routers": 0,
+            "experts": 256
+          },
+          {
+            "hits": 0,
+            "routers": 256,
+            "experts": 256
+          }
+        ]
+      }
+    }
+  ],
+  "recompute_tokens_per_s": 3954.3600124735376,
+  "replay_tokens_per_s": 5712.50055786138,
+  "speedup": 1.4446081135359468,
+  "routing_hit_rate": 0.5,
+  "outputs_and_final_states_bit_exact": true,
+  "caveat": "Both arms restore the same real recurrent state snapshot; both pay snapshot cloning and route-wrapper costs. Prefix prefill/cache seeding excluded. All expert and recurrent updates retained. No production backend integration."
+}
