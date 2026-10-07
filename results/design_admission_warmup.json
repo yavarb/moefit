@@ -1,0 +1,65 @@
+{
+ "kind": "simulated",
+ "policy": "admit_warmup (second-chance admission + cache-fullness warmup bypass)",
+ "reference": "results/design_admission_control.json (v2, no bypass)",
+ "cap92": {
+  "omlx_decay": {
+   "miss_global": 89.006,
+   "miss_suffix": 82.287,
+   "tps_suffix": 9.48,
+   "tps_global": 8.99
+  },
+  "admit_second_chance": {
+   "miss_global": 89.259,
+   "miss_suffix": 81.483,
+   "tps_suffix": 9.54,
+   "tps_global": 8.98
+  },
+  "admit_warmup": {
+   "miss_global": 89.259,
+   "miss_suffix": 81.481,
+   "tps_suffix": 9.54,
+   "tps_global": 8.98
+  }
+ },
+ "cap143": {
+  "omlx_decay": {
+   "miss_global": 56.932,
+   "miss_suffix": 46.943,
+   "tps_suffix": 13.41,
+   "tps_global": 12.01
+  },
+  "admit_second_chance": {
+   "miss_global": 58.075,
+   "miss_suffix": 46.562,
+   "tps_suffix": 13.47,
+   "tps_global": 11.87
+  },
+  "admit_warmup": {
+   "miss_global": 58.074,
+   "miss_suffix": 46.403,
+   "tps_suffix": 13.5,
+   "tps_global": 11.87
+  }
+ },
+ "cap192": {
+  "omlx_decay": {
+   "miss_global": 41.015,
+   "miss_suffix": 28.181,
+   "tps_suffix": 17.42,
+   "tps_global": 14.51
+  },
+  "admit_second_chance": {
+   "miss_global": 43.141,
+   "miss_suffix": 29.569,
+   "tps_suffix": 17.04,
+   "tps_global": 14.12
+  },
+  "admit_warmup": {
+   "miss_global": 43.062,
+   "miss_suffix": 28.777,
+   "tps_suffix": 17.25,
+   "tps_global": 14.14
+  }
+ }
+}

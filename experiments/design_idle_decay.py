@@ -185,6 +185,39 @@ def replay(gold, cap, policy):
                 if calls[li] % 4 == 0:
                     for e in r:
                         r[e] *= 0.7
+    elif policy == "admit_warmup":
+        # v3: second-chance admission + WARMUP BYPASS. The v2 global-window
+        # loss came from cold-start compulsory misses: a first miss is gated,
+        # then its second touch (which for warm-up experts comes SOON) pays a
+        # second fetch. Fix: until a layer's cache is FULL, install on first
+        # miss (classic fill); once eviction begins (cache full), gate first
+        # misses and install only recurrent ones. The bypass is tied to
+        # cache-fullness, not a token count — no knob.
+        res = [dict() for _ in range(sp.L)]
+        miss_hist = [dict() for _ in range(sp.L)]
+        calls = [0] * sp.L
+        for t in range(T):
+            for li in range(sp.L):
+                r, hist = res[li], miss_hist[li]
+                warm = len(r) < cap          # bypass while cache not full
+                cur = set(int(x) for x in gold[t, li])
+                for e in cur:
+                    if e in r:
+                        r[e] = r.get(e, 0.0) + 1.0
+                        continue
+                    M[t, li] += 1
+                    hist[e] = hist.get(e, 0) + 1
+                    if hist[e] >= 2 or warm:
+                        while len(r) >= cap:
+                            cand = [x for x in r if x not in cur]
+                            if not cand:
+                                break
+                            del r[min(cand, key=lambda x: r[x])]
+                        r[e] = 1.0
+                calls[li] += 1
+                if calls[li] % 4 == 0:
+                    for e in r:
+                        r[e] *= 0.7
     else:
         raise ValueError(policy)
     return M
