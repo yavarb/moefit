@@ -213,6 +213,22 @@ all-layer cross-position expert repeat 0.365 real vs 0.350 synth (within
 real-trace collection (paused by the Chief priority order) is the highest
 payoff per unit of trace.
 
+### Evidence hierarchy (T3, commit 09565e9 — per-constant honesty labels)
+
+The blanket "every constant measured or measured-confirmed" claim is
+withdrawn; each constant carries its evidence class:
+
+| class | items |
+|---|---|
+| **directly measured** | physical SSD MB/token (iostat, 17 points); per-layer k-miss read latency + install + sync (F_NOCACHE microbench); prompt-to-prompt throughput variation (10.2–13.1 tok/s); page-cache occupancy (mincore, 2.29/71.6 GB) |
+| **inferred robustly** | miss-cost slope 0.288 ± 0.053 ms/MB (descriptive; value sits above all pure byte-rates 0.179–0.263 and within 3% of the serial io+install prediction 0.297 — supports per-miss overhead, marginally, within 1 SE of the slowest rate); logical misses [50.8, 53.5]/tok (mincore-bounded, pending T6's stock-vs-flow audit of the snapshot's decode-time representativeness); anchor reproduction 12.52–12.87 tok/s @compute 24.1 |
+| **assumed working values** | compute 24.1 ms @410-bin (best-supported, not certified; 48 GB keeps 18.1 @546-bin); serial-resolve discipline transferring to other tiers |
+
+What would settle the assumed items: a second residency point
+(pre-registered Test B/D), direct logical-miss + timing counters on
+matched windows, and T6's mincore stock-vs-flow audit.
+(`results/fidelity_t7_audit_response.json`)
+
 ### Hypothesis verdicts (updated)
 
 - **H1 partially confirmed**: the SSD never delivers 7.4 GB/s on this
