@@ -1,0 +1,8 @@
+layers=48 tensors/layer=9 expert_MB=2.765
+k=1/layer x48 layers: 36.4 ms/step  133 MB  3.64 GB/s  per-layer 0.76 ms
+k=2/layer x48 layers: 58.4 ms/step  265 MB  4.54 GB/s  per-layer 1.22 ms
+k=3/layer x48 layers: 84.0 ms/step  398 MB  4.74 GB/s  per-layer 1.75 ms
+k=4/layer x48 layers: 105.8 ms/step  531 MB  5.02 GB/s  per-layer 2.20 ms
+bulk 96 experts: 5.7 GB/s
+{'install_ms_per_expert_eval_each': 0.18, 'install_ms_per_expert_batched': 0.28, 'tiny_sync_ms': 0.108}
+RESULT {"expert_MB": 2.7648, "tensors_per_expert": 9, "step_k1_ms": 36.4, "step_k1_GBps": 3.64, "step_k2_ms": 58.4, "step_k2_GBps": 4.54, "step_k3_ms": 84.0, "step_k3_GBps": 4.74, "step_k4_ms": 105.8, "step_k4_GBps": 5.02, "bulk96_GBps": 5.7, "install_ms_per_expert_eval_each": 0.18, "install_ms_per_expert_batched": 0.28, "tiny_sync_ms": 0.108}

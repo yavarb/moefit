@@ -1,0 +1,40 @@
+{
+ "kind": "measured",
+ "host": "santacruz",
+ "timestamp": "2026-10-06T20:33:32-0700",
+ "budget_experts_per_token": 100.0,
+ "max_tokens": 512,
+ "runs": [
+  {
+   "tokens": 512,
+   "ttft_s": 6.932,
+   "decode_s": 37.441,
+   "tps": 13.65,
+   "phase": "A"
+  },
+  {
+   "tokens": 512,
+   "ttft_s": 11.571,
+   "decode_s": 49.685,
+   "tps": 10.28,
+   "bg_target_experts_per_s": 1365.0,
+   "bg_experts_per_s": 1364.5,
+   "bg_GBps": 3.773,
+   "bg_experts_per_token": 132.7,
+   "phase": "B"
+  },
+  {
+   "tokens": 512,
+   "ttft_s": 6.72,
+   "decode_s": 36.509,
+   "tps": 14.0,
+   "phase": "A2"
+  }
+ ],
+ "tps_A_mean": 13.82,
+ "tps_B": 10.28,
+ "slowdown_frac": 0.256,
+ "extra_ms_per_token": 24.94,
+ "bg_ms_per_token_if_serial": 73.38,
+ "note": "background reads are random (useless) experts: pure interference cost of T2's idle-window budget"
+}
