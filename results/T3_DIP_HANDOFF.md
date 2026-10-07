@@ -37,10 +37,12 @@ mutation point; per-install mutation is not.**
 - LIP on REAL short-prompt decode routes (T1 capture, SIM): WASH everywhere (66.44→66.29
   miss/tok baseline). The one-shot-vs-recurrent distinction pays only in warm multi-prompt
   steady state. Expect DIP's single-prompt A/B to be a WASH by regime, not by bug.
-- Per-miss value under DB-ON: 0.52 ms/miss registered; T5's sidecar composition bounds
-  S ∈ [0.58, 0.71] ms/miss. A 1 miss/tok saving ≈ +0.06–0.07 tps — below the 3-run floor;
-  the MISS/TOK COUNTER (T2's per-request hits/misses patch) is the decisive readout, tps is
-  the coarse check.
+- Per-miss value under DB-ON: 0.52 ms/miss registered + MEASURED install exposure 0.124–0.134
+  ms/miss (T9's corrected BATCH1 window b6bd72f: D=4.74 ms/tok over m=38.2 miss/tok) →
+  **S ≈ 0.65 ms/miss**, inside and settling T5's consistency bound [0.58, 0.71]. A
+  1 miss/tok saving ≈ +0.10 tps warm-suffix (LIP's own −1.291 miss/tok × 0.65 ≈ +0.21 tps —
+  right at the 3-run power floor); below the 3-run tps floor either way — the MISS/TOK
+  COUNTER (T2's per-request hits/misses patch) is the decisive readout, tps is the coarse check.
 - Demotion bookkeeping overhead (T9 microbench + my counters): pop-all-reinsert ≈ 4.65 µs
   per demoted entry per call, flat k=1..10; expected k ≈ 0.76 first-lifetime misses per
   layer-call at cap143 (114,610 misses / 48 layers / ~3136 tok) → ~0.17 ms/tok ≈ −0.04 tps
