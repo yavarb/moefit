@@ -246,7 +246,11 @@ n=128 scoring at cap ≥ 180, no crowded boxes, no 54.8.
 
 Tooling: `experiments/gap_report.py --serial` pairs the silicon-realistic
 serial-model prediction with any measured record in one command
-(commit 23aecd9); `moefit/metrics.py` is the RunRecord schema (tok-gap
+(commit 23aecd9) and now prints the S-vs-Q verdict automatically from any
+run with per-token gaps (`moefit/metrics.serial_signature_check`,
+commit 8536806 — Test C of the pre-registered protocol is zero-touch);
+the full instrumentation reference is [INSTRUMENTATION.md](../INSTRUMENTATION.md);
+`moefit/metrics.py` is the RunRecord schema (tok-gap
 p50/p90/p95/p99 supported); `experiments/gap_santa_cruz.py` and
 `experiments/microbench_expert_reads.py` regenerate the tables above;
 `experiments/fidelity_santa_cruz.py` regenerates the policy table;

@@ -163,6 +163,29 @@ Also folded this cycle:
   test_sim_equivalence was stale reference constants (EXPERT_MIB 1.46 vs
   2.69), not algorithm drift — restored, 45/45 pass (4a7ebb8).
 
+## Entry 4 — prediction quality on traffic + IO coalescing/layout bounds (SIM)
+
+`experiments/analysis_t6_predict_coalesce.py` +
+`results/analysis_t6_predict_coalesce.json` +
+`results/analysis_t6_packed_layout.json` (owner: sheryl_analysis_a/T6,
+commit 969ec54, SIM on locked synth, measured serial constants, compute
+18.1 assumed; notebook note pending at fold time).
+
+| question | number | verdict |
+|---|---|---|
+| PLE ridge-probe as a next-token predictor | precision 0.002 overall, 1.1% on new installs (coact matrix: 15.7% — **14× better**); 83% of picks re-install already-resident hot experts; serial net −1.4/−2.6 tps at budgets 6/12 | **DROP the probe as a prefetch predictor** — it re-installs the hot core instead of catching misses |
+| co-locating co-missed experts (pack for A-batch merging) | clusters/step 1.15; A saving **−0.97 ms/tok** (packing pays A more often than it saves); 12.59 vs 12.74 tps | **DROP packing-for-A-merging at cap143** — only 13.3% of miss steps have ≥2 clusters, so the A*(g−1) saving is structurally tiny |
+| perfect A-merging bound (all co-misses in one IO) | max +3.14 ms/tok → 13.42 tps (+4%) | ceiling too small to chase |
+| sequential read packing (duty cycle 2×) | 12.74 → **16.83 tps (+31%)**; bounded ~3× on miss bytes (drive microbench 3.8–5.6 GB/s vs 1.79 duty) | **KEEP as the read-path lever** — the win is duty-cycle/sequential-merge, not batch-A |
+
+Context that sharpens earlier entries: T8's "install ≤ 0.18 ms/expert
+break-even" assumed a useful predictor; on synth the only candidate with
+signal is the coact matrix (15.7% precision@10), so prediction work should
+target coact-class signals, real traces (synth has no t→t+1 structure),
+and only after install cost drops. The read-path lever is confirmed but
+its paying form is sequential/duty-cycle, not the A-batch form I
+speculatively ranked in the cycle-2 gap doc — corrected here.
+
 ## Method notes for all design rows
 
 - Traces: `results/traces_synth` (synthetic). Trace-shape uncertainty on
@@ -188,6 +211,10 @@ Also folded this cycle:
 - Entry 3 numbers read from
   `results/design_idle_prefetch.json` (owner: design_inventor/T2, commit
   377eb7c, SIM, serial cost model, sidecar/sidecar_opt/Belady rows).
+- Entry 4 numbers read from
+  `results/analysis_t6_predict_coalesce.json` and
+  `results/analysis_t6_packed_layout.json` (owner: sheryl_analysis_a/T6,
+  commit 969ec54, SIM, measured serial constants).
 - Cross-track synthesis draws on T8
   `results/t8_pipelining_predictor_probes.json` (SIM), T3
   `results/sim_serial_policy_ranking.json` (commit 9cd94bd), T6 notebook
