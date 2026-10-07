@@ -207,6 +207,16 @@ stall) or arrive on demand from SSD (stall).
 Simulated decode speed in tok/s, holdout routing trace, measured tier
 bandwidths, capacity audited every token (`results/sim_paging.json`):
 
+**Read these as ceilings, not expectations.** This table uses the bandwidth
+overlap model, which measurements on a 36 GB M4 Max showed to be 2.7–3.5×
+optimistic on every SSD-bound row: oMLX resolves expert misses serially per
+layer rather than overlapping them. The serial-latency model built from
+those measured constants re-prices the stock-oMLX expectations at
+~4.9 tok/s (24 GB @64), ~9.7 (32 GB @128), ~11.8–15.9 (48 GB @128/192) —
+see [results/fidelity_tier_predictions.json](results/fidelity_tier_predictions.json)
+and [results/MEASURED_VS_SIM_36GB.md](results/MEASURED_VS_SIM_36GB.md).
+The table below is what perfect cross-layer pipelining could approach.
+
 | RAM tier | experts/layer resident | LRU | pinned hot-set | routing sidecar | SSD (pinned) |
 |---|---|---|---|---|---|
 | 24 GB (M4) | 32 | 8.1 | 7.6 | 8.6 | 670 MB/tok |

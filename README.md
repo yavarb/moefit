@@ -39,14 +39,16 @@ report measured numbers back to me.
 
 ## How fast is it?
 
-| Your Mac | Experts kept in RAM per layer | Decode (LRU → pinned hot-set) | Notes |
+| Your Mac | Experts kept in RAM per layer | Decode (LRU) | Notes |
 |---|---|---|---|
 | M4 Max, 128 GB | all (model fits) | **57.4 tok/s — measured** | baseline; you don’t need moefit |
 | M4 Max, 36 GB | 143 (fraction 0.28) | **13.0 tok/s — measured** ([results/measured_santa_cruz_36gb.json](results/measured_santa_cruz_36gb.json)) | oMLX 0.7.0 expert offload, PLE table on SSD, MTP off; idle box (~85% free before load) |
-| M4 Max, 48 GB | 192 | 45.1 → **54.8 tok/s** — simulated | ~96% of full-fit when pinned |
-| M4 Max, 48 GB | 128 | 29.1 → 31.7 tok/s — simulated | |
-| M4 Pro, 32 GB | 128 | 23.6 → 25.7 tok/s — simulated | usable for agents |
-| M4, 24 GB | 64 | 11.8 tok/s — simulated | chip bandwidth ceiling; tight |
+| M4 Max, 48 GB | 192 | **~15.9 tok/s — simulated (serial model)** | stock oMLX; bandwidth-model ideal-pipelining ceiling ~52–55 tok/s |
+| M4 Max, 48 GB | 128 | **~11.8 tok/s — simulated (serial model)** | ceiling ~32 tok/s |
+| M4 Pro, 32 GB | 128 | **~9.7 tok/s — simulated (serial model)** | usable for patient agent loops; ceiling ~26 tok/s |
+| M4, 24 GB | 64 | **~4.9 tok/s — simulated (serial model)** | likely too slow for agents; ceiling ~12 tok/s |
+
+Rows below 128 GB are re-priced under the serial-latency model (see Status); the older bandwidth-model numbers (45.1→54.8 etc.) remain in [SETUP.md](SETUP.md#what-the-simulation-says) and should be read as ideal-pipelining ceilings, not expectations. Simulated tier rows other than 36 GB extrapolate constants measured on Santa Cruz ([results/fidelity_tier_predictions.json](results/fidelity_tier_predictions.json)).
 
 The limit is your chip’s memory bandwidth, not clever paging math: each token still reads about 1.3 GB of weights through unified RAM. Paging only decides whether you stall waiting for SSD. Full table and methods: [SETUP.md](SETUP.md#what-the-simulation-says).
 
@@ -59,10 +61,10 @@ The limit is your chip’s memory bandwidth, not clever paging math: each token 
 | Memory | Verdict |
 |---|---|
 | **128 GB+** | Don’t use this. Load the model normally. |
-| **64 GB / 48 GB** | Good fit. Pinned hot-set ≈ within 4% of full-resident speed in sim. |
+| **64 GB / 48 GB** | Works. ~12–16 tok/s simulated (serial model) at 128–192 experts per layer — slower than the older bandwidth-model table suggested; measured run pending. |
 | **36 GB (M4 Max)** | Runs. 13.0 tok/s measured idle with oMLX expert offload at 143 experts per layer (fraction 0.28). |
-| **32 GB** | Yes, with care (~14–26 tok/s on M4 Pro, simulated). Prefer the pinned hot-set. |
-| **24 GB** | Marginal. OS wants the same RAM. Prefer 32 GB+. |
+| **32 GB** | Usable for patient agent loops at ~10 tok/s simulated (serial model); the older 14–26 range was bandwidth-model optimism. |
+| **24 GB** | Not recommended: ~5 tok/s simulated (serial model) on top of OS memory pressure. Prefer 32 GB+. |
 
 Check first (stdlib only; no heavy install):
 
