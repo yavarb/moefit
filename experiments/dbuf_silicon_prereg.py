@@ -42,6 +42,41 @@ out = dict(
     kind="pre-registered prediction", design="within-layer double-buffer / "
     "staged expert install (T4, commits 56fdb43/4475d05)",
     owner="T4 glm_instrumentation; silicon execution T9 silicon_dbuf",
+    amendment2=dict(
+        registered="2026-10-08 ~05:35 ET, BEFORE any T9 A/B/A data exists",
+        trigger=("T9's source read of the INSTALLED Santa Cruz file "
+                 "(Homebrew oMLX 0.7.0, md5 d420b305): the staged-install "
+                 "machinery is NOT merely present - it is ON BY DEFAULT "
+                 "(IO pool default 12 workers, read-ahead window 4*12=48, "
+                 "decode-overlap path default 1; workers<=1 = serial)."),
+        consequence=("ARM SEMANTICS FLIP: the 15.55 tok/s n=1024 baseline "
+                     "IS the DB-ON arm. ON = stock default env; OFF = "
+                     "OMLX_MOE_OFFLOAD_IO_WORKERS=1 (serial). The A/B/A "
+                     "measures the DB's realized contribution by REMOVAL."),
+        predicted=("OFF-arm tps = 1000/(64.31 + saving): the saving bands "
+                   "below are UNCHANGED in magnitude, but they now "
+                   "describe ON-minus-OFF with ON pinned at the measured "
+                   "15.55 (not above it): OFF predicted 14.58-15.24 "
+                   "@install 0.18; ON-OFF = +0.33..+1.10 as before."),
+        rules_unchanged=("The original decision rules apply verbatim "
+                         "with ON=default/OFF=serial labels, EXCEPT the "
+                         "WASH branch gains a decisive second reading "
+                         "(see wash_reading)."),
+        wash_reading=("A WASH (|ON-OFF| < 0.30) now ALSO measures the "
+                      "serial model's install term: if removing the "
+                      "read-ahead window costs nothing, install was "
+                      "never on the DB-ON critical path, so the 0.797 "
+                      "ms/miss regression slope is fetch-dominated and "
+                      "the serial model's install charge (inst * misses "
+                      "= 17.5 ms/tok @0.30) should be re-priced toward "
+                      "inst * missing_steps. Either a TRANSFER or a "
+                      "WASH therefore closes an open model question - "
+                      "there is no uninformative outcome."),
+        original_predictions_superseded=("The original JSON's "
+                                         "'on_tps_band 15.88-16.65 above "
+                                         "the 15.55 OFF baseline' assumed "
+                                         "stock-serial silicon; that "
+                                         "framing is void - 15.55 is ON.")),
     measured_inputs=dict(base_tps_n1024=BASE_TPS,
                          base_ms_per_tok=round(BASE_MS, 2),
                          base_mb_per_tok=BASE_MB_PER_TOK,
@@ -92,7 +127,10 @@ for iname, inst in INSTALL_CANDIDATES.items():
         saving_ms_lo=round(s_lo, 2), saving_ms_hi=round(s_hi, 2),
         on_tps_band=[round(t_lo, 2), round(t_hi, 2)],
         delta_tps_band=[round(t_lo - BASE_TPS, 2),
-                        round(t_hi - BASE_TPS, 2)])
+                        round(t_hi - BASE_TPS, 2)],
+        amendment2_on_is_measured_baseline=BASE_TPS,
+        amendment2_off_tps_band=[round(1000 / (BASE_MS + s_hi), 2),
+                                 round(1000 / (BASE_MS + s_lo), 2)])
 out["notes"] = [
     "Prediction band at the best-measured install (0.18): +0.3..+1.1 "
     "tok/s on a 15.55 baseline - SMALL; a decisive ON/OFF test needs "
@@ -106,6 +144,10 @@ out["notes"] = [
     "informative.",
     "No silicon run of this design exists; all numbers above are "
     "predictions from measured constants.",
+    "AMENDMENT 2 note: the 'on_tps_band' entries preserve the original "
+    "(superseded) framing for audit continuity; score T9's A/B/A against "
+    "amendment2 (ON = 15.55 measured default, OFF = "
+    "amendment2_off_tps_band, decision rules as amended).",
 ]
 print(json.dumps(out, indent=1))
 p = ROOT / "results/t4_dbuf_silicon_prereg.json"
