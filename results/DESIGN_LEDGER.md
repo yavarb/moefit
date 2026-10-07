@@ -47,10 +47,45 @@ Verdicts:
   prefetching extra bytes alone does nothing; only designs that remove
   misses from the serial path (or overlap layers) can win.**
 
+## Entry 2 — mechanism headroom at cap 143 (SIM, exact stack-distance sweep)
+
+`experiments/analysis_t6_traffic_headroom.py` →
+`results/analysis_t6_traffic_headroom.json` (owner: sheryl_analysis_a/T6,
+committed c358684). Exact reuse-distance sweep on the synth holdout —
+served fraction is analytically determined by the reuse-distance
+distribution (p50 D=24, p90 170, p99 28821; cross-check: analytic 0.879 =
+true-LRU replay 0.879, shipped FIFO-LRU 0.84 undercounts by 3.9pp):
+
+| mechanism (true-LRU basis, cap 143) | served | verdict |
+|---|---|---|
+| plain true-LRU | 0.879 | baseline |
+| static hot-set pinning (0 → 50% of cap) | −2.9pp at any pin fraction | **pinning HURTS** — persist-pin-style designs lose at this cap |
+| perfect next-token prefetcher | +12.1pp | **upper bound for ANY prefetcher** — the served-fraction lever caps here |
+| sidecar (exact prefix knowledge) | 1.000 | removes all sync misses; only helps if it feeds pipelining |
+
+Miss dynamics for design sizing: 58.3 misses/token mean (p50/p90/p99 =
+50/81/188, max 480); SSD MB/token p99 506.7, max 1291, burst p99/mean 3.23 —
+bursty, so queue-aware designs matter more than mean-rate ones.
+
+Verdicts:
+
+- **Static pinning: DROP at cap 143** — every pin fraction 0–50% is below
+  plain LRU (−0.1 to −2.9pp served). Same story as T8's prior-pin-half
+  (+15% misses at both caps): frequency-prior hot-sets do not pay on this
+  traffic. Persist-pin / layer-persist-mix WIP designs must be re-based on
+  the TRUE-LRU baseline or their comparisons are inflated ~20%.
+- **Prefetch: bounded.** Even a perfect next-token predictor buys only
+  +12.1pp served — the large wins are in *pipelining the misses that
+  remain* (serial model: ~0.82 ms/miss), not in eliminating them.
+- Served-vs-cap curve (analytic): 0.734@64, 0.879@143, 0.912@192, 0.975@448
+  — diminishing returns past cap ~192 argue against footprint growth as a
+  strategy on its own.
+
 ## Method notes for all design rows
 
-- Traces: `results/traces_synth` (synthetic; served@143 spans 0.767–0.897
-  across calibration-matching variants — quote bands, not points). Real
+- Traces: `results/traces_synth` (synthetic). Trace-shape uncertainty on
+  gate-passing variants is small (served@143 0.837–0.846; only gate-failing
+  variants spread 0.767–0.897) — quote the gated band. Real
   router traces are absent from the lab checkout.
 - Residency sweeps on silicon need n ≥ 1024 tokens per run (short benches
   understate steady state more as cap rises: n128/steady ≈ 0.92 @143,
@@ -64,6 +99,10 @@ Verdicts:
   `results/design_admission_cache.json` (owner: design_inventor/T2, SIM,
   serial-latency cost model, synth holdout, sha f8262a526f8c); oracle row is
   the clairvoyant farthest-next-use bound, not an implementable policy.
+- Entry 2 numbers read from
+  `results/analysis_t6_traffic_headroom.json` (owner: sheryl_analysis_a/T6,
+  commit c358684, SIM, exact stack-distance sweep + true-LRU/pin/prefetch
+  replay at cap 143).
 - Arbitration rows from `results/t8_policy_arbitration_cap92_143.json`
   (sheryl_local_exp/T8, SIM).
 - Cost-model validation and measured anchors: see

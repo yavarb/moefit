@@ -32,13 +32,18 @@ full-fit measurement (57.4 tok/s).
 
 The sim's byte accounting is right; its time model is not.
 
-One more honesty note on the headline "2.8× optimistic" ratio: it carries a
-large trace uncertainty. Across synthetic-trace variants that all still
-match the shipped calibration targets
-(`results/t7_gap_uncertainty.json`, SIMULATED), served@143 spans
-0.767–0.897, so the same sim at fixed knobs spans 25.2–55.2 tok/s — the
-measured/sim ratio is anywhere in 1.9–4.2×, not exactly 2.8×. Quote the
-band, not the point.
+One more honesty note on the headline "2.8× optimistic" ratio: how much
+is trace uncertainty? T7's gated sweep
+(`results/t7_gap_uncertainty.json`, SIMULATED) regenerated seven synth
+variants and scored them against the shipped served-table gate: the five
+that PASS the gate (mean |Δ| ≤ 0.03) all predict 35.9–38.0 tok/s at
+cap 143 — a ratio band of **2.76–2.92×** (±0.1×). Only gate-FAILING traces
+move it far (1.9–4.2×). So: the gap is not a synth-trace artifact — any
+trace matching the shipped served stats leaves the bandwidth-model sim at
+least 2.7× optimistic — but quote the ±0.1× band, not the bare point.
+(T7's earlier hardware-knob "residency discriminator" predictions were
+retracted as built on the superseded bandwidth framing; a replacement,
+computed through the serial model, is in progress.)
 
 ## The gap, decomposed
 
@@ -126,6 +131,16 @@ Two latency models fit the cap-143 ramp equally well (lead_silicon's
 serial-resolve vs T8's byte-backlog at fitted BW); the n=16 warmup weakly
 favors serial-resolve, and a cap-180, n≥1024 silicon run discriminates
 physical-vs-logical traffic accounting (predictions 12.2–18.0, SIM).
+
+Policy reconciliation (T8, SIM under model S): only a **hit-refreshing
+LRU** lands on the measured band — shipped no-refresh LRU predicts 10.04
+tok/s vs measured 12.7–13.0 (−21%), true-LRU predicts 11.99–12.77. Two
+consequences: (a) oMLX's runtime behaves like true-LRU, not the shipped
+no-refresh variant (consistent with the 57.4 replay miss count); (b) the
+hit-refresh fix is worth ~20% predicted tps — retro item 2 is now
+quantitatively justified, and all policy baselines must use the fixed LRU.
+Labeling flag to T1: the "plain LRU" replay in `gap_santa_cruz.json` is
+true-LRU by behavior; name it accordingly.
 
 ### Hypothesis verdicts (updated)
 
