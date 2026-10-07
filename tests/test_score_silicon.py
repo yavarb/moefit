@@ -18,13 +18,16 @@ SCRIPT = ROOT / "experiments" / "score_silicon_run.py"
 
 
 def _blob(tps, tokens=1024, gaps=None, n_runs=3, max_tokens=None,
-          drop_run_tokens=False, host="fixture", model="m"):
+          drop_run_tokens=False, host="fixture", model="m",
+          drop_run_finish=False):
     runs = []
     for i in range(n_runs):
         r = dict(tokens=tokens, decode_tps=tps, ttft_s=0.7,
-                 per_token_ms=gaps)
+                 per_token_ms=gaps, finish_reason="stop")
         if drop_run_tokens:
             del r["tokens"]   # T8: missing per-run counts
+        if drop_run_finish:
+            del r["finish_reason"]   # T8: incomplete stream
         runs.append(r)
     return dict(
         kind="measured", host=host, model=model, timestamp="t",
@@ -120,6 +123,20 @@ def test_all():
         out = _run(["--test", "C", "--measured",
                     _path(td, _blob(12.7, drop_run_tokens=True))])
         assert out["verdicts"][0].startswith("SCORING REFUSED"), out
+
+        # stream-integrity gate (T8 stream-integrity probe): a run with
+        # no finish_reason is an incomplete stream -> refuse scoring
+        out = _run(["--test", "D", "--measured",
+                    _path(td, _blob(16.0, drop_run_finish=True))])
+        assert out["verdicts"][0].startswith("SCORING REFUSED"), out
+        assert "stream incomplete" in out["verdicts"][0]
+        # ...and a recorded integrity problem (e.g. truncated stream)
+        bad = _blob(16.0)
+        bad["runs"][0]["stream_integrity"] = dict(
+            eligible=False, problems=["missing_or_unsupported_finish"])
+        out = _run(["--test", "D", "--measured", _path(td, bad)])
+        assert out["verdicts"][0].startswith("SCORING REFUSED"), out
+        assert "integrity problems" in out["verdicts"][0]
 
 
 if __name__ == "__main__":

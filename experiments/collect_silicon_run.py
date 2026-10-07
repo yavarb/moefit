@@ -25,7 +25,7 @@ are client-observed SSE arrivals: timing is TRANSPORT-provisional
 (Amendment 1) unless a server-side token-level source vouches for it
 (`timing_provenance` field says which).
 """
-import argparse, json, time, urllib.request
+import argparse, json, time, urllib.error, urllib.request
 from pathlib import Path
 
 
@@ -46,43 +46,81 @@ def one_run(url, model, prompt, max_tokens, timeout):
     completion_tokens = usage_prompt = None
     finish_reason = None
     ttft = None
-    with urllib.request.urlopen(req, timeout=timeout) as r:
-        for line in r:
-            line = line.strip()
-            if not line.startswith(b"data:"):
-                continue
-            payload = line[5:].strip()
-            if payload == b"":
-                break
-            try:
-                j = json.loads(payload)
-            except json.JSONDecodeError:
-                continue
-            if "usage" in j and j.get("usage"):
-                completion_tokens = j["usage"].get("completion_tokens")
-                usage_prompt = j["usage"].get("prompt_tokens")
-                continue
-            ch = j.get("choices") or [{}]
-            delta = (ch[0].get("delta") or {})
-            # thinking models stream reasoning_content; count it as text
-            txt = delta.get("content") or delta.get("reasoning_content") or ""
-            # count 1 text chunk = 1 sample; oMLX coalesces (~3
-            # tok/chunk measured on Santa Cruz, 86 chunks/256 tok),
-            # so per_token_ms may be CHUNK gaps — gap_granularity
-            # below says which, and usage tokens stay authoritative
-            n_tok = 1 if txt else 0
-            now = time.monotonic()
-            if txt:
-                if ttft is None:
-                    ttft = now - t0
-                n_text_chunks += 1
-                text_ts.append(now)
-                text_tokens.append(n_tok)
-            chunk_ts.append(now)
-            chunk_tokens.append(n_tok)
-            if ch[0].get("finish_reason"):
-                finish_reason = ch[0]["finish_reason"]
+    done_seen = False      # [DONE] terminal: nothing after it counts
+    parse_errors = 0       # malformed data lines (recorded, not silent)
+    integrity_problems = []
+    import http.client
+    try:
+        with urllib.request.urlopen(req, timeout=timeout) as r:
+            for line in r:
+                line = line.strip()
+                if not line.startswith(b"data:"):
+                    continue
+                payload = line[5:].strip()
+                if payload == b"[DONE]":
+                    done_seen = True
+                    continue    # terminal for CONTENT; trailing
+                                # usage-only events may still follow
+                if payload == b"":
+                    break               # blank data line == stream end
+                try:
+                    j = json.loads(payload)
+                except json.JSONDecodeError:
+                    parse_errors += 1
+                    continue
+                # usage is processed INDEPENDENTLY of choices: a
+                # combined usage+final-text event must not drop the
+                # text/finish (T8: 16 tokens -> 15 deltas, finish lost)
+                if j.get("usage"):
+                    completion_tokens = j["usage"].get("completion_tokens")
+                    usage_prompt = j["usage"].get("prompt_tokens")
+                if done_seen and j.get("choices"):
+                    # content after the terminal marker is protocol
+                    # damage (T8: post-DONE text changed 12.50 -> 6.82)
+                    # — record, never count it as tokens
+                    integrity_problems.append("content_after_done")
+                    continue
+                if not done_seen:
+                    ch = j.get("choices") or [{}]
+                    delta = (ch[0].get("delta") or {})
+                    # thinking models stream reasoning_content; count as
+                    # text
+                    txt = (delta.get("content")
+                           or delta.get("reasoning_content") or "")
+                    # count 1 text chunk = 1 sample; oMLX coalesces
+                    # (~3 tok/chunk measured on Santa Cruz, 86/256), so
+                    # per_token_ms may be CHUNK gaps — gap_granularity
+                    # says which; usage tokens stay authoritative
+                    n_tok = 1 if txt else 0
+                    now = time.monotonic()
+                    if txt:
+                        if ttft is None:
+                            ttft = now - t0
+                        n_text_chunks += 1
+                        text_ts.append(now)
+                        text_tokens.append(n_tok)
+                    chunk_ts.append(now)
+                    chunk_tokens.append(n_tok)
+                    if ch[0].get("finish_reason"):
+                        finish_reason = ch[0]["finish_reason"]
+    except (ConnectionError, http.client.IncompleteRead,
+            urllib.error.URLError) as exc:
+        # truncated stream (connection reset / incomplete read):
+        # keep the descriptive data, mark the run damaged — never a
+        # clean positive throughput (T8: abrupt EOF reported 12.50)
+        integrity_problems.append(f"stream_interrupted ({type(exc).__name__})")
     wall = time.monotonic() - t0
+    # stream integrity (T8 stream-integrity probe, production form):
+    # a benchmark run is ELIGIBLE only with a recognized finish, the
+    # [DONE] terminal (or clean EOF), an authoritative positive count,
+    # and no parse damage. Incomplete runs keep their descriptive data
+    # but must not enter model scoring (scorer gates on this).
+    if finish_reason not in ("stop", "length"):
+        integrity_problems.append("missing_or_unsupported_finish")
+    if not (completion_tokens and completion_tokens > 0):
+        integrity_problems.append("no_authoritative_count")
+    if parse_errors:
+        integrity_problems.append(f"{parse_errors} malformed data lines")
     last_text_s = (text_ts[-1] - t0) if text_ts else None
     # per-token gaps: token-bearing events only, so finish/role control
     # chunks and any post-last-token trailer (usage) contribute nothing
@@ -117,6 +155,10 @@ def one_run(url, model, prompt, max_tokens, timeout):
                          "tok/chunk; per_token_ms are chunk gaps)"),
         timing_provenance=("client SSE chunk timestamps (transport-"
                            "provisional; not verified token-level timing)"),
+        stream_integrity=dict(
+            eligible=not integrity_problems, done=done_seen,
+            finish_reason=finish_reason, usage_tokens=completion_tokens,
+            parse_errors=parse_errors, problems=integrity_problems),
     )
 
 

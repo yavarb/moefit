@@ -57,7 +57,10 @@ def _load(path, label):
         min_tokens = min(per_run)
     return dict(rec=r, n_runs=len(runs), per_run_tokens=per_run,
                 min_tokens=min_tokens, host=d.get("host"),
-                model=d.get("model"))
+                model=d.get("model"),
+                per_run_finish=[x.get("finish_reason") for x in runs],
+                per_run_integrity=[x.get("stream_integrity")
+                                   for x in runs])
 
 
 def eligibility(b, cap, need_runs=3):
@@ -72,6 +75,16 @@ def eligibility(b, cap, need_runs=3):
     elif cap is not None and cap >= 180 and b["min_tokens"] < 1024:
         e.append(f"actual n={b['min_tokens']} < 1024 at cap {cap} >= 180: "
                  "protocol FORBIDS scoring (short runs understate; T8 ramp)")
+    # stream integrity (T8 stream-integrity probe): incomplete/damaged
+    # runs keep descriptive data but must never enter model scoring
+    for i, fin in enumerate(b.get("per_run_finish") or []):
+        if fin not in ("stop", "length"):
+            e.append(f"run {i}: stream incomplete (finish_reason="
+                     f"{fin!r}) - FAIL CLOSED")
+    for i, si in enumerate(b.get("per_run_integrity") or []):
+        if si and si.get("problems"):
+            e.append(f"run {i}: stream integrity problems: "
+                     f"{'; '.join(si['problems'])}")
     return e
 
 
