@@ -11,6 +11,28 @@
   "loose_proxy": 46.67,
   "strict_proxy": 15.16
  },
+ "gate_head_calibration": {
+  "score>=0.5": {
+   "precision_pct": 27.88,
+   "candidates_per_tok": 47.7
+  },
+  "score>=1.0": {
+   "precision_pct": 28.02,
+   "candidates_per_tok": 47.35
+  },
+  "score>=2.0": {
+   "precision_pct": 28.17,
+   "candidates_per_tok": 46.78
+  },
+  "score>=4.0": {
+   "precision_pct": 31.13,
+   "candidates_per_tok": 34.97
+  },
+  "score>=8.0": {
+   "precision_pct": 46.22,
+   "candidates_per_tok": 2.6
+  }
+ },
  "prefill_reference_6b359d4": {
   "hist1_pct": [
    10.6,
@@ -31,5 +53,6 @@
    38
   ]
  },
+ "gate_reading": "A confidence gate CAN push the history signal above breakeven \u2014 score>=8 reaches 46.2% precision (clears even the DB-ON pessimistic band, 38%) \u2014 but only 2.6 candidates/tok survive it, so the net is +0.1..+0.8 ms/tok (~+0.02..+0.12 tps on 15.55): an order of magnitude below run noise. The 'cheaper issue policy' lever from d7f45b6 EXISTS but its head is too small to matter. DROP final on this axis.",
  "verdict": "DECODE-WINDOW RESULT: decayed-history hist1 precision on real DECODE positions is 7.53% (strict) / 27.69% (loose proxy) vs 10.6/25.4% on the prefill-heavy holdout \u2014 CONSISTENT (no prefill artifact). Read against breakeven (9-24% serial / 14-38% DB-ON): the cold-window marginality verdict of d7f45b6 stands or strengthens; and per T3's c90c06d the misses here are cold-expert dominated, so even this precision overstates steady-decode usefulness (many scored 'hits' fall inside the 161-token prompt's own early-cold phase)."
 }

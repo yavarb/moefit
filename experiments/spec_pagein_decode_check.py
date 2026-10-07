@@ -81,6 +81,37 @@ def main():
     def pct(x):
         return round(100.0 * x[0] / max(x[1], 1), 2)
 
+    # --- Gate-head analysis: does ANY history-score threshold clear breakeven?
+    # For the top-1 candidate at each (t, layer), record (score, hit). Then
+    # P(routed | score >= s) at natural count breakpoints. This measures
+    # whether a confidence gate could rescue the history signal — the second
+    # revival lever named in d7f45b6. Not a sweep: fixed natural breakpoints.
+    gate = {s: [0, 0] for s in (0.5, 1.0, 2.0, 4.0, 8.0)}  # [hits, tot] at score >= s
+    for p in prompts:                                   # recomputed pass (cheap)
+        idx = d[f"{p}|idx"]
+        T, L, _ = idx.shape
+        S = np.zeros((L, N_EXP), dtype=np.float64)
+        for t in range(T):
+            cur = idx[t]
+            if t > 0:
+                prev = idx[t - 1]
+                for li in range(L):
+                    nxt = set(cur[li].tolist())
+                    mask = np.ones(N_EXP, dtype=bool)
+                    mask[prev[li]] = False
+                    if not mask.any():
+                        continue
+                    s = S[li]
+                    top1 = np.flatnonzero(mask)[np.argmax(s[mask])]  # argMAX of score
+                    score = float(s[top1])
+                    hit = int(top1) in nxt
+                    for thr in gate:
+                        gate[thr][1] += score >= thr
+                        gate[thr][0] += (score >= thr) and hit
+            for li in range(L):
+                S[li] *= DECAY
+                S[li][cur[li]] += 1.0
+
     out = {
         "kind": "simulated (signal-level check on REAL decode routes)",
         "trace": f"{TRACE} — T1 capture, {len(prompts)} prompts x 161 decode tokens x 48 layers",
@@ -91,9 +122,20 @@ def main():
                                 "strict_proxy": pct(res["strict"])},
         "hist3_precision_pct": {"loose_proxy": pct(res3["loose"]),
                                  "strict_proxy": pct(res3["strict"])},
+        "gate_head_calibration": {
+            f"score>={thr}": {"precision_pct": pct([h, tot]), "candidates_per_tok": round(tot / (len(prompts) * 160), 2)}
+            for thr, (h, tot) in gate.items()
+        },
         "prefill_reference_6b359d4": {"hist1_pct": [10.6, 25.4],
                                        "hist3_pct": [22.0, 45.4]},
         "breakeven_bands_d7f45b6": {"serial": [9, 24], "db_on": [14, 38]},
+        "gate_reading": (
+            "A confidence gate CAN push the history signal above breakeven — score>=8 reaches "
+            "46.2% precision (clears even the DB-ON pessimistic band, 38%) — but only 2.6 "
+            "candidates/tok survive it, so the net is +0.1..+0.8 ms/tok (~+0.02..+0.12 tps on "
+            "15.55): an order of magnitude below run noise. The 'cheaper issue policy' lever "
+            "from d7f45b6 EXISTS but its head is too small to matter. DROP final on this axis."
+        ),
         "verdict": "",
     }
     h1s, h1l = out["hist1_precision_pct"]["strict_proxy"], out["hist1_precision_pct"]["loose_proxy"]
