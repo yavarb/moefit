@@ -1,0 +1,58 @@
+{
+  "scope": "MEASURED LOCAL WARM file read+full-byte CRC, NOT physical SSD or decode. Known demand order is an oracle layout, not an online predictor.",
+  "experts": 16,
+  "component_equalities": 144,
+  "guard_cases": 5,
+  "order": [
+    3,
+    14,
+    13,
+    5,
+    9,
+    15,
+    4,
+    10,
+    12,
+    7,
+    6,
+    0,
+    1,
+    8,
+    11,
+    2
+  ],
+  "reorder_seconds": 0.02082724999999999,
+  "payload_bytes": 44236800,
+  "seconds": {
+    "identity_random": [
+      0.002833749999999996,
+      0.0028532920000000073,
+      0.0025862080000000065,
+      0.002832583999999999,
+      0.0026155420000000262,
+      0.002500457999999983
+    ],
+    "reordered_same_random": [
+      0.0029143750000000246,
+      0.0028586250000000035,
+      0.0029187499999999977,
+      0.002781374999999975,
+      0.0029120830000000097,
+      0.003006125000000026
+    ],
+    "identity_sequential": [
+      0.002876916000000007,
+      0.0028488750000000007,
+      0.002673707999999997,
+      0.002856125000000015,
+      0.0028823750000000203,
+      0.0026342500000000046
+    ]
+  },
+  "useful_GBps": {
+    "identity_random": 16.239271999215802,
+    "reordered_same_random": 15.184800096387802,
+    "identity_sequential": 15.508080631025374
+  },
+  "layout_speed_ratio": 0.9350665532987611
+}
