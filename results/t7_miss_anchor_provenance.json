@@ -1,0 +1,52 @@
+{
+  "role": "astra_analysis_b",
+  "model_tag": "Astra gpt-6",
+  "kind": "derived provenance audit, NOT new silicon measurement",
+  "source_sha256": {
+    "results/measured_santa_cruz_36gb_ssd.json": "52d1e2fc4aa9801164edd1f25576e9d927f524276aaef0817e7c4263290caeae",
+    "results/gap_santa_cruz.json": "1f06b690e3a1d2b627231c3c96d4efc396862333ee40da0b39ed870024692e74",
+    "results/design_omlx_exact.json": "94b3bf9f9cf4a76fd28e83744900850596b4bbf764a5899c6fc8da78aff1b79f"
+  },
+  "measured": {
+    "physical_MB_per_token": 140.5,
+    "decode_tps": 12.71,
+    "n_disk_samples": 19
+  },
+  "simulated_miss_anchor": 57.4,
+  "assumed_expert_MB": 2.765,
+  "derived_physical_fraction": 0.8852568505018555,
+  "circular_recovered_misses": 57.4,
+  "no_absorption_misses_per_token": 50.81374321880651,
+  "existing_policy_explanations": [
+    {
+      "policy": "lru",
+      "simulated_misses_per_token": 57.41,
+      "fitted_physical_fraction": 0.8851026514336615,
+      "reconstructed_physical_MB_per_token": 140.5
+    },
+    {
+      "policy": "omlx",
+      "simulated_misses_per_token": 56.91,
+      "fitted_physical_fraction": 0.8928789882060537,
+      "reconstructed_physical_MB_per_token": 140.5
+    }
+  ],
+  "identifiability": {
+    "equation": "P = q * E * M",
+    "observed_scalars": 1,
+    "unknown_scalars": [
+      "q physical fraction",
+      "M logical misses"
+    ],
+    "jacobian_rank": 1,
+    "caveat": "Assumes all disk traffic is expert reads, consistent byte units, complete expert payloads, no read amplification or unrelated IO."
+  },
+  "provenance": [
+    "gap_santa_cruz.py: lru_misses(gold, cap), then M.sum(1).mean() -> sim_miss_experts_per_token.",
+    "t8_pagecache_capacity_probe.json: 140.5 measured / 158.8 simulated -> 0.885, not an independent measured fraction.",
+    "Inverting that derived fraction to claim measured ~57.4 misses returns the input simulation by construction.",
+    "design_omlx_exact.json labels itself simulated; its measured_anchor has throughput and physical bytes, not logical miss counts."
+  ],
+  "verdict": "57.4 misses/token is simulated; source-code policy identification survives, independent measured miss-count validation does not.",
+  "handoff": "Measure logical miss/admission counts and payload bytes directly in the same decode window as physical IO. Host vm_stat/iostat alone cannot identify expert-cache hits."
+}
