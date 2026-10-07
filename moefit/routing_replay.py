@@ -85,6 +85,23 @@ class RoutingReplayCache:
         self.entries.clear()
         self.bytes = 0
 
+    def invalidate_namespace(self, namespace):
+        """Remove cached routes for exactly one context; return removed count.
+
+        O(number of entries), not thread safe. Does not revoke arrays already
+        returned or reset sessions/KV. Stop affected execution and use a NEW
+        namespace when model/context changes; old live sessions can repopulate
+        their old namespace. Hit/miss/eviction counters are unchanged.
+        """
+        if not isinstance(namespace, bytes) or not namespace:
+            raise ValueError('nonempty opaque context namespace required')
+        keys = [key for key in self.entries
+                if (key[0] if isinstance(key[0], bytes) else key[0][0]) == namespace]
+        for key in keys:
+            _, size = self.entries.pop(key)
+            self.bytes -= size
+        return len(keys)
+
     def _resolve(self, key, compute, enabled):
         if enabled and key in self.entries:
             self.hits += 1

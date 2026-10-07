@@ -1,0 +1,24 @@
+{
+  "kind": "EXECUTED tiny routing-cache lifecycle checks, no timing measurement",
+  "rows": [
+    {
+      "compact": false,
+      "removed_entries": 9,
+      "survivor_entries": 9,
+      "bytes_before": 5499,
+      "bytes_after": 2754,
+      "unaffected_hits": 9,
+      "live_session_recompute_layers": 2
+    },
+    {
+      "compact": true,
+      "removed_entries": 9,
+      "survivor_entries": 9,
+      "bytes_before": 4203,
+      "bytes_after": 2106,
+      "unaffected_hits": 9,
+      "live_session_recompute_layers": 2
+    }
+  ],
+  "caveat": "Invalidation is not revocation of returned arrays or live sessions; context mutation requires quiescence and a new namespace. No KV state managed."
+}
