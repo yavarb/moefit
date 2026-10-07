@@ -57,8 +57,38 @@ def test_silicon_record_and_gap():
     assert "unexplained" in txt and "13.0" in txt
 
 
+SILICON_SSD_FIXTURE = dict(
+    kind="measured", host="santacruz", timestamp="t", max_tokens=256,
+    decode_tps=12.71, ttft_s=6.67, n_decode_samples=19,
+    decode_disk_MBps=1785.7, decode_disk_MB_per_token=140.5,
+    decode_iops=10746.0, decode_avg_KB_per_io=171.4,
+)
+
+
+def test_silicon_ssd_blob_and_measured_accounting():
+    rec = silicon_record_from_measured(SILICON_SSD_FIXTURE, "ssd")
+    assert rec["kind"] == "silicon" and rec["tps"] == 12.71
+    assert rec["ssd_meas_mb_per_tok"] == 140.5
+    assert rec["ssd_meas_mbps"] == 1785.7
+    # 140.5 / 1785.7 * 1000 = 78.7 ms/tok
+    assert rec["disk_ms_per_tok"] == 78.7
+    sim = sim_record_from_row(SIM_ROW, "48GB-M4M", "fixture")
+    rep = gap_report(sim, rec)
+    sm = rep["ssd_measured"]
+    assert sm["sim_logical_mb_per_tok"] == 207.0
+    assert abs(sm["traffic_ratio_meas_over_sim"] - 140.5 / 207.0) < 0.001
+    assert sm["silicon_ms_per_tok"] == 78.7
+    # measured accounting closes the gap to within rounding
+    assert abs(sm["residual_ms_per_tok"]) <= 0.1
+    txt = format_gap_report(rep)
+    assert "MEASURED SSD" in txt and "duty-cycle" in txt
+    # sim-spec accounting still reported and labeled as such
+    assert "sim-spec accounting" in txt
+
+
 if __name__ == "__main__":
     for fn in [test_validate_record, test_sim_record_from_row,
-               test_silicon_record_and_gap]:
+               test_silicon_record_and_gap,
+               test_silicon_ssd_blob_and_measured_accounting]:
         fn()
         print("ok", fn.__name__)

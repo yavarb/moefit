@@ -99,6 +99,27 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
     from pathlib import Path
     d = path_or_dict if isinstance(path_or_dict, dict) \
         else json.loads(Path(path_or_dict).read_text())
+    # SSD-counter blob (measure_ssd_per_token.py): flat keys, no runs
+    if not d.get("runs"):
+        rec = dict(
+            kind="silicon", source=source, tps=d["decode_tps"],
+            ttft_s=d.get("ttft_s"),
+            config=dict(host=d.get("host"), max_tokens=d.get("max_tokens"),
+                        model=d.get("model"),
+                        n_decode_samples=d.get("n_decode_samples")),
+            host=d.get("host"), measured_at=d.get("timestamp"),
+        )
+        if d.get("decode_disk_MBps") and d.get("decode_disk_MB_per_token"):
+            rec["ssd_meas_mbps"] = d["decode_disk_MBps"]
+            rec["ssd_meas_mb_per_tok"] = d["decode_disk_MB_per_token"]
+            rec["ssd_meas_iops"] = d.get("decode_iops")
+            rec["ssd_io_kb"] = d.get("decode_avg_KB_per_io")
+            rec["disk_ms_per_tok"] = round(
+                d["decode_disk_MB_per_token"]
+                / d["decode_disk_MBps"] * 1000.0, 1)
+        errs = validate_record(rec)
+        assert not errs, f"bad silicon record: {errs}"
+        return rec
     runs = d.get("runs", [])
     mem = d.get("memory_during_run", {})
     setg = d.get("omlx_model_settings", {})
@@ -213,6 +234,32 @@ def gap_report(sim: dict, silicon: dict) -> dict:
         rec["unexplained_ms_per_tok"] = round(
             ms_needed - max(ct, st), 1)
         rep["reconciliation"] = rec
+    # measured-SSD accounting (iostat blob): the stream term evaluated
+    # with MEASURED concurrent disk MB/s and MEASURED physical MB/tok.
+    # NOTE: measured MBps is a duty-cycle average under oMLX's serial
+    # per-layer miss resolution (lead_silicon microbench: the drive
+    # does 3.8-5.6 GB/s on the same pattern) - not a drive ceiling.
+    m_mbpt = silicon.get("ssd_meas_mb_per_tok")
+    m_mbps = silicon.get("ssd_meas_mbps")
+    if m_mbpt and m_mbps:
+        rep["ssd_measured"] = dict(
+            mb_per_tok=m_mbpt, mbps=m_mbps,
+            iops=silicon.get("ssd_meas_iops"),
+            io_kb=silicon.get("ssd_io_kb"),
+            disk_ms_per_tok=silicon.get("disk_ms_per_tok"))
+        sim_mbpt = (sim.get("config") or {}).get("ssd_mb_per_tok_total")
+        if sim_mbpt:
+            rep["ssd_measured"]["sim_logical_mb_per_tok"] = sim_mbpt
+            rep["ssd_measured"]["traffic_ratio_meas_over_sim"] = round(
+                m_mbpt / sim_mbpt, 3)
+        ms_needed = 1000.0 / silicon["tps"]
+        rep["ssd_measured"]["silicon_ms_per_tok"] = round(ms_needed, 1)
+        rep["ssd_measured"]["residual_ms_per_tok"] = round(
+            ms_needed - silicon["disk_ms_per_tok"], 1)
+    # per-token latency distribution, when the silicon run has it
+    tg = silicon.get("tok_gap_ms")
+    if tg:
+        rep["tok_gap_ms"] = tg
     return rep
 
 
@@ -238,8 +285,29 @@ def format_gap_report(rep: dict) -> str:
         lines.append(f"  silicon needs {rc['silicon_ms_per_tok']} ms/tok;"
                      f" sim's limiting term is {max(st_['compute'], st_['stream'])}"
                      f" ms -> {rc['unexplained_ms_per_tok']} ms/tok"
-                     " unexplained by sim terms")
+                     " unexplained by sim terms (sim-spec accounting)")
         lines.append(f"  if compute-bound with sim bytes, silicon implies"
                      f" {rc['dram_eff_gbs_silicon_needed_if_compute_bound']}"
                      " GB/s eff DRAM (sim assumes 293)")
+    sm = rep.get("ssd_measured")
+    if sm:
+        lines.append(f"  MEASURED SSD: {sm['mb_per_tok']} MB/tok at"
+                     f" {sm['mbps']} MB/s ({sm['iops']} IOPS,"
+                     f" {sm['io_kb']} KB/IO)"
+                     f" = {sm['disk_ms_per_tok']} ms/tok disk time"
+                     f" vs {sm['silicon_ms_per_tok']} ms/tok measured"
+                     f" -> residual {sm['residual_ms_per_tok']} ms")
+        if "sim_logical_mb_per_tok" in sm:
+            lines.append(f"  traffic: sim logical"
+                         f" {sm['sim_logical_mb_per_tok']} MB/tok vs"
+                         f" measured physical {sm['mb_per_tok']}"
+                         f" (ratio {sm['traffic_ratio_meas_over_sim']});"
+                         " measured MB/s is a duty-cycle average under"
+                         " oMLX serial miss resolution, NOT the drive"
+                         " ceiling (microbench: 3.8-5.6 GB/s)")
+    tg = rep.get("tok_gap_ms")
+    if tg:
+        lines.append(f"  tok-gap ms: p50 {tg['p50']} p90 {tg['p90']}"
+                     f" p95 {tg['p95']} p99 {tg['p99']}"
+                     f" max {tg['max']} (n={tg['n']})")
     return "\n".join(lines)
