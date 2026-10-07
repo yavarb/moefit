@@ -1,0 +1,104 @@
+{
+  "kind": "MEASURED_WARM_MEMORY_PATH_NOT_SSD_OR_DECODE",
+  "component_equalities": 144,
+  "lifetime_guards": "live exports, double close, read after close PASS",
+  "samples": {
+    "pread_random": [
+      {
+        "seconds": 0.003171124999999997,
+        "useful_GBps": 13.949875832709226,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.0031086250000000037,
+        "useful_GBps": 14.230342997305867,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.003215957999999991,
+        "useful_GBps": 13.755403522060961,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.0031529590000000107,
+        "useful_GBps": 14.03024904542046,
+        "checksum": 285887135425
+      }
+    ],
+    "mapped_random": [
+      {
+        "seconds": 0.0011186669999999899,
+        "useful_GBps": 39.54420752556426,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.0010754169999999952,
+        "useful_GBps": 41.1345552469416,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.0011800829999999984,
+        "useful_GBps": 37.486176819766115,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.0012084580000000233,
+        "useful_GBps": 36.60598878901803,
+        "checksum": 285887135425
+      }
+    ],
+    "pread_sequential": [
+      {
+        "seconds": 0.002900374999999983,
+        "useful_GBps": 15.252096711632205,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.003048374999999992,
+        "useful_GBps": 14.511600442858938,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.003123874999999998,
+        "useful_GBps": 14.160873914609269,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.0031536249999999932,
+        "useful_GBps": 14.02728605969324,
+        "checksum": 285887135425
+      }
+    ],
+    "mapped_sequential": [
+      {
+        "seconds": 0.001074709000000007,
+        "useful_GBps": 41.16165399191754,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.0011310840000000044,
+        "useful_GBps": 39.11009261911567,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.0011471249999999988,
+        "useful_GBps": 38.56319058515859,
+        "checksum": 285887135425
+      },
+      {
+        "seconds": 0.001133917000000012,
+        "useful_GBps": 39.01237921294022,
+        "checksum": 285887135425
+      }
+    ]
+  },
+  "median_useful_GBps": {
+    "pread_random": 13.990062439064843,
+    "mapped_random": 38.51519217266519,
+    "pread_sequential": 14.336237178734104,
+    "mapped_sequential": 39.06123591602794
+  },
+  "random_speedup": 2.753039333485613,
+  "sequential_speedup": 2.724650508291679,
+  "caveat": "All pages warmed; read+CRC32 includes full payload consumption. No F_NOCACHE claim for mmap, no physical-byte counters. File must remain immutable; exported views prevent close."
+}

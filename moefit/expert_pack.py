@@ -145,3 +145,38 @@ class ExpertPack:
 
     def close(self):
         os.close(self.fd)
+
+
+class MappedExpertPack(ExpertPack):
+    """Read-only zero-copy pack views, backed by demand-paged file mapping.
+
+    Warm-path optimization, not guaranteed SSD bypass. Views retain the mapping;
+    close raises BufferError while exports exist. File must remain immutable.
+    """
+    def __init__(self, path):
+        import mmap
+        super().__init__(path)
+        try:
+            self.mapping = mmap.mmap(self.fd, 0, access=mmap.ACCESS_READ)
+        except Exception:
+            os.close(self.fd)
+            raise
+        self.closed = False
+
+    def read(self, eid, verify=False):
+        if self.closed:
+            raise ValueError('Pack is closed')
+        m = self.manifest
+        start = self.positions[eid] * m['stride']
+        if start + m['stride'] > len(self.mapping):
+            raise EOFError('Truncated mapped expert')
+        view = memoryview(self.mapping)[start:start+m['payload_bytes']]
+        if verify and hashlib.sha256(view).hexdigest() != m['sha256'][str(eid)]:
+            raise ValueError('Pack checksum mismatch')
+        return {c['name']:view[c['pack_offset']:c['pack_offset']+c['size']] for c in m['components']}
+
+    def close(self):
+        if not self.closed:
+            self.mapping.close()  # Refuse teardown with outstanding views.
+            os.close(self.fd)
+            self.closed = True
