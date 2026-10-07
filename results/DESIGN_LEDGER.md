@@ -67,7 +67,8 @@ audits, `results/T7_MISS_ANCHOR_PROVENANCE.md`): the often-quoted "~57.4
 misses/tok" is a SIM replay value, not a measured counter — deriving
 0.885 = 140.5/(57.4×2.765) from iostat bytes and inverting it recovers
 57.4 circularly. What IS measured: 140.5 MB/tok physical reads, which
-correspond to ≥50.8 full-expert misses with no absorption (mincore
+correspond to **50.8–52.5 full-expert misses** (absorption 0–3.2%, the
+mincore-bounded interval; both synth policies overstate by 9–15%. mincore
 confirms no hidden page-cache tier). The policy identification stands on
 the source read and throughput agreement, not on a measured miss count;
 direct logical-miss counters are still needed. Window caveat (astra T6):

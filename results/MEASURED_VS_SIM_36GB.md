@@ -158,26 +158,37 @@ two independent implementations agree exactly
 breakdown identical 18.1/37.0/17.5/5.9 ms, 58.3 misses/token). With this,
 the residual is closed: geometry, policy, and time model all reproduce the
 silicon operating point from measured constants. **Compute term resolved
-— with an honesty caveat (cycle 13)**: with mincore rejecting page-cache
-absorption, real logical misses are 140.5/2.765 = **50.8/token**, and
-feeding that REAL miss count through the serial model gives **12.52–12.87
+— with an honesty caveat (cycle 13)**: with mincore bounding page-cache
+absorption at ≤3.2%, real logical misses are an INTERVAL,
+**[50.8, 52.5]/token** (140.5 MB/tok physical, absorption 0–3.2%), and
+feeding that REAL miss interval through the serial model gives **12.52–12.87
 tok/s with compute 24.1 ms (the 410 GB/s DRAM bin — the physically
 correct chip)** vs measured 12.71–13.07, while compute 18.1 overshoots at
-13.54–13.95 — non-overlapping bands over the mincore-bounded miss
-interval. The earlier "18.1 fits best" was an artifact compensating for
-synth-trace miss overstatement (T3, commits a61a035 + af10b16). "Resolved"
+13.54–13.95 — non-overlapping bands across the whole miss interval. The
+earlier "18.1 fits best" was an artifact compensating for synth-trace
+miss overstatement (T3, commits a61a035 + af10b16 + 3376266). "Resolved"
 means best-supported, not statistically certified: the regression
 intercept alone does not separate 18.1 from 24.1 (fixed terms 0.39 vs
 1.10 σ below it); a second residency point or direct logical-miss
-counters would settle it. Two consequences: (a) synth overstates misses
-at cap143 by ~15% (58.3 vs 50.8), so every synth-based serial
-prediction is ~0.8–1.1 tok/s conservative; (b) 48 GB (546 GB/s bin)
+counters would settle it. Two consequences: (a) both synth policies
+overstate misses at cap143 by 9–15% (true-LRU 58.3, omlx-exact 56.9 vs
+the real 50.8–52.5), so every synth-based serial prediction is
+~0.8–1.1 tok/s conservative; (b) 48 GB (546 GB/s bin)
 keeps compute 18.1 in its tier table. Constants remain
 Santa-Cruz-specific — other machines need their own microbench.
 
 **Post-capstone: the per-miss constant and fixed term are now MEASURED
 directly** (T1 cycle 2, `results/silicon_sc36/regress_pooled.json`,
-commit 26a943e): 17 measured 256-token decodes across six prompt types give
+commit 26a943e) — with a statistical honesty note (T7's identifiability
+audit, `results/t7_regression_identifiability.json`): treat the
+regression as a DESCRIPTIVE association, not a causal decomposition —
+intercept and slope are strongly coupled (r ≈ −0.99), both fixed-term
+candidates (30 and 36 ms) lie inside the intercept's 95% interval
+(22.8–55.7 ms), and a constant-rate construction can score high r²
+without establishing causal miss latency. The robust measured piece is
+the SLOPE (0.797 ms/expert, computed from MB not miss counts, immune to
+the miss-count circularity). With that framing: 17 measured 256-token
+decodes across six prompt types give
 ms/token = **39.2 ± 8.4 + 0.288 ± 0.053 × SSD MB/token** (r² 0.66) —
 i.e. **0.80 ms per missed expert** on the critical path (vs the serial
 model's 0.82 = 0.52 io + 0.30 install; within 2%) and a **~39 ms/token
