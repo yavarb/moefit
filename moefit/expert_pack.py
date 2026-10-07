@@ -91,5 +91,57 @@ class ExpertPack:
         view = memoryview(data)
         return {c['name']:view[c['pack_offset']:c['pack_offset']+c['size']] for c in m['components']}
 
+    def read_into(self, eid, buffer, verify=False):
+        """One synchronous libc pread directly into caller-owned writable storage.
+
+        Returned views alias buffer: caller must finish all consumers before reuse.
+        No hidden allocation of the expert payload. BF16 stays raw 16-bit bits.
+        """
+        import ctypes
+        import errno
+        m = self.manifest
+        position = self.positions[eid]
+        view = memoryview(buffer)
+        if view.readonly or not view.c_contiguous:
+            raise ValueError('Need contiguous writable buffer')
+        view = view.cast('B')
+        size = m['stride']
+        if len(view) < size:
+            raise ValueError('Buffer smaller than expert stride')
+        if not hasattr(self, '_pread'):
+            lib = ctypes.CDLL(None, use_errno=True)
+            fn = lib.pread
+            fn.argtypes = [ctypes.c_int, ctypes.c_void_p, ctypes.c_size_t, ctypes.c_longlong]
+            fn.restype = ctypes.c_ssize_t
+            self._pread = fn
+        target = (ctypes.c_char * size).from_buffer(view)
+        while True:
+            n = self._pread(self.fd, target, size, position * size)
+            if n >= 0:
+                break
+            error = ctypes.get_errno()
+            if error != errno.EINTR:
+                raise OSError(error, os.strerror(error))
+        if n != size:
+            raise EOFError(f'Short read {n} != {size}')
+        if verify and hashlib.sha256(view[:m['payload_bytes']]).hexdigest() != m['sha256'][str(eid)]:
+            raise ValueError('Pack checksum mismatch')
+        return {c['name']: view[c['pack_offset']:c['pack_offset']+c['size']] for c in m['components']}
+
+    def numpy_views(self, component_views):
+        """Read-only zero-copy typed arrays; BF16 represented by uint16 bits.
+
+        These arrays retain backing storage but are invalidated logically when a
+        caller-owned buffer is reused. No dequantization or BF16 conversion.
+        """
+        import numpy as np
+        types = {'U32': '<u4', 'BF16': '<u2', 'F16': '<f2', 'F32': '<f4'}
+        arrays = {}
+        for c in self.manifest['components']:
+            a = np.frombuffer(component_views[c['name']], dtype=types[c['dtype']]).reshape(c['shape'])
+            a.flags.writeable = False
+            arrays[c['name']] = a
+        return arrays
+
     def close(self):
         os.close(self.fd)

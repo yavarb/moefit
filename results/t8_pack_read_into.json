@@ -1,0 +1,110 @@
+{
+  "kind": "MEASURED_LOCAL_CACHE_INFLUENCED_FILE_IO_NOT_DECODE",
+  "component_equalities": 576,
+  "typed_zero_copy_checks": 576,
+  "invalid_buffer_checks": 3,
+  "samples": {
+    "alloc_random": [
+      {
+        "seconds": 0.008013792000000075,
+        "useful_GBps": 22.08033350503711,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.008130291000000067,
+        "useful_GBps": 21.76394424258597,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.007926125000000006,
+        "useful_GBps": 22.324553296850585,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.007880624999999863,
+        "useful_GBps": 22.45344753747362,
+        "checksum": 72741
+      }
+    ],
+    "into_random": [
+      {
+        "seconds": 0.00807749999999996,
+        "useful_GBps": 21.90618384401125,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.007794290999999953,
+        "useful_GBps": 22.70215469245388,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.008135082999999987,
+        "useful_GBps": 21.75112411268579,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.007961791999999912,
+        "useful_GBps": 22.224544424170084,
+        "checksum": 72741
+      }
+    ],
+    "alloc_sequential": [
+      {
+        "seconds": 0.008204749999999983,
+        "useful_GBps": 21.56643407782082,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.008154208000000107,
+        "useful_GBps": 21.700108704609654,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.0080022500000001,
+        "useful_GBps": 22.11218094910779,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.008177458000000026,
+        "useful_GBps": 21.63841134983505,
+        "checksum": 72741
+      }
+    ],
+    "into_sequential": [
+      {
+        "seconds": 0.00820624999999997,
+        "useful_GBps": 21.562492003046536,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.008145625000000045,
+        "useful_GBps": 21.72297398910446,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.00784754199999993,
+        "useful_GBps": 22.548104871563808,
+        "checksum": 72741
+      },
+      {
+        "seconds": 0.007814166999999816,
+        "useful_GBps": 22.64440982640941,
+        "checksum": 72741
+      }
+    ]
+  },
+  "median_useful_GBps": {
+    "alloc_random": 22.20244340094385,
+    "into_random": 22.065364134090665,
+    "alloc_sequential": 21.66926002722235,
+    "into_sequential": 22.135539430334134
+  },
+  "reusable_buffer_bytes": 2768896,
+  "tracemalloc_peak_incremental_bytes": {
+    "alloc_random": 5542530,
+    "into_random": 5061
+  },
+  "random_speedup": 0.9938259377863178,
+  "sequential_speedup": 1.0215180122683476,
+  "caveat": "F_NOCACHE accepted; physical device traffic unverified. Existing-buffer allocation excluded from tracemalloc. All views alias buffer and must be consumed before reuse. No MLX/oMLX adapter."
+}
