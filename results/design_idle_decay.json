@@ -1,0 +1,93 @@
+{
+ "kind": "simulated (replay + serial model)",
+ "traces": "locked synth holdout (seed 0 selection)",
+ "cap": 143,
+ "policies": {
+  "lru": {
+   "miss_per_tok_global_drop200": 57.4,
+   "miss_per_tok_prompt_suffix": 47.751,
+   "serial_tps_global": 11.96,
+   "serial_tps_suffix": 13.28,
+   "per_prompt_suffix_miss": [
+    47.452,
+    43.973,
+    46.232,
+    47.842,
+    48.367,
+    48.516,
+    48.587,
+    47.219,
+    46.57,
+    50.855,
+    47.619,
+    49.469,
+    46.571
+   ]
+  },
+  "omlx_decay": {
+   "miss_per_tok_global_drop200": 56.932,
+   "miss_per_tok_prompt_suffix": 46.943,
+   "serial_tps_global": 12.01,
+   "serial_tps_suffix": 13.41,
+   "per_prompt_suffix_miss": [
+    46.484,
+    43.384,
+    45.609,
+    47.021,
+    47.578,
+    47.763,
+    47.578,
+    46.419,
+    45.731,
+    49.916,
+    47.035,
+    48.477,
+    45.848
+   ]
+  },
+  "idle_decay": {
+   "miss_per_tok_global_drop200": 57.008,
+   "miss_per_tok_prompt_suffix": 47.213,
+   "serial_tps_global": 12.0,
+   "serial_tps_suffix": 13.36,
+   "per_prompt_suffix_miss": [
+    46.823,
+    43.616,
+    45.754,
+    47.337,
+    47.844,
+    48.043,
+    47.844,
+    46.657,
+    46.075,
+    50.301,
+    47.124,
+    48.836,
+    46.095
+   ]
+  }
+ },
+ "protocol": {
+  "cache_reset": "caches empty at t=0 (retained across the whole concatenated holdout)",
+  "windows": [
+   "global drop-first-200",
+   "per-prompt suffix drop-128 (T6 protocol)"
+  ]
+ },
+ "validation_targets": {
+  "lru_global_drop200": 57.407,
+  "omlx_global_drop200": 56.911
+ },
+ "idle_decay_vs_lru": {
+  "miss_delta_global": -0.392,
+  "miss_delta_suffix": -0.538,
+  "miss_delta_pct_suffix": -1.13,
+  "serial_tps_delta_suffix": 0.08
+ },
+ "idle_decay_vs_omlx_decay": {
+  "miss_delta_global": 0.076,
+  "miss_delta_suffix": 0.27,
+  "miss_delta_pct_suffix": 0.58,
+  "serial_tps_delta_suffix": -0.05
+ }
+}
