@@ -1,0 +1,41 @@
+{
+ "kind": "T5 application of the registered IO_BATCH=1 conditional (088913d) to the MEASURED BATCH1 arm (T9, eligibility clean, Amendment-4 candidate A confirmed by T4's scoring)",
+ "inputs": {
+  "batch1_tps_runs": [
+   14.63,
+   15.17,
+   14.1
+  ],
+  "batch1_median": 14.63,
+  "on_median": 15.72,
+  "m_from_stats_diffs": 9.576,
+  "m_note": "d_misses 29419 over 3072 scored tokens; the arm's repeats ran WARM (m ~9.6/tok vs 44 cold incl. prefill in the sidecar run and ~37 first-run anchor) \u2014 m is strongly regime-dependent, which is exactly why the prereg carried an m band"
+ },
+ "gates": {
+  "D_nonnegative": true,
+  "D_over_m_le_install": false,
+  "D_ms_per_tok": 4.74,
+  "D_over_m": 0.495
+ },
+ "gate_result": "FAIL -> NO re-price per the registered rule; attribution flagged to T9/T4",
+ "S_prime": null,
+ "attribution_flag": "D/m = 0.495 > 0.30 = the serial install constant: the measured DB term EXCEEDS install-exposure x misses at the arm's own window m. Either the window m understates the arm's true per-run misses (warmup contaminates the stats window: numerator includes warmup misses, denominator is scored-tokens only), or window=1 costs more than install exposure alone (fetch-order serialization: expert i+1's reads wait for expert i's install). Both readings are T4/T9 attribution territory; T5's rule is mechanical: no S' re-price.",
+ "sidecar_composition_stands": {
+  "note": "independent of the gated S' re-price: the sidecar measurement bounds S via S - C = 0.509 with the measured contention band",
+  "S_minus_C_measured": 0.509,
+  "S_bounds_from_measured_C": [
+   0.582,
+   0.707
+  ],
+  "install_exposure_bounds": [
+   0.062,
+   0.187
+  ],
+  "read": "S in [0.58, 0.71] ms/miss: the DB-ON saving constant CANNOT be 0.52 (install fully hidden) unless the contention floor itself is falsified \u2014 install exposure is at least 0.06 ms/miss on the live box."
+ },
+ "provenance": {
+  "registered": "results/t5_iobatch1_conditional_prereg.json (088913d)",
+  "measured": "results/t9_silicon/t9_batch1_C.json + t9_b1_stats{0,1}.json",
+  "sidecar": "results/t5_sidecar_aba_scored.json (d2f860f)"
+ }
+}
