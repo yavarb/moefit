@@ -1,0 +1,276 @@
+{
+  "kind": "MEASURED_LOCAL_FILE_IO_NOT_LLM_DECODE",
+  "host": "ybs-MacBook-Pro-2.local",
+  "source": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp",
+  "layer": 0,
+  "experts": 64,
+  "component_byte_equalities": 576,
+  "f_nocache_enabled": true,
+  "caveat": "F_NOCACHE requested successfully; no device-counter proof of physical SSD bytes, existing cache/device effects possible. Small subset, single host, Python pread allocation included. No oMLX integration.",
+  "payload_bytes_per_expert": 2764800,
+  "stride": 2768896,
+  "padding_fraction": 0.0014814814814814814,
+  "source_headers": [
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.gate_proj.weight",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 1941800721,
+      "size": 819200,
+      "experts": 512,
+      "dtype": "U32",
+      "shape": [
+        640,
+        320
+      ],
+      "pack_offset": 0
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.gate_proj.scales",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 5001814601,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        640,
+        40
+      ],
+      "pack_offset": 819200
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.gate_proj.biases",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 4975600201,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        640,
+        40
+      ],
+      "pack_offset": 870400
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.up_proj.weight",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 1322369361,
+      "size": 819200,
+      "experts": 512,
+      "dtype": "U32",
+      "shape": [
+        640,
+        320
+      ],
+      "pack_offset": 921600
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.up_proj.scales",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 576723121,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        640,
+        40
+      ],
+      "pack_offset": 1740800
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.up_proj.biases",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 3577522281,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        640,
+        40
+      ],
+      "pack_offset": 1792000
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.down_proj.weight",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 652937761,
+      "size": 819200,
+      "experts": 512,
+      "dtype": "U32",
+      "shape": [
+        2560,
+        80
+      ],
+      "pack_offset": 1843200
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.down_proj.scales",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 2830661761,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        2560,
+        10
+      ],
+      "pack_offset": 2662400
+    },
+    {
+      "name": "language_model.model.layers.0.mlp.switch_mlp.down_proj.biases",
+      "file": "/Users/yb/.lmstudio/models/Jundot/Qwen3.8-Flash-Next-oQ4e-mtp/model-00008-of-00021.safetensors",
+      "offset": 2906876401,
+      "size": 51200,
+      "experts": 512,
+      "dtype": "BF16",
+      "shape": [
+        2560,
+        10
+      ],
+      "pack_offset": 2713600
+    }
+  ],
+  "expert_sha256": {
+    "0": "5d14f2daf278b51a896540225574d253d64020a342a34a85033e010c5a6bef40",
+    "1": "6f00cab1b96f99e9f7f1bd746ad50c8f6a626a21ec5155d9ad1e4bf205f1d61b",
+    "2": "dd23ef4d821c016173f5f2cb5189aaddf9f5667490983414aad393c286a6b669",
+    "3": "3d7f8d4643000e3ea49c766775cde9013bca87673ae92f29193ded8f2702635e",
+    "4": "61d5e33b9fd855e495a64c0372b40f1fe9c15db437732f3dcefbcace19de5fda",
+    "5": "f0630780ddd6a9c4cd877f34ae98ffdbc5fd346b9b3dc886bebee4975bb1dbcc",
+    "6": "8d08377222d61d12b394561be84b56e7eeab7f2455abaed9b443cd9c76c9de2d",
+    "7": "1f36e5631107f0eaba508e1936ea24b47939bd2f632dbea29bad8822e6e1ab71",
+    "8": "4d193f8b7100e34514408e6970d7bf07b8055b8f9df81ccd7eee9c9a3405e690",
+    "9": "7cd701d87d240fe46dd51b86a51cabdf2a2f9274a586715a681db59f714fcede",
+    "10": "a2056c36cb3f3575b975beda58051d4bf52a59e6d00d31dc9b6ab05c0fcb4117",
+    "11": "36a67a250b2daa49dc3eadd2dc34626250ecb9ff5614e84fcfd601b14bd29639",
+    "12": "f67b8d3340f5ddeba732c27978ddae681c13364c31233979dffadba46b1e92e2",
+    "13": "58056259cbf4ace349c5443bc1f035c53e9c67dde81e5a8cecc340ba181ff00b",
+    "14": "c8c9e4773ebcebc83f062f65d62035f7d2369c0d9f703352015b1cae7d65d9a8",
+    "15": "02527f9b95114d93d4778e69d90aa32df13466aeb8439930ecb2de838213a23f",
+    "16": "66a0aa03806cf52c4d5974e7284ea02d03e384688aa1a2f7fe9cb6d1b842bad4",
+    "17": "afafd596bd9e20851c3d7887376af80a31fec65689e09c1ecce299dd59e63b06",
+    "18": "64cc15c297e8800b813d6972b7c1eca377b492074f36a8adc295ae5526e44519",
+    "19": "b7c8bbadaaa797cc109a01b821f1ce17ea7ffb90d2d34d749dcd4939e4ff34eb",
+    "20": "776d1ba416e72d432fcbb571d87dc0bda4b6ebc9d054e9c9d6c2d2870e4d3c1b",
+    "21": "d8582dda3b32461f114d372be8ba9b745d9006367271429929fe4c7df939ba83",
+    "22": "4bd18ec619876a96b019f08d905cc36931b850e5ab176cb12876a997f48ef684",
+    "23": "6a7b670643e6c2d6746426b259dfa62d102e58fc0d30a58ba0db8622b7840dc3",
+    "24": "f9927689c9edbebcf2873fc2e67ac1c9bfd1d63529595eefb357b6497f3af91b",
+    "25": "fe7f218ca4df1b69ee66d8170d05e105c18d5f063af9589bb1d11da32fb29598",
+    "26": "871215ff3e05f89d6aea4d79b5835385afac3fa698cc466841ff0695be6920e7",
+    "27": "e5ebaa4ac9f07132d2862df41df6fc77b97aa6c2435e072f6654fb1cf59c6100",
+    "28": "ac589579365a6c0dd3e031acaaa87bdd9c0b3667f1a5ad734273833bbe2bcb50",
+    "29": "ef85873836279eb711d8721b3aafb19b2a217d3ade8060156e91b6fd7a2ac72b",
+    "30": "907dd865e4ec160360c7a999646b7a2a200707b41fda4880ed374cba027eb485",
+    "31": "a81e02e5db39168af329a98d4d9a61007eb8e1ab3324e5ba981e1178ab2414a4",
+    "32": "4ccefb0f7425c8c5cee94da5f6316d8b66726dd9562c7c34e69dbc4388c1c5c9",
+    "33": "d2d26776b901258f711c624216666b23896c147cdb7ff86d5d297a3d8c4a1d44",
+    "34": "3cb157cd3555aa2dfb621b5be315d1debb1ea54be3141a392217f611c565f3dd",
+    "35": "7345ca80f0a69b6c8d10f3af7b1d9c7a5f96282f4e42d14032298aaa9347691b",
+    "36": "c45972e5b1b6ab7e63f40fae95303084f97ddafcee3ecb924dd20079bbb9df3e",
+    "37": "a4f74e55c846094832f437b82e1fc641c78de4330d72bd9bf576609fb3da3814",
+    "38": "aca63eb501e872e755b5c432af034ffdce833014b70c2ab173d603c7684650f7",
+    "39": "ec65d9385b57e185431db37a35270159ee517f51abb883a611a8be4a135ddb91",
+    "40": "0a90d6c54e166f7c6f24fddced16d8c7e01082755963e239642cdf2646942bfc",
+    "41": "0a2e749dbbe77a3a917260fbb679b479772614416e08ea3cfd93e5a653d33e94",
+    "42": "780ee6898e84f5093b7b277244b1fdec7ee6a408c15a549e2518fe70ada6bbce",
+    "43": "2eb1a83becbf09f9c214dc358a41f73aae4c25163ca5de1b6294cfc5e16da5fc",
+    "44": "c12f7b5cac91544cdf8453954b7e2ce5f999a3f6a49ab0eae3928193590d366c",
+    "45": "fa10d51ae803fb0ec97129f41de4f689810d0037093aa39016db832e39f1108a",
+    "46": "bb9053c956e342c86710c03c62e62dc932250e606ec5c1fd7628b498dbeddc4f",
+    "47": "6f9d0fc4f408f1325159fc982a5142130d7d4936721eb2aa26d0f2515123a8f3",
+    "48": "1c0a1efb03ad648d8d882c99943e98e68a4ad05138b354b8686cf33dc65a9fd4",
+    "49": "9e6edcb848b2f899cd6c575a522a4647cd086618546fa7883ba7c72e8096adb1",
+    "50": "0388279565def4e5e22266e19b21731373bef1bd80edd0dd1a67f82cf3bf8dd4",
+    "51": "d9548c04f09b170df1b3bbee45d052ae58a171105b9b4806321d2d8e2a690754",
+    "52": "b2ceae7c9c44eff3eb29bb5e82f267f47b489283a3060ac7154e3463db47559b",
+    "53": "48fb1fd9638d11caf85d28cca5b16a3d330f565613d375aaac5ec55787638746",
+    "54": "c46bb5fde23fc5520dc0eb01ec410538021b2d595b83e4b647cd27eea70a5cb6",
+    "55": "7ca62af2be3d5b00ccf7641654629e4800b505aedd3e98c79e2a7f20f3050e1c",
+    "56": "31528bd06f63ac52273d247f6af4f06ba21e512cdbe10fee3c8fc699d601c2a2",
+    "57": "2a32805acfeba2a786eb79120977d0f0b213cabece07b0d6289570e0a2f11d6f",
+    "58": "c1ea3b4b9181441cac86adf0c91343c6084c02339e3da9eaa3690fe49bbeb449",
+    "59": "9060bf499f0ad66c6a94f39f9653bd08919651103802b828437bbae25830e179",
+    "60": "542ca233fd37e4b66aecea80d5f618800cf68a4de055f2d9424eae74cdf8b7db",
+    "61": "6d09e3bb37df782ec7e67d2528e9581d06921180910cc7c70dbc8aa7a38d466c",
+    "62": "b3dda4cebb0e41bf93a5cd28d1a02d2ff0f44a9ba7dafc01972cc64ca2fdb41d",
+    "63": "7e33517c730b43f8c2c0dc65093cd7f47b56586e8cd80734e6a849316150dcec"
+  },
+  "samples": {
+    "source_random": [
+      {
+        "seconds": 0.008367667000000023,
+        "useful_GBps": 21.146539411761907,
+        "read_bytes": 176947200,
+        "useful_bytes": 176947200,
+        "pread_calls": 576
+      },
+      {
+        "seconds": 0.008354332999999992,
+        "useful_GBps": 21.180290515113555,
+        "read_bytes": 176947200,
+        "useful_bytes": 176947200,
+        "pread_calls": 576
+      },
+      {
+        "seconds": 0.008312792000000013,
+        "useful_GBps": 21.286133467552144,
+        "read_bytes": 176947200,
+        "useful_bytes": 176947200,
+        "pread_calls": 576
+      }
+    ],
+    "pack_random": [
+      {
+        "seconds": 0.007480500000000001,
+        "useful_GBps": 23.654461600160417,
+        "read_bytes": 177209344,
+        "useful_bytes": 176947200,
+        "pread_calls": 64
+      },
+      {
+        "seconds": 0.007483874999999918,
+        "useful_GBps": 23.64379415743875,
+        "read_bytes": 177209344,
+        "useful_bytes": 176947200,
+        "pread_calls": 64
+      },
+      {
+        "seconds": 0.00735362500000003,
+        "useful_GBps": 24.06258137993157,
+        "read_bytes": 177209344,
+        "useful_bytes": 176947200,
+        "pread_calls": 64
+      }
+    ],
+    "pack_sequential": [
+      {
+        "seconds": 0.00753041600000004,
+        "useful_GBps": 23.497665998797288,
+        "read_bytes": 177209344,
+        "useful_bytes": 176947200,
+        "pread_calls": 64
+      },
+      {
+        "seconds": 0.0072125420000000995,
+        "useful_GBps": 24.53326441634552,
+        "read_bytes": 177209344,
+        "useful_bytes": 176947200,
+        "pread_calls": 64
+      },
+      {
+        "seconds": 0.007451208999999959,
+        "useful_GBps": 23.74744823289764,
+        "read_bytes": 177209344,
+        "useful_bytes": 176947200,
+        "pread_calls": 64
+      }
+    ]
+  },
+  "median_useful_GBps": {
+    "source_random": 21.180290515113555,
+    "pack_random": 23.654461600160417,
+    "pack_sequential": 23.74744823289764
+  },
+  "pack_random_over_source_random": 1.1168147851079462,
+  "pack_sequential_over_pack_random": 1.00393103991581
+}
