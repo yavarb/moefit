@@ -485,6 +485,7 @@ class ExpertCache:
         self.hits = self.misses = 0
         self._admit = os.environ.get("OMLX_ADMISSION", "0") == "1"
         self._miss_hist = {}  # expert id -> lifetime miss count (LIP arm)
+        self._lip_pend = []  # first-lifetime misses installed this call (T3 LIP)
         self.warm = False
         self._sc_script: list = []
         self._sc_index: dict = {}
@@ -546,14 +547,12 @@ class ExpertCache:
             and self._miss_hist.get(e, 0) == 1
             and not self.free
         ):
-            # LIP insertion (Qureshi ISCA'07): first-lifetime miss installs at
-            # the LRU position (next eviction victim), not MRU. Warm/free-slot
-            # phase inserts stock.
-            slot_val = self.slot_of.pop(e)
-            rest = list(self.slot_of.items())
-            self.slot_of.clear()
-            self.slot_of[e] = slot_val
-            self.slot_of.update(rest)
+            # LIP (Qureshi ISCA'07), v3: RECORD ONLY. Demotion happens once,
+            # AFTER the _ensure_ids install loop (see the tail of
+            # _ensure_ids) — a per-install reorder evicts in-use experts
+            # (KeyError in _glu_routes, found on silicon 2026-10-06), and a
+            # margin reordering is unbounded for large calls (prefill).
+            self._lip_pend.append(e)
         self.warm = len(self.slot_of) == self.n_experts
         return slot
 
@@ -703,6 +702,20 @@ class ExpertCache:
                 future.cancel()
             if futures:
                 wait(futures)
+        # LIP v3 post-loop demotion (T3): all of this call's installs are
+        # done and NOTHING evicts between here and _glu_routes' gathers, so
+        # demoting now cannot unseat an in-use expert. Each first-lifetime
+        # miss (installed while the cache was full) moves to the LRU head —
+        # the next call's evictions reclaim pollution before the hot core.
+        if self._admit and self._lip_pend:
+            for e in self._lip_pend:
+                if e in self.slot_of:
+                    slot_val = self.slot_of.pop(e)
+                    rest = list(self.slot_of.items())
+                    self.slot_of.clear()
+                    self.slot_of[e] = slot_val
+                    self.slot_of.update(rest)
+            self._lip_pend = []
         # No mx.eval here: installs are already-materialized host arrays, and
         # evaluating every resident tensor on every miss measured 22% slower
         # at identical peak memory. Prefill's transient is bounded by the
