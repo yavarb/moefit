@@ -20,13 +20,14 @@ class CausalBranch:
 
     def fork(self):
         # Session validates the completed-token boundary before state cloning.
-        return CausalBranch(self.model, self.session.fork(), self.state)
+        return CausalBranch(self.model, self.session.fork() if self.session is not None else None, self.state)
 
     def run(self, tokens):
         emb, router, expert = self.model
         out = []
         for token in tokens:
-            self.session.begin_token(token)
+            if self.session is not None:
+                self.session.begin_token(token)
             x = emb[token].copy()
             for layer in range(8):
                 x = np.tanh(x + .2 * self.state[layer])
@@ -36,7 +37,11 @@ class CausalBranch:
                     ids = np.argsort(-logits)[:4].astype(np.int16)
                     w = np.exp(logits[ids] - np.max(logits[ids])); w /= w.sum()
                     return ids, w
-                ids, w, hit = self.session.route(layer, compute)
+                if self.session is None:
+                    ids, w = compute()
+                    hit = False
+                else:
+                    ids, w, hit = self.session.route(layer, compute)
                 self.hits += hit
                 vals = np.einsum('h,khj->kj', x, expert[layer, ids], optimize=False)
                 x = np.tanh(x + np.sum(vals * w[:, None], axis=0))

@@ -1,0 +1,117 @@
+{
+  "kind": "MEASURED constructed causal CPU MoE, not production LLM",
+  "trials": [
+    {
+      "direct": {
+        "seconds": 0.01426766700000004,
+        "hits": 0,
+        "routers": 512,
+        "experts": 512
+      },
+      "disabled": {
+        "seconds": 0.01765283299999998,
+        "hits": 0,
+        "routers": 512,
+        "experts": 512
+      },
+      "replay": {
+        "seconds": 0.012040249999999975,
+        "hits": 256,
+        "routers": 256,
+        "experts": 512
+      }
+    },
+    {
+      "disabled": {
+        "seconds": 0.017094500000000012,
+        "hits": 0,
+        "routers": 512,
+        "experts": 512
+      },
+      "replay": {
+        "seconds": 0.011943708999999969,
+        "hits": 256,
+        "routers": 256,
+        "experts": 512
+      },
+      "direct": {
+        "seconds": 0.013394249999999941,
+        "hits": 0,
+        "routers": 512,
+        "experts": 512
+      }
+    },
+    {
+      "replay": {
+        "seconds": 0.011870292000000005,
+        "hits": 256,
+        "routers": 256,
+        "experts": 512
+      },
+      "direct": {
+        "seconds": 0.01338499999999998,
+        "hits": 0,
+        "routers": 512,
+        "experts": 512
+      },
+      "disabled": {
+        "seconds": 0.01663012499999994,
+        "hits": 0,
+        "routers": 512,
+        "experts": 512
+      }
+    },
+    {
+      "direct": {
+        "seconds": 0.01318016700000002,
+        "hits": 0,
+        "routers": 512,
+        "experts": 512
+      },
+      "disabled": {
+        "seconds": 0.01683820800000002,
+        "hits": 0,
+        "routers": 512,
+        "experts": 512
+      },
+      "replay": {
+        "seconds": 0.011944209000000039,
+        "hits": 256,
+        "routers": 256,
+        "experts": 512
+      }
+    },
+    {
+      "disabled": {
+        "seconds": 0.016716874999999964,
+        "hits": 0,
+        "routers": 512,
+        "experts": 512
+      },
+      "replay": {
+        "seconds": 0.011864458000000022,
+        "hits": 256,
+        "routers": 256,
+        "experts": 512
+      },
+      "direct": {
+        "seconds": 0.013404874999999983,
+        "hits": 0,
+        "routers": 512,
+        "experts": 512
+      }
+    }
+  ],
+  "tokens": 64,
+  "hit_rate": 0.5,
+  "tokens_per_s": {
+    "direct": 4778.169737014038,
+    "disabled": 3800.879523521738,
+    "replay": 5358.469467064223
+  },
+  "replay_speedup_vs_direct": 1.1214481196753852,
+  "replay_speedup_vs_disabled": 1.4097972413761977,
+  "disabled_overhead_ratio": 1.257122123299184,
+  "exact_outputs_and_states": true,
+  "caveat": "Prefill/seeding excluded. Direct arm skips cache wrappers, immutable copies, and prefix tracking. All arms clone identical recurrent state and execute every expert layer. No attention KV/SSD/GPU/server work."
+}
