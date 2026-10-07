@@ -52,3 +52,19 @@ capacity per layer, and the v2 table is the only one quoted in these
 docs.
 Capacity accounting is audited every token in the current code and the
 simulator raises if any layer exceeds its cap.
+
+## Geometry correction (post-review, all numbers re-simmed)
+
+`estimate.py` counted U32-packed 4-bit tensors at 2 bytes/element, and
+the original geometry constants inherited the same halving: the model
+is 99.0 GiB (64.6 routed / 29.8 PLE / 4.6 floor), not 57 GiB, and
+experts are 2.69 MiB, not 1.46. DRAM calibration was redone against
+actual bytes read (57.4 tok/s x 4.75 GiB/token => 293 GB/s effective,
+54% of peak). The table in SETUP.md and `results/sim_paging.json` were
+regenerated on the real traces with the corrected geometry; ceilings
+drop to 11.8 / 23.6 / 45.1 tok/s (LRU) and a 48 GB M4 Max reaches 51%
+of a 128 GB Mac at cap 128 (96% at cap 192 pinned). All qualitative
+conclusions are unchanged: LRU reaches the chip ceiling when capacity
+allows, the pinned hot-set is the cheapest win, n-gram speculative
+prefetch loses, and the sidecar wins tight capacity on repeated
+prefixes.

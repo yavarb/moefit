@@ -48,17 +48,27 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
-EXPERT_MIB = 1.46
+# Geometry measured from the checkpoint's safetensors data_offsets
+# (U32-packed 4-bit weights counted correctly): routed experts 64.6 GiB
+# over 512/layer x 48, PLE n-gram table 29.8 GiB, non-expert floor
+# 4.6 GiB, total 99.0 GiB on disk. An earlier revision halved packed
+# tensors (dtype-table default of 2 bytes instead of U32=4).
+EXPERT_MIB = 2.69
 L, K, E = 48, 10, 512
-GOLD_MIB = L * K * EXPERT_MIB
-FLOOR_MIB = 2900.0
+GOLD_MIB = L * K * EXPERT_MIB      # expert bytes consumed per token
+FLOOR_MIB = 4.6 * 1024             # resident non-expert footprint
+# per-token DRAM READ from the floor side: attn 2.0 + other 1.09 +
+# shared 0.23 + lm_head ~0.63 GiB (embed table resident but gather-read)
+READ_FLOOR_MIB = 4.05 * 1024
 PLE_STREAM_MIB = 0.3
 
+# usable = 0.75 x RAM (macOS default GPU/VM working-set ceiling)
+# minus 3 GiB headroom. dram = Apple-published peak GB/s.
 TIERS = {
-    "24GB-M4":  dict(dram=135.0, ssd=5.0, usable=15.0),
-    "32GB-M4P": dict(dram=273.0, ssd=6.0, usable=23.0),
-    "48GB-M4M": dict(dram=546.0, ssd=7.4, usable=39.0),
-    "64GB-M4X": dict(dram=546.0, ssd=7.4, usable=55.0),
+    "24GB-M4":  dict(dram=120.0, ssd=5.0, usable=15.0),
+    "32GB-M4P": dict(dram=273.0, ssd=6.0, usable=21.0),
+    "48GB-M4M": dict(dram=546.0, ssd=7.4, usable=33.0),
+    "64GB-M4X": dict(dram=546.0, ssd=7.4, usable=45.0),
 }
 
 
@@ -210,12 +220,14 @@ def simulate(gold, picks, prior_rank, cap, mode, pick, async_allow,
     return served / n, sync * EXPERT_MIB / T, async_ * EXPERT_MIB / T
 
 
-DRAM_EFF = 0.385   # calibrated: M4 Max measured 57 tok/s fully resident
-                   # => decode sustains ~210 of 546 GB/s peak
+DRAM_EFF = 293.0 / 546.0
+# calibration: measured 57.4 tok/s on M4 Max 128 GB fully resident, at
+# 4.75 GiB/token actual DRAM reads (measured geometry) => 293 GB/s
+# sustained effective bandwidth (54% of peak).
 
 
 def _times(spec, sync_mb, async_mb):
-    dram_mb = FLOOR_MIB + GOLD_MIB + async_mb
+    dram_mb = READ_FLOOR_MIB + GOLD_MIB + async_mb
     c_ms = dram_mb / 1024.0 / (spec["dram"] * DRAM_EFF) * 1000.0
     st_ms = (sync_mb + async_mb + PLE_STREAM_MIB) / 1024.0 \
         / spec["ssd"] * 1000.0

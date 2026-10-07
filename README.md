@@ -1,31 +1,32 @@
 # specexp
 
-Run a 57 GiB mixture-of-experts model (Qwen3.8-Flash-Next class) on a
-24 to 64 GB Apple Silicon Mac. The model's always-needed part (2.9 GiB)
-stays in RAM. The 35.9 GiB of routed experts are paged from SSD, and the
-17.9 GiB n-gram embedding table streams row by row.
+Run a 99 GB mixture-of-experts model (Qwen3.8-Flash-Next class) on a
+24 to 64 GB Apple Silicon Mac. The model's always-needed part (4.6 GiB)
+stays in RAM. The 64.6 GiB of routed experts are paged from SSD, and the
+29.8 GiB n-gram embedding table streams row by row.
 
 ## Verdict
 
 Decode speed on these models is set by DRAM bandwidth, because every
-token reads about 700 MB of expert weights from unified memory whether
+token reads about 1.26 GB of expert weights from unified memory whether
 those experts were cached or just arrived from SSD. A paging policy can
 only decide whether the bytes are already in RAM when the token needs
 them. In simulation at measured bandwidths, plain LRU paging already
 reaches that chip-bound ceiling at most RAM sizes. A 48 GB Mac holding
-128 experts per layer decodes at about 93% of a 128 GB Mac's measured
-57.4 tok/s. A 32 GB Mac reaches 26 to 30 tok/s. A 24 GB Mac is capped
-near 14.8 tok/s by its chip and leaves little room for the OS.
+192 experts per layer with a pinned hot-set decodes at about 55 tok/s
+against a 128 GB Mac's measured 57.4 — the pinned set reaches ~95%
+there, while LRU alone sits at 51 to 79%. A 32 GB Mac reaches 14 to
+26 tok/s. A 24 GB Mac is capped near 11.8 tok/s by its chip and leaves little room for the OS.
 
 ## Should I use this?
 
 | Your Mac | Verdict |
 |---|---|
 | 128 GB or more | No. The model fits. Load it normally. |
-| 64 GB | Yes. Keep 384 experts per layer resident and expect the chip's ceiling. |
-| 48 GB | Yes. 128 to 192 experts per layer; 53 to 60 tok/s simulated on M4 Max. |
-| 32 GB | Yes, with care. 64 to 192 experts per layer; 26 to 30 tok/s simulated on M4 Pro. Prefer the pinned hot-set to keep SSD traffic low. |
-| 24 GB | Marginal. The chip caps decode at 14.8 tok/s, and the OS may push on the 2.9 GiB floor. 32 GB is the comfortable minimum. |
+| 64 GB | Yes. 192+ experts per layer, pinned hot-set; ~55 tok/s on M4 Max. |
+| 48 GB | Yes. 128 to 192 experts per layer; 29 to 55 tok/s simulated on M4 Max (pinned hot-set). |
+| 32 GB | Yes, with care. 64 to 128 experts per layer; 14 to 26 tok/s simulated on M4 Pro. Prefer the pinned hot-set to keep SSD traffic low. |
+| 24 GB | Marginal. The chip caps decode at 11.8 tok/s, and the OS may push on the 2.9 GiB floor. 32 GB is the comfortable minimum. |
 
 Run the estimator before anything else. It reads the checkpoint and this
 machine and prints FULL, PAGING, or NO-GO:

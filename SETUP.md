@@ -7,25 +7,26 @@ and never disable SIP.
 
 ## What the simulation says
 
-Geometry: 2.9 GiB non-expert floor, 35.9 GiB routed experts (512 per
-layer, 48 layers, 1.46 MiB each, top-10 routing), 17.9 GiB n-gram table.
-Decode reads about 700 MB of expert weights per token from unified DRAM
+Geometry: 4.6 GiB non-expert floor, 64.6 GiB routed experts (512 per
+layer, 48 layers, 2.69 MiB each, top-10 routing), 29.8 GiB n-gram table.
+Decode reads about 1.26 GB of expert weights per token from unified DRAM
 whether or not they were cached, so tok/s is DRAM-bound and the ceiling
-belongs to the chip: 14.8 tok/s on a base M4, 29.9 on an M4 Pro, 59.8 on
-an M4 Max. Paging decides whether those bytes are already in RAM (no
+belongs to the chip: 11.8 tok/s on a base M4, 23.6 on an M4 Pro, 45.1 on
+an M4 Max at full LRU (55 with a pinned hot-set; 57.4 measured fully
+resident on a 128 GB M4 Max). Paging decides whether those bytes are already in RAM (no
 stall) or arrive on demand from SSD (stall).
 
 Simulated decode speed in tok/s, holdout routing trace, measured tier
 bandwidths, capacity audited every token (`results/sim_paging.json`):
 
-| RAM tier | experts/layer resident | LRU | pinned hot-set | routing sidecar |
-|---|---|---|---|---|
-| 24 GB (M4) | 32 | 14.8 | 14.1 | 13.6 |
-| 24 GB (M4) | 128 | 14.8 | 14.8 | 14.2 |
-| 32 GB (M4 Pro) | 64 | 26.1 | 25.8 | **26.6** |
-| 32 GB (M4 Pro) | 192 | 29.9 | 29.9 (75 MB/tok SSD) | 29.2 |
-| 48 GB (M4 Max) | 128 | 53.5 | **58.3** | 54.1 |
-| 48 GB (M4 Max) | 192 | 59.8 | 59.8 | 58.5 |
+| RAM tier | experts/layer resident | LRU | pinned hot-set | routing sidecar | SSD (pinned) |
+|---|---|---|---|---|---|
+| 24 GB (M4) | 32 | 8.1 | 7.6 | 8.6 | 670 MB/tok |
+| 24 GB (M4) | 64 | 11.8 | 11.7 | 11.4 | 438 MB/tok |
+| 32 GB (M4 Pro) | 64 | 14.2 | 14.0 | 14.5 | 438 MB/tok |
+| 32 GB (M4 Pro) | 128 | 23.6 | **25.7** | 23.8 | 239 MB/tok |
+| 48 GB (M4 Max) | 128 | 29.1 | **31.7** | 29.4 | 239 MB/tok |
+| 48 GB (M4 Max) | 192 | 45.1 | **54.8** | 45.3 | 138 MB/tok |
 
 Policies:
 
@@ -39,17 +40,18 @@ Policies:
 
 What follows from the table:
 
-1. LRU alone reaches the chip ceiling at most sizes. A 48 GB Mac holding
-   128 experts per layer runs at about 93% of the 128 GB machine's
-   measured 57.4 tok/s; with the pinned hot-set it reaches the ceiling.
+1\. Paging costs real speed at these capacities: a 48 GB Mac at
+   128 experts per layer runs at about 51% of the 128 GB machine's
+   measured 57.4 tok/s with LRU (55% with the pinned hot-set), and
+   about 96% once 192 per layer are pinned\.
 2. The pinned hot-set beats LRU in the middle of the capacity range and
    costs no prefetch bandwidth. It is the cheapest real win.
 3. The routing sidecar wins the tight-capacity rows and never hurts on
    repeated prefixes.
-4. n-gram speculative prefetch loses at tight capacity: about 75% of
+4\. n-gram speculative prefetch loses everywhere tested: about 75% of
    prefetches are wasted and they eat the SSD time that hides other
    misses. Do not ship it for byte-exact MoE execution.
-5. SSD traffic under LRU is about 141 to 341 MB per token (steady state,
+5. SSD traffic under LRU is about 260 to 629 MB per token (steady state,
    cap 128 down to cap 32). At 15 tok/s that is several terabytes per
    day. Prefer the pinned hot-set, and pick the RAM tier whose row shows
    the lowest SSD traffic you can afford.
@@ -106,7 +108,7 @@ restarting the tool, the same prompt still logs hits
   so do not implement expert skipping.
 - n-gram speculative prefetch: net-negative at tight RAM in the shipped
   simulation.
-- 24 GB runs at the 14.8 tok/s ceiling and the OS may still press on the
+- 24 GB runs at the 11.8 tok/s ceiling and the OS may still press on the
   floor. 32 GB is the comfortable minimum.
 
 ## Checking the numbers
