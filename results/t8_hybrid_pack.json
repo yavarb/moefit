@@ -1,0 +1,63 @@
+{
+  "scope": "MEASURED LOCAL cache-influenced read+full-byte CRC. NOT physical SSD or decode.",
+  "packed_experts": 16,
+  "fallback_experts": 16,
+  "component_equalities": 288,
+  "invalid_id_guards": 4,
+  "source_read_calls": 288,
+  "hybrid_read_calls": 160,
+  "seconds": {
+    "source_random": [
+      0.006450542000010273,
+      0.006725875000000769,
+      0.0065010839999786185,
+      0.006568958000002567,
+      0.006225749999998698,
+      0.008154458000007025,
+      0.00649983299999235,
+      0.007219375000005357
+    ],
+    "hybrid_random": [
+      0.006680625000001328,
+      0.006742416999998113,
+      0.006591417000009869,
+      0.00718166699999756,
+      0.006500208000005614,
+      0.006709625000013375,
+      0.0064315420000014,
+      0.006562208000019609
+    ],
+    "source_sequential": [
+      0.006941541000003326,
+      0.007120708000002196,
+      0.0068287499999826196,
+      0.006472582999975884,
+      0.006618290999995224,
+      0.008252707999986342,
+      0.006634832999992568,
+      0.006535667000008516
+    ],
+    "hybrid_sequential": [
+      0.006591541999995343,
+      0.0065324999999916145,
+      0.00649004199999581,
+      0.00647699999998963,
+      0.0066883340000174485,
+      0.007399583000022858,
+      0.006352624999976797,
+      0.006365499999986923
+    ]
+  },
+  "useful_GBps": {
+    "source_random": 13.538380366356492,
+    "hybrid_random": 13.332326706007313,
+    "source_sequential": 13.142653036738148,
+    "hybrid_sequential": 13.587761897805425
+  },
+  "ratios": {
+    "random": 0.984780036106739,
+    "sequential": 1.0338675045154924
+  },
+  "caveat": "Same immutable checkpoint required; geometry checked, full model identity not cryptographically authenticated. Mixed 50% fixture is not measured route residency.",
+  "lifetime_guards": 2
+}
