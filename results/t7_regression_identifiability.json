@@ -1,0 +1,229 @@
+{
+  "kind": "offline reanalysis of measured aggregates + synthetic null diagnostics; no new silicon",
+  "source_sha256": "b5d79fee9e32359a83cc044365ce93e173ce209ade0eaab476339b42bb0e9a25",
+  "observed_ols": {
+    "n": 17,
+    "intercept": 39.24885762333539,
+    "slope": 0.28827238829650687,
+    "intercept_se": 8.370164814932137,
+    "slope_se": 0.05340526127496881,
+    "r2": 0.6601455530485278,
+    "intercept_slope_corr": -0.9940336590745931,
+    "intercept_normal95": [
+      22.8433345860684,
+      55.65438066060238
+    ]
+  },
+  "observed_x_range_MB": [
+    132.9,
+    196.6
+  ],
+  "fixed_term_candidates": {
+    "30.0": {
+      "z_from_intercept": -1.1049791524816441,
+      "in_normal95": true
+    },
+    "36.0": {
+      "z_from_intercept": -0.38814738958777967,
+      "in_normal95": true
+    }
+  },
+  "permutation": {
+    "seed": 731,
+    "n": 20000,
+    "null": "Permute measured rate across measured token durations; reconstruct x=rate*y/1000. Removes rate-duration pairing but preserves shared duration factor.",
+    "slope_p025_p50_p975": [
+      0.2925647047977378,
+      0.3064532030715545,
+      0.3326135718548699
+    ],
+    "intercept_p025_p50_p975": [
+      32.48964259554247,
+      36.46174284105558,
+      38.59331152628319
+    ],
+    "r2_p025_p50_p975": [
+      0.31235199390199797,
+      0.5756325949418316,
+      0.7793019850968339
+    ],
+    "fraction_r2_ge_observed": 0.2323,
+    "caution": "Diagnostic null, NOT a causal p-value; prompt clusters, rounded aggregates and measurement endogeneity remain."
+  },
+  "constant_rate_counterexample": {
+    "n": 17,
+    "intercept": -2.7290189392957337e-14,
+    "slope": 0.5408175213799541,
+    "intercept_se": 2.7682947496905394e-14,
+    "slope_se": 1.774321964280557e-16,
+    "r2": 1.0,
+    "intercept_slope_corr": -0.9974131117493734,
+    "intercept_normal95": [
+      -8.15487664868919e-14,
+      2.6968387700977232e-14
+    ]
+  },
+  "leave_source_prompt_out": [
+    {
+      "omitted": "anchor_Count",
+      "n": 16,
+      "intercept": 38.83061790670429,
+      "slope": 0.2920685812221902,
+      "intercept_se": 8.516098461532577,
+      "slope_se": 0.05445739428726896,
+      "r2": 0.6726252223367533,
+      "intercept_slope_corr": -0.9936872796565107,
+      "intercept_normal95": [
+        22.13906492210044,
+        55.522170891308136
+      ]
+    },
+    {
+      "omitted": "anchor_Repea",
+      "n": 16,
+      "intercept": 40.35469628751229,
+      "slope": 0.2826106393343478,
+      "intercept_se": 8.46178831931861,
+      "slope_se": 0.05381613858169016,
+      "r2": 0.6632779038528958,
+      "intercept_slope_corr": -0.9937743284190748,
+      "intercept_normal95": [
+        23.769591181647815,
+        56.93980139337677
+      ]
+    },
+    {
+      "omitted": "chinese_story",
+      "n": 15,
+      "intercept": 32.90423822137414,
+      "slope": 0.3241208993078601,
+      "intercept_se": 5.174026103725998,
+      "slope_se": 0.032734645978158956,
+      "r2": 0.88292399407874,
+      "intercept_slope_corr": -0.9936756008299248,
+      "intercept_normal95": [
+        22.763147058071187,
+        43.0453293846771
+      ]
+    },
+    {
+      "omitted": "code_lru",
+      "n": 15,
+      "intercept": 38.21788487232797,
+      "slope": 0.2945787382185222,
+      "intercept_se": 9.152254908755376,
+      "slope_se": 0.05775396826792969,
+      "r2": 0.6668026523832499,
+      "intercept_slope_corr": -0.9939228222273264,
+      "intercept_normal95": [
+        20.279465251167434,
+        56.156304493488506
+      ]
+    },
+    {
+      "omitted": "essay_uma",
+      "n": 15,
+      "intercept": 39.53138851627908,
+      "slope": 0.2867321272523782,
+      "intercept_se": 9.265670856117989,
+      "slope_se": 0.05876394289558738,
+      "r2": 0.6468200879792165,
+      "intercept_slope_corr": -0.9936401752477799,
+      "intercept_normal95": [
+        21.370673638287823,
+        57.69210339427033
+      ]
+    },
+    {
+      "omitted": "json_tool",
+      "n": 15,
+      "intercept": 49.02847689001382,
+      "slope": 0.22212436927041967,
+      "intercept_se": 13.352514004387372,
+      "slope_se": 0.08819021340393315,
+      "r2": 0.3279511297150267,
+      "intercept_slope_corr": -0.9971433454849749,
+      "intercept_normal95": [
+        22.857549441414573,
+        75.19940433861306
+      ]
+    },
+    {
+      "omitted": "math_proof",
+      "n": 15,
+      "intercept": 38.591413497198204,
+      "slope": 0.2942357828170576,
+      "intercept_se": 8.402727076199197,
+      "slope_se": 0.05372773981644869,
+      "r2": 0.6976125293285843,
+      "intercept_slope_corr": -0.9932569542485143,
+      "intercept_normal95": [
+        22.12206842784778,
+        55.06075856654863
+      ]
+    },
+    {
+      "omitted": "measured_santa_cruz_36gb_ssd",
+      "n": 16,
+      "intercept": 39.89390031062217,
+      "slope": 0.2845843680343083,
+      "intercept_se": 8.916481732712326,
+      "slope_se": 0.05654505362214191,
+      "r2": 0.6440363906966944,
+      "intercept_slope_corr": -0.9940509520423317,
+      "intercept_normal95": [
+        22.417596114506015,
+        57.37020450673833
+      ]
+    },
+    {
+      "omitted": "sql_explain",
+      "n": 15,
+      "intercept": 39.58616870052851,
+      "slope": 0.2856747895136012,
+      "intercept_se": 9.231499605093598,
+      "slope_se": 0.05966055342233914,
+      "r2": 0.638166869582829,
+      "intercept_slope_corr": -0.9937932687775357,
+      "intercept_normal95": [
+        21.49242947454506,
+        57.67990792651196
+      ]
+    },
+    {
+      "omitted": "ssd_tok_run2",
+      "n": 16,
+      "intercept": 40.49462636499453,
+      "slope": 0.28088168952142134,
+      "intercept_se": 9.227950938544351,
+      "slope_se": 0.058368056312394355,
+      "r2": 0.6232280124032813,
+      "intercept_slope_corr": -0.9944697056618509,
+      "intercept_normal95": [
+        22.407842525447602,
+        58.581410204541456
+      ]
+    },
+    {
+      "omitted": "ssd_tok_run4",
+      "n": 16,
+      "intercept": 40.215910542146084,
+      "slope": 0.28288109509626874,
+      "intercept_se": 8.765592179537693,
+      "slope_se": 0.055645774126262135,
+      "r2": 0.6486211225196397,
+      "intercept_slope_corr": -0.9939304863018058,
+      "intercept_normal95": [
+        23.035349870252205,
+        57.39647121403996
+      ]
+    }
+  ],
+  "verdict": "Descriptive association reproduced; shared denominator permits association without causal miss latency. Both candidate fixed terms remain inside even the approximate normal95 interval. Compute not statistically resolved by this intercept.",
+  "caveats": [
+    "OLS normal95 is optimistic for n=17 and clustered prompts; not a definitive coverage guarantee.",
+    "Intercept extrapolates to 0 MB/token outside observed support.",
+    "Slope per physical MB converts to cost per logical expert only with independently validated byte/miss mapping.",
+    "Microbench evidence of serialization is independent and not refuted."
+  ]
+}
