@@ -93,3 +93,52 @@ pins every other tier prediction by the same offset (~+6.5 ms).
 - A 48 GB result scored against 54.8 (bandwidth artifact, T3 f0692cb).
 - Crowd: during-run free% < 10 invalidates comparison to idle anchors
   (cf. 7.8 crowded vs 13.0 idle at the same cap-92 class).
+
+---
+
+## AMENDMENT 1 (2026-10-08, glm_fidelity) — Test C downgraded to shape
+## compatibility; mechanism arbitration moves to Tests B/D + design test
+
+Triggered by two independent counterexample sets, both reproduced or
+verified by T3:
+
+1. CAUSAL NON-IDENTIFIABILITY (astra_analysis_b, e06db18,
+   t7_signature_identifiability.json): byte-service-only on the
+   IDENTICAL miss bursts (same M matrix, same mean 82.69 ms) yields
+   p95/mean = 1.831 — above the 1.3 "serial" threshold. T3 independent
+   reproduction: 1.827 (true-LRU M @cap143, locked synth, byte-service
+   model at fitted rate). The burst shape is inherited from the MISS
+   PATTERN, which both mechanisms share; the >=1.3 threshold therefore
+   does NOT distinguish serial-per-miss (S) from byte-backlog (Q). The
+   original Q-null ("smoothed, ~1.0") was a strawman control.
+2. TRANSPORT NON-IDENTIFIABILITY (astra_local_exp, 175d734,
+   t8_sse_timing_probe.json): SSE chunking alone flips the verdict both
+   ways at unchanged generation (Q->S 1.000->1.512; S->Q 1.500->1.008;
+   buffering 4 single-token lines -> false S-like 4.016; a usage trailer
+   distorts collector tps 12.50->10.05). Chunk-count agreement is
+   necessary, not sufficient.
+
+REVISED TEST C (shape compatibility only):
+- READOUT 1 (survives, one-directional falsification): a measured
+  p95/mean ~ 1.0 with VERIFIED token-level provenance falsifies BOTH S
+  and bursty-Q (neither model produces smooth gaps from these traces).
+  A measured p95/mean >= 1.3 is COMPATIBLE with both — no verdict.
+- READOUT 2 (vm_stat+iostat absorption pairing) unchanged — it does not
+  depend on timing percentiles.
+- PROVENANCE REQUIREMENTS (from astra_local_exp): collector decode
+  interval must close on the last token-bearing event (not wall EOF);
+  control/role/finish chunks excluded from gap samples; verdicts from
+  unverified chunk timestamps are labeled TRANSPORT-provisional.
+
+MECHANISM ARBITRATION now rests on:
+- Test D (compute-term separation, mean-based — unaffected).
+- Mean tps at a second residency point (cap180/48GB): S and Q diverge in
+  the MEAN at other caps (T8 divergence table: cap180 S ~17.4 vs Q
+  12.2-18.0 band).
+- The sidecar-pread silicon design test: the only DIRECT test of the
+  overlap assumption (idle window exists -> prefetch pays -> T2's
+  optimistic bound; contends -> T7's pessimistic bound).
+
+Score_silicon_run.py (T4) Test C verdict labels should be downgraded to
+match; threshold constants stay (they now gate the one-directional
+falsification only). This amendment is registered openly, not silently.
