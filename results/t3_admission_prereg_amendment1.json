@@ -1,0 +1,16 @@
+{
+ "amendment": "T3 admission prereg Amendment 1 (registered BEFORE any A/B/A data, following T4's Amendment 2 basis)",
+ "trigger": "T4 0af86e7: the installed box runs the staged-install (DB) machinery ON by default; the 15.55 baseline is the DB-ON arm; install is overlapped under fetch (fetch-bound), so a removed miss pays io-time (0.52 ms) on the critical path, with install contribution largely hidden.",
+ "repricing": {
+  "lru_vs_lip_suffix_miss_delta_per_tok": 1.291,
+  "value_per_removed_miss_io_only_ms": 0.52,
+  "suffix_gain_ms_per_tok": 0.672,
+  "predicted_delta_tps_on_15.55": "+0.17 (suffix-only upper bound; measured calc 64.31->63.64 ms/tok)",
+  "global_window_cost_miss_per_tok": 0.188,
+  "global_cost_ms_per_tok": 0.098,
+  "predicted_global_delta_tps": "-0.02",
+  "single_prompt_band": "[-0.04, +0.17] tps (narrower than the serial-basis [-0.05, +0.25]; both bands are WASH)"
+ },
+ "decision_rules": "UNCHANGED verbatim: >=+0.30 = TRANSFERS; |d|<0.30 = WASH (expected); ON<OFF by >0.30 = falsifies single-prompt transfer.",
+ "composition_note": "LIP and DB compose without interaction: LIP only reorders slot_of; installs still ride the windowed read-ahead path unchanged. If T4's WASH reading holds (install never on the DB-ON critical path), the serial model's per-miss pricing for ALL T3 policy comparisons moves from 0.82 to ~0.52 ms/miss \u2014 miss-rate gains shrink ~37% in tps terms, reinforcing every T3 DROP verdict; the LIP KEEP verdict for memory-tight tiers rests on miss-rate, which is unchanged."
+}
