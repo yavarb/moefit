@@ -83,6 +83,24 @@ def main():
                          "db_on_provenance": "T4 Amendment 2 (0af86e7): staged install ON by "
                          "default on the box; pending T9 A/B/A confirmation"},
         "measured_baseline": {"tps": BASE_TPS_MEASURED, "ms_per_tok": round(BASE_MS_MEASURED, 2)},
+        "t9_measured_anchors": {
+            "note": "T9 A/B/A (75cdc0f), landed AFTER this artifact's original re-pricing",
+            "on_dbuf_default_median_tps": 15.72,
+            "off_fully_serial_median_tps": 9.20,
+            "off_serial_ms_per_tok": 108.7,
+            "baseline_confirmation": "the DB-ON 15.55 baseline assumed here is measured-confirmed "
+                                     "(15.72 median, +1.1%); the DB-ON basis rows are the "
+                                     "operative ones for the box",
+            "fully_serial_counterfactual": "pricing spec-pagein on the MEASURED serial point "
+                                          "(108.7 ms/tok): saving 0.50 ms/tok minus contention "
+                                          "3.81-10.30 -> 8.4-9.0 tps vs 9.20 = still a net "
+                                          "regression; the original serial-basis rows mixed "
+                                          "serial per-miss cost with the DB-ON baseline and "
+                                          "are superseded by this counterfactual",
+            "caveat": "workers=1 disables slab-parallel reads + decode-overlap too, so 9.20 is "
+                      "the fully-serial floor, not the DB-ON-minus-install point; the 0.52 "
+                      "DB-ON basis stays provisional until the IO_BATCH=1 isolating arm",
+        },
         "rows": [],
         "verdict": "",
     }
