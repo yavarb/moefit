@@ -81,6 +81,80 @@ Verdicts:
   — diminishing returns past cap ~192 argue against footprint growth as a
   strategy on its own.
 
+## Entry 3 — idle-window sidecar prefetch (SIM; first designs to beat baseline)
+
+`experiments/design_idle_prefetch.py` → `results/design_idle_prefetch.json`
+(owner: design_inventor/T2, commit 377eb7c). Mechanism: during the
+~29.1 ms/token the SSD sits idle (compute+sync), background-read next-token
+routes from the routing sidecar — budget 50 experts/token at the measured
+4.85 GB/s — inserted as MRU into the same capped LRU, behind a break-even
+precision gate (0.366 pessimistic / 0.05 with async install). Serial
+cost model, compute 23.2 ms assumed. All numbers SIM on synth holdout
+(sha f8262a526f8c), cap 143 unless noted:
+
+| variant | misses/tok | tok/s (install on critical path / async) | vs LRU |
+|---|---|---|---|
+| LRU baseline | 57.15 | 12.12 | 1.0 |
+| sidecar prefetch | 10.12 | 19.02 / 26.0 | +57% / +114% |
+| sidecar + Belady eviction | 3.5 | 24.54 / 30.94 | +103% / +155% |
+
+Verdicts:
+
+- **KEEP — this is the first design family to beat the baseline** (the
+  Belady-eliminated eviction alone cannot; the win comes from *prediction
+  feeding pipelining*, exactly where entries 1–2 said the headroom lives).
+  Cap 92: 8.9 → 12.2/14.9 (sidecar), 21.0/28.7 (+Belady); cap 192:
+  14.7 → 22.2/29.1, 27.4/33.5.
+- **Online predictors: DROP, safely.** decay-freq / co-activation precision
+  is 1–3% on synth — far below the 36.6% break-even — so the gate shuts
+  them off and they cost 0.998–1.00×. Zero-risk by construction, but also
+  zero gain on synth; real traces may differ.
+- **Install cost is the second-order lever**: at cap143 sidecar+async,
+  pessimistic install is 9.5 ms of a 40.7 ms token (19.0 vs 26.0 tps).
+- Standing assumptions to check on silicon: background preads must not
+  slow GPU compute or demand reads; prefix-replay regime only (the sidecar
+  knows exact routes because the prefix was seen before). Proposed first
+  silicon test (needs an oMLX patch, not started): sidecar-driven pread
+  thread vs the measured 12.7 tok/s.
+
+## Cross-track synthesis: the design ordering (all SIM, measured constants)
+
+Three independent analyses (T2 idle-window, T8 mechanism probes, T6
+stack-distance) converge on one ranking for where the next tok/s comes
+from, at cap 143, true-LRU baseline 12.0–12.1:
+
+1. **Install-cost reduction — the gating lever** (T8): every prefetched
+   expert pays 0.30 ms install regardless of hit; a real coact predictor
+   is net-NEGATIVE until install ≤ ~0.18 ms/expert (16.0–15.4 vs 16.6
+   pipelining-only baseline; at install 0 the same predictor yields 22.6).
+   Worth ~17 ms/tok directly (0.30 × 58 misses).
+2. **Cross-layer pipelining** — +38% (12.0 → 16.6; matches the ~18.6
+   ideal-overlap ceiling). Oracle prediction on top breaks that ceiling:
+   25.1 tps drive-capped at 4.65 GB/s / 39.1 uncapped, because the
+   constraint shifts to the 18.1 ms compute floor.
+3. **Prediction** — the largest prize (oracle: served 1.0, misses → 0,
+   compute-bound ceiling ~43–55 tok/s) but pays only after 1–2.
+4. **Eviction/pinning/admission heuristics — DEAD** (entries 1–2; T6
+   pin scan; T8 prior warning).
+
+Also folded this cycle:
+
+- **Policy ranking flip** (glm_fidelity/T3, commit 9cd94bd): the serial
+  model is now IN sim_paging (`solve_policy_serial`, `hit_refresh=True` =
+  oMLX ExpertCache semantics, `want_misses` hooks). Under it, true-LRU
+  beats static-pinned prior at EVERY cap (11.9 vs 10.4 @143; 14.5 vs 13.3
+  @192) because prior's misses (72/tok) exceed true-LRU's (57.4) at
+  ~0.82 ms each. The carry-forward "prior@≥128 for peak tps (54.8@192)"
+  is a bandwidth-model artifact. Discriminator for the 48 GB silicon run:
+  race lru@192 vs prior@192 — if prior wins on silicon the serial ranking
+  is wrong.
+- **Shipped-sim bias table** (T6): FIFO-vs-true-LRU served bias is
+  +7.0/+6.4/+4.3/+3.9/+2.4 pp at caps 32/64/128/143/192 — design sims
+  below cap 128 on the shipped (no-refresh) sim understate baselines
+  most.
+- **Probe confirmed broken** (T8): `probe_picks()` NaNs on current synth
+  features (matmul overflow) — research-only until fixed, per the retro.
+
 ## Method notes for all design rows
 
 - Traces: `results/traces_synth` (synthetic). Trace-shape uncertainty on
@@ -103,6 +177,13 @@ Verdicts:
   `results/analysis_t6_traffic_headroom.json` (owner: sheryl_analysis_a/T6,
   commit c358684, SIM, exact stack-distance sweep + true-LRU/pin/prefetch
   replay at cap 143).
+- Entry 3 numbers read from
+  `results/design_idle_prefetch.json` (owner: design_inventor/T2, commit
+  377eb7c, SIM, serial cost model, sidecar/sidecar_opt/Belady rows).
+- Cross-track synthesis draws on T8
+  `results/t8_pipelining_predictor_probes.json` (SIM), T3
+  `results/sim_serial_policy_ranking.json` (commit 9cd94bd), T6 notebook
+  bias table, and T4 `experiments/serial_predict.py` (commit 9b89eab).
 - Arbitration rows from `results/t8_policy_arbitration_cap92_143.json`
   (sheryl_local_exp/T8, SIM).
 - Cost-model validation and measured anchors: see

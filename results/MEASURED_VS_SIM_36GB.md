@@ -187,7 +187,11 @@ true-LRU by behavior; name it accordingly.
    to verify the serial model's per-token distribution, not just its mean.
 4. A cap-180 silicon point if memory allows (~27 GiB footprint; watch the
    memory-guard at 18–19% free).
-5. One 48 GB M4 Max paging run — the serial model's out-of-sample test.
+5. One 48 GB M4 Max paging run — the serial model's out-of-sample test,
+   and a policy-ranking discriminator: race **lru@192 vs prior@192** —
+   the serial model says true-LRU wins (14.5 vs 13.3, SIM); the old
+   bandwidth-model carry-forward said prior (54.8). Silicon picks the
+   ranking.
 6. Method note from the T8 queue model (SIM): residency sweeps on silicon
    need runs of n ≥ 1024 tokens; short 128-token benches understate
    steady-state more as residency rises (n128/steady ≈ 0.92 @cap143,
