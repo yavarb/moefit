@@ -1,0 +1,230 @@
+{
+  "kind": "SIMULATED matched-window replay plus evidence accounting; no new silicon",
+  "cap": 143,
+  "trace_tokens": 2882,
+  "hashes": {
+    "results/traces_synth/holdout.npz": "f8262a526f8cf51eda38ee33a175013fa71ffad2682338c2addf06cc058b5d8f",
+    "experiments/design_omlx_exact.py": "61d22539ac32e725a183f21fdb9826baf032871fe073cbfc13023525a2d9873d",
+    "experiments/design_admission_cache.py": "038f7af0a1f5f9de936c127a5f3b2b79cafbb5f024d7951bdab337475eed5f9d",
+    "results/measured_santa_cruz_36gb_ssd.json": "52d1e2fc4aa9801164edd1f25576e9d927f524276aaef0817e7c4263290caeae",
+    "results/t8_pagecache_capacity_probe.json": "0528d25620ae4042c2eeba0c33a05c0dc1aa00c197c61c5af2f21e3bd34d3be9"
+  },
+  "rows": [
+    {
+      "lifecycle": "retained",
+      "window": "all",
+      "tokens": 2882,
+      "lru": {
+        "miss_per_token": 58.281054823039554,
+        "miss_layers_per_token": 33.21651630811936
+      },
+      "omlx": {
+        "miss_per_token": 57.78730048577377,
+        "miss_layers_per_token": 33.1530187369882
+      },
+      "omlx_minus_lru_miss_per_token": -0.4937543372657842,
+      "omlx_vs_lru_miss_percent": -0.8471952657085335
+    },
+    {
+      "lifecycle": "retained",
+      "window": "global_drop200_T2",
+      "tokens": 2682,
+      "lru": {
+        "miss_per_token": 57.407158836689035,
+        "miss_layers_per_token": 33.12453392990306
+      },
+      "omlx": {
+        "miss_per_token": 56.91088739746458,
+        "miss_layers_per_token": 33.06002982848621
+      },
+      "omlx_minus_lru_miss_per_token": -0.4962714392244578,
+      "omlx_vs_lru_miss_percent": -0.8644765727498283
+    },
+    {
+      "lifecycle": "retained",
+      "window": "each_prompt_drop128_T6",
+      "tokens": 1218,
+      "lru": {
+        "miss_per_token": 47.77914614121511,
+        "miss_layers_per_token": 30.870279146141215
+      },
+      "omlx": {
+        "miss_per_token": 46.90065681444992,
+        "miss_layers_per_token": 30.673234811165845
+      },
+      "omlx_minus_lru_miss_per_token": -0.878489326765191,
+      "omlx_vs_lru_miss_percent": -1.83864593178108
+    },
+    {
+      "lifecycle": "reset",
+      "window": "all",
+      "tokens": 2882,
+      "lru": {
+        "miss_per_token": 64.32373351839,
+        "miss_layers_per_token": 33.77515614156835
+      },
+      "omlx": {
+        "miss_per_token": 63.77897293546148,
+        "miss_layers_per_token": 33.6530187369882
+      },
+      "omlx_minus_lru_miss_per_token": -0.544760582928518,
+      "omlx_vs_lru_miss_percent": -0.8469044831994621
+    },
+    {
+      "lifecycle": "reset",
+      "window": "global_drop200_T2",
+      "tokens": 2682,
+      "lru": {
+        "miss_per_token": 63.60029828486204,
+        "miss_layers_per_token": 33.71961222967934
+      },
+      "omlx": {
+        "miss_per_token": 63.04436987322893,
+        "miss_layers_per_token": 33.5917225950783
+      },
+      "omlx_minus_lru_miss_per_token": -0.5559284116331114,
+      "omlx_vs_lru_miss_percent": -0.8740971766250882
+    },
+    {
+      "lifecycle": "reset",
+      "window": "each_prompt_drop128_T6",
+      "tokens": 1218,
+      "lru": {
+        "miss_per_token": 47.779967159277504,
+        "miss_layers_per_token": 30.870279146141215
+      },
+      "omlx": {
+        "miss_per_token": 46.914614121510674,
+        "miss_layers_per_token": 30.676518883415437
+      },
+      "omlx_minus_lru_miss_per_token": -0.8653530377668304,
+      "omlx_vs_lru_miss_percent": -1.811121039246688
+    }
+  ],
+  "retained_per_prompt_suffix": [
+    {
+      "tag": "p0_holdout0",
+      "suffix_tokens": 62,
+      "lru_miss_per_token": 47.483870967741936,
+      "omlx_miss_per_token": 46.45161290322581,
+      "omlx_vs_lru_miss_percent": -2.1739130434782594
+    },
+    {
+      "tag": "p10_holdout10",
+      "suffix_tokens": 73,
+      "lru_miss_per_token": 44.082191780821915,
+      "omlx_miss_per_token": 43.32876712328767,
+      "omlx_vs_lru_miss_percent": -1.7091361093847124
+    },
+    {
+      "tag": "p11_holdout11",
+      "suffix_tokens": 69,
+      "lru_miss_per_token": 46.17391304347826,
+      "omlx_miss_per_token": 45.594202898550726,
+      "omlx_vs_lru_miss_percent": -1.2554927809165006
+    },
+    {
+      "tag": "p12_holdout12",
+      "suffix_tokens": 95,
+      "lru_miss_per_token": 47.92631578947368,
+      "omlx_miss_per_token": 46.93684210526316,
+      "omlx_vs_lru_miss_percent": -2.064572809136822
+    },
+    {
+      "tag": "p1_holdout1",
+      "suffix_tokens": 90,
+      "lru_miss_per_token": 48.455555555555556,
+      "omlx_miss_per_token": 47.577777777777776,
+      "omlx_vs_lru_miss_percent": -1.811511121302456
+    },
+    {
+      "tag": "p2_holdout2",
+      "suffix_tokens": 93,
+      "lru_miss_per_token": 48.44086021505376,
+      "omlx_miss_per_token": 47.795698924731184,
+      "omlx_vs_lru_miss_percent": -1.3318534961154205
+    },
+    {
+      "tag": "p3_holdout3",
+      "suffix_tokens": 109,
+      "lru_miss_per_token": 48.57798165137615,
+      "omlx_miss_per_token": 47.477064220183486,
+      "omlx_vs_lru_miss_percent": -2.2662889518413665
+    },
+    {
+      "tag": "p4_holdout4",
+      "suffix_tokens": 105,
+      "lru_miss_per_token": 47.23809523809524,
+      "omlx_miss_per_token": 46.34285714285714,
+      "omlx_vs_lru_miss_percent": -1.895161290322589
+    },
+    {
+      "tag": "p5_holdout5",
+      "suffix_tokens": 93,
+      "lru_miss_per_token": 46.623655913978496,
+      "omlx_miss_per_token": 45.75268817204301,
+      "omlx_vs_lru_miss_percent": -1.8680811808118203
+    },
+    {
+      "tag": "p6_holdout6",
+      "suffix_tokens": 83,
+      "lru_miss_per_token": 50.83132530120482,
+      "omlx_miss_per_token": 49.87951807228916,
+      "omlx_vs_lru_miss_percent": -1.8724816307181813
+    },
+    {
+      "tag": "p7_holdout7",
+      "suffix_tokens": 113,
+      "lru_miss_per_token": 47.716814159292035,
+      "omlx_miss_per_token": 46.95575221238938,
+      "omlx_vs_lru_miss_percent": -1.594955489614247
+    },
+    {
+      "tag": "p8_holdout8",
+      "suffix_tokens": 128,
+      "lru_miss_per_token": 49.53125,
+      "omlx_miss_per_token": 48.3828125,
+      "omlx_vs_lru_miss_percent": -2.3186119873817024
+    },
+    {
+      "tag": "p9_holdout9",
+      "suffix_tokens": 105,
+      "lru_miss_per_token": 46.53333333333333,
+      "omlx_miss_per_token": 45.857142857142854,
+      "omlx_vs_lru_miss_percent": -1.4531313958248027
+    }
+  ],
+  "provenance_audit": {
+    "physical_MB_per_token_measured": 140.5,
+    "expert_MB_assumed_from_geometry": 2.764892578125,
+    "physical_full_expert_equivalent_not_logical_misses": 50.8157174392936,
+    "simulated_LRU_misses_used_to_derive_absorption": 57.4,
+    "derived_absorption_ratio_not_independently_measured": 0.8852912445869965,
+    "circular_recovered_misses": 57.4,
+    "raw_measured_blob_keys": [
+      "decode_avg_KB_per_io",
+      "decode_disk_MB_per_token",
+      "decode_disk_MBps",
+      "decode_iops",
+      "decode_s",
+      "decode_tps",
+      "host",
+      "idle_disk_MBps",
+      "kind",
+      "max_tokens",
+      "method",
+      "n_decode_samples",
+      "samples",
+      "timestamp",
+      "tokens",
+      "ttft_s"
+    ],
+    "conclusion": "57.4 is simulated, not an independent logical-miss counter. Throughput and IO microbench evidence remain independent."
+  },
+  "checks": [
+    "LRU mask cross-check on all 48 layers",
+    "T2 57.41/56.91 global-drop200 anchors reproduced",
+    "absorption inversion circularity identity",
+    "input/source hashes unchanged during execution"
+  ]
+}
