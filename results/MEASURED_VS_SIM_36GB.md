@@ -157,23 +157,26 @@ two independent implementations agree exactly
 (`sim_paging.solve_policy_serial` vs `moefit/metrics.serial_model_from_misses`,
 breakdown identical 18.1/37.0/17.5/5.9 ms, 58.3 misses/token). With this,
 the residual is closed: geometry, policy, and time model all reproduce the
-silicon operating point from measured constants. **Compute term resolved
-— with an honesty caveat (cycle 13)**: with mincore bounding page-cache
-absorption at ≤3.2%, real logical misses are an INTERVAL,
-**[50.8, 52.5]/token** (140.5 MB/tok physical, absorption 0–3.2%), and
-feeding that REAL miss interval through the serial model gives **12.52–12.87
-tok/s with compute 24.1 ms (the 410 GB/s DRAM bin — the physically
-correct chip)** vs measured 12.71–13.07, while compute 18.1 overshoots at
-13.54–13.95 — non-overlapping bands across the whole miss interval. The
-earlier "18.1 fits best" was an artifact compensating for synth-trace
-miss overstatement (T3, commits a61a035 + af10b16 + 3376266). "Resolved"
-means best-supported, not statistically certified: the regression
-intercept alone does not separate 18.1 from 24.1 (fixed terms 0.39 vs
-1.10 σ below it); a second residency point or direct logical-miss
-counters would settle it. Two consequences: (a) both synth policies
-overstate misses at cap143 by 9–15% (true-LRU 58.3, omlx-exact 56.9 vs
-the real 50.8–52.5), so every synth-based serial prediction is
-~0.8–1.1 tok/s conservative; (b) 48 GB (546 GB/s bin)
+silicon operating point from measured constants. **Compute term — best
+supported, now CONDITIONAL (cycle 15 correction)**: the earlier
+"mincore bounds absorption at ≤3.2%" reasoning is RETRACTED — T6's
+residency audit (`analysis_t6_residency_weighting.json`) shows the
+mincore snapshot fraction is a FOOTPRINT average, not a request-weighted
+absorption bound (same-size static sets span 0.5–5.9% of request
+coverage). The honest miss interval is **[50.8, 54.1]/token** (absorption
+0 to T6's future-knowledge oracle ceiling 5.9%; dynamic UBC effects
+unmodeled). Across it, compute 24.1 ms reproduces the anchor at
+**12.46–12.87 tok/s** vs measured 12.71–13.07 (the measured band touches
+the low end), while 18.1 overshoots — **but the 24.1-vs-18.1 preference
+FLIPS at absorption ≈ 6.6%** (logical ~54.4/tok), and T6's oracle ceiling
+sits just below the flip. So compute 24.1 (410 GB/s bin) is the working
+value CONDITIONAL on absorption ≤ ~6% — bounded by a static-set argument,
+not a measurement; direct logical-miss counters now gate the compute
+term itself. The regression intercept cannot certify either value
+(both fixed terms inside its 95% interval). Two standing consequences:
+(a) both synth policies overstate misses at cap143 by 6–15% (true-LRU
+58.3, omlx-exact 56.9 vs the real 50.8–54.1), so synth-based serial
+predictions run conservative; (b) 48 GB (546 GB/s bin)
 keeps compute 18.1 in its tier table. Constants remain
 Santa-Cruz-specific — other machines need their own microbench.
 
@@ -221,8 +224,8 @@ withdrawn; each constant carries its evidence class:
 | class | items |
 |---|---|
 | **directly measured** | physical SSD MB/token (iostat, 17 points); per-layer k-miss read latency + install + sync (F_NOCACHE microbench); prompt-to-prompt throughput variation (10.2–13.1 tok/s); page-cache occupancy (mincore, 2.29/71.6 GB) |
-| **inferred robustly** | miss-cost slope 0.288 ± 0.053 ms/MB (descriptive; value sits above all pure byte-rates 0.179–0.263 and within 3% of the serial io+install prediction 0.297 — supports per-miss overhead, marginally, within 1 SE of the slowest rate); logical misses [50.8, 53.5]/tok (mincore-bounded, pending T6's stock-vs-flow audit of the snapshot's decode-time representativeness); anchor reproduction 12.52–12.87 tok/s @compute 24.1 |
-| **assumed working values** | compute 24.1 ms @410-bin (best-supported, not certified; 48 GB keeps 18.1 @546-bin); serial-resolve discipline transferring to other tiers |
+| **inferred robustly** | miss-cost slope 0.288 ± 0.053 ms/MB (descriptive; value sits above all pure byte-rates 0.179–0.263 and within 3% of the serial io+install prediction 0.297 — supports per-miss overhead, marginally, within 1 SE of the slowest rate); logical misses [50.8, 54.1]/tok (corrected interval: footprint≠request-weighted absorption, oracle-ceiling-bounded); anchor reproduction 12.46–12.87 tok/s @compute 24.1 |
+| **assumed working values** | compute 24.1 ms @410-bin (CONDITIONAL on absorption ≤ ~6%; preference over 18.1 flips at ~6.6%; 48 GB keeps 18.1 @546-bin); serial-resolve discipline transferring to other tiers |
 
 What would settle the assumed items: a second residency point
 (pre-registered Test B/D), direct logical-miss + timing counters on
@@ -270,8 +273,10 @@ matched windows, and T6's mincore stock-vs-flow audit.
 (T3, commit 2ce6a32): predictions and decision rules are fixed before any
 run — Test A (48 GB, cap 192, lru AND prior, n≥1024, 3 runs; score vs
 15.9/14.5, never 54.8), Test B (36 GB cap 180; band 13.8–15.7),
-Test C (collector run: p95/mean decides serial-resolve vs byte-backlog;
-vm_stat+iostat pairing settles the 0.885 absorption), Test D (48 GB
+Test C (collector run: p95/mean is shape-compatibility only per
+Amendment 1; vm_stat+iostat pairing constrains — but per the T7
+provenance audit cannot directly measure — absorption: 0.885 remains
+sim-derived), Test D (48 GB
 cap 224 separates the compute term: 17.4 vs 15.8 tok/s). Anti-rules: no
 n=128 scoring at cap ≥ 180, no crowded boxes, no 54.8.
 
@@ -334,17 +339,21 @@ n=128 scoring at cap ≥ 180, no crowded boxes, no 54.8.
    need runs of n ≥ 1024 tokens; short 128-token benches understate
    steady-state more as residency rises (n128/steady ≈ 0.92 @cap143,
    0.69 @cap220).
-7. ~~Page-cache absorption probe~~ — **settled by mincore (T1 cycle 2,
-   26a943e)**: a direct residency scan
-   (`experiments/pagecache_expert_residency.py`) shows only **2.29 of
-   71.6 GB** of expert tables in the page cache (683/24,576 slabs, ~14
-   per layer). The unified buffer cache is NOT a hidden tier; physical ≈
-   logical miss bytes. The 0.885 phys/logical ratio and the measured
-   140.5 < sim 159–207 MB/tok gap is therefore a **routing/trace
-   difference** (oMLX's actual misses ≈ 56.9/token per the omlx-exact
-   replay), not page-cache dedup — T8's two-level absorption hypothesis
-   is dropped, and the evict-to-L2 design what-if (16.8 → 21.9–24.9) is
-   downgraded with it.
+7. Page-cache absorption — **partially answered, bound RETRACTED**: a
+   mincore residency scan (T1 cycle 2, 26a943e) shows only **2.29 of
+   71.6 GB** of expert tables in the page cache (683/24,576 slabs) — the
+   UBC is not a large hidden *tier by footprint*. BUT T6's residency
+   audit (astra_analysis_a, `analysis_t6_residency_weighting.json`)
+   shows a small footprint does NOT bound request-weighted absorption:
+   same-size static sets cover 0.5–5.9% of held-out misses depending on
+   selection, so "physical ≈ logical miss bytes" is NOT established and
+   the earlier "settled" claim is withdrawn. The miss interval and the
+   compute-term preference are now conditional on absorption ≤ ~6%
+   (see the capstone). What still stands: the measured 140.5 <
+   sim-logical MB/tok gap is at least partly a routing/trace difference,
+   and T8's evict-to-L2 what-if (16.8 → 21.9–24.9) remains downgraded.
+   Settling this needs direct logical-miss + physical-byte counters on
+   matched windows — footprint scans cannot do it.
 
 Tooling: the silicon loop is zero-touch end-to-end —
 `experiments/collect_silicon_run.py` (streamed-timestamp blob) →

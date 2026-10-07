@@ -75,9 +75,10 @@ decayed-count eviction per the oMLX 0.7.0 source; exact replay in
 the global synth window vs true-LRU's 58.3; the two differ by <1% there
 but −1.8% on matched per-prompt suffixes). CAUTION on miss-count
 provenance (astra T7 audit): "~57.4 misses/tok" is a SIM replay value —
-140.5 MB/tok physical reads imply 50.8–52.5 full-expert misses
-(absorption 0–3.2%, mincore-bounded interval; both synth policies
-overstate real misses by 9–15%); direct logical-miss
+140.5 MB/tok physical reads imply 50.8–54.1 full-expert misses
+(absorption 0–5.9%, oracle-ceiling-bounded — the mincore footprint is
+NOT a request-weighted absorption bound; both synth policies
+overstate real misses by 6–15%); direct logical-miss
 counters are still unmeasured.
 No-refresh contrast: 10.56 tok/s.
 Equivalent implementation inside the sim: `sim_paging.solve_policy_serial`.
