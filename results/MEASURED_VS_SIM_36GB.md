@@ -162,6 +162,23 @@ compute ms is assumed (18.1 fits best but is within run noise of 23.2),
 and the constants are Santa-Cruz-specific — other machines need their own
 microbench.
 
+**Post-capstone: the per-miss constant and fixed term are now MEASURED
+directly** (T1 cycle 2, `results/silicon_sc36/regress_pooled.json`,
+commit 26a943e): 17 measured 256-token decodes across six prompt types give
+ms/token = **39.2 ± 8.4 + 0.288 ± 0.053 × SSD MB/token** (r² 0.66) —
+i.e. **0.80 ms per missed expert** on the critical path (vs the serial
+model's 0.82 = 0.52 io + 0.30 install; within 2%) and a **~39 ms/token
+fixed term** (brackets the model's compute + sync + A-term stack of
+18.1 + 5.9 + ~6.6 ≈ 30.6 within its SE). Same run also measured: prompt
+choice alone moves decode **10.2–13.1 tok/s** on the identical box and
+residency (json_tool 187–197 MB/tok worst, essay/code 133–147 best) —
+the 13.0 anchor is prompt-specific and every silicon tok/s should cite
+its prompt; and GPU device utilization is a median **42%** during decode
+(the GPU is idle more than half of each token, consistent with
+SSD-bound). Upper bound if miss latency were fully overlapped with the
+fixed term: ~**25 tok/s** @0.28 (1000/max(39.2, 40.3), SIM bound from
+measured terms).
+
 ### Hypothesis verdicts (updated)
 
 - **H1 partially confirmed**: the SSD never delivers 7.4 GB/s on this
@@ -267,16 +284,17 @@ n=128 scoring at cap ≥ 180, no crowded boxes, no 54.8.
    need runs of n ≥ 1024 tokens; short 128-token benches understate
    steady-state more as residency rises (n128/steady ≈ 0.92 @cap143,
    0.69 @cap220).
-7. Page-cache absorption probe (T8 ask, one 256-token run, no restart):
-   measured physical/logical traffic ratio is 0.885 (140.5 vs 158.8
-   MB/tok). A two-level replay fits 0.885 only with ~13–16 GiB of
-   page-cache absorption — more than the ~5–7 GiB visible spare RAM.
-   Pairing vm_stat page-in deltas with iostat during decode separates:
-   buffer-cache reuse / non-F_NOCACHE reads (pageins ≈ 18 MB/tok) vs
-   oMLX admission beating LRU (pageins ≈ 0, logical misses < 57.4).
-   Design consequence: in the pipelined regime, evict-to-L2 alone is
-   worth 16.8 → 21.9–24.9 tok/s (L2 = 110–200 experts/layer, SIM), and
-   the drive stops binding at ~31 physical misses/token.
+7. ~~Page-cache absorption probe~~ — **settled by mincore (T1 cycle 2,
+   26a943e)**: a direct residency scan
+   (`experiments/pagecache_expert_residency.py`) shows only **2.29 of
+   71.6 GB** of expert tables in the page cache (683/24,576 slabs, ~14
+   per layer). The unified buffer cache is NOT a hidden tier; physical ≈
+   logical miss bytes. The 0.885 phys/logical ratio and the measured
+   140.5 < sim 159–207 MB/tok gap is therefore a **routing/trace
+   difference** (oMLX's actual misses ≈ 56.9/token per the omlx-exact
+   replay), not page-cache dedup — T8's two-level absorption hypothesis
+   is dropped, and the evict-to-L2 design what-if (16.8 → 21.9–24.9) is
+   downgraded with it.
 
 Tooling: the silicon loop is zero-touch end-to-end —
 `experiments/collect_silicon_run.py` (streamed-timestamp blob) →

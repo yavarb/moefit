@@ -19,8 +19,11 @@ ASSUMED term).
 
 - `experiments/collect_silicon_run.py` — stdlib streaming bench against
   any OpenAI-style chat-completions endpoint. Emits the canonical blob
-  with per-chunk timestamps + per-token gaps (chunk-coalescing servers
-  distort per-token gaps; omlx streams ~1 token/chunk). Handles
+  with per-chunk timestamps + per-token gaps. CAUTION (measured, T1
+  cycle 2, `results/silicon_sc36/collect_silicon_run_256x2.json`):
+  oMLX coalesces ~3 tokens/chunk (86 chunks per 256 tokens), so
+  per_token_ms values are CHUNK gaps, not token gaps — the earlier
+  "omlx streams ~1 token/chunk" assumption is false. Handles
   reasoning_content streams.
 - `experiments/measure_ssd_per_token.py` (lead_silicon) — iostat
   physical-bytes blob: `decode_disk_MBps`, `decode_disk_MB_per_token`,
