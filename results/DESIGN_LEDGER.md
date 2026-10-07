@@ -261,6 +261,37 @@ installed, cancelled on wrong route) and T2's sidecar. Structural finding:
 current-token top-10 self-prediction is empty (demand resolution); the viable
 signal class sees the residual stream (preview), not the past (history).
 
+### Silicon addendum (2026-10-08, measured)
+
+The two durable outputs are now both silicon-measured (T5 scoring, commits
+d2f860f/a43d7e6; execution T2/T9):
+
+- **Primitive measured** — T2's sidecar A/B/A on Santa Cruz (75398bf):
+  OFF 14.02 → ON 20.13 tok/s median (+44%, replay regime), outputs
+  bit-identical; the deployed mechanism IS the cancel-on-wrong-route
+  deferred install: coverage 0.9996, **0 wasted prefetches**, demand-miss
+  counters unchanged (44.2 vs 44.0/tok — held-not-installed, no pollution).
+  Mechanical verdict vs the T5 prereg band (81a6483) honestly REFUSED at 2
+  ON runs (< 3 gate); descriptive: ON median inside both the registered
+  band [18.5, 38.1] and the measured-m re-anchored band [17.5, 26.0].
+- **Framework constants constrained by silicon** — measured net 21.65 ms/tok
+  at 42.5 used/tok → S − C = 0.509 ms/expert; with the measured contention
+  band C ∈ [0.073, 0.198] → S ∈ [0.58, 0.71] ms/miss: the 0.52
+  install-fully-hidden DB-ON basis is falsified at its lower edge unless the
+  contention floor is. The registered IO_BATCH=1 conditional (088913d) was
+  applied mechanically: sanity gate FAILED at the registered primary m
+  (D = 4.74 ms/tok, warm-window m = 9.58, D/m = 0.495 > 0.30) → no S′
+  re-price, attribution flagged to T9/T4.
+- **DROP re-priced, verdict unchanged** — breakeven precision over the
+  silicon-consistent region p* = C/S ∈ [10%, 34%] (was 14–38% provisional);
+  steady-state history precision 1.2% remains far below every band edge, so
+  the entry-5 DROP stands on measured constants.
+- **Preview-class signal confirmed on hardware** — T1's d=1 guarded
+  cross-layer fetch (554a8d8, MBP, real ExpertCache): demand-wait −6.3
+  ms/tok, 5/5 pairs, 63.4% precision, bit-identical outputs — the
+  breakeven-clearing signal class the framework identified, now measured.
+
+
 ## Method notes for all design rows
 
 - Traces: `results/traces_synth` (synthetic). Trace-shape uncertainty on
