@@ -2,6 +2,10 @@
 decision rules (results/SILICON_TEST_PROTOCOL_PREREGISTERED.md).
 Thresholds are fixed by the protocol — if one changes, the protocol must
 be re-registered; do not relax a threshold to make a test pass.
+
+Eligibility is FAIL-CLOSED (T8 audit d778463): the adversarial fixtures
+below reproduce the audit's protocol-invalid inputs and must all receive
+SCORING REFUSED with no model verdict.
 """
 import json
 import subprocess
@@ -13,14 +17,22 @@ ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "experiments" / "score_silicon_run.py"
 
 
-def _blob(tps, tokens=1024, gaps=None):
+def _blob(tps, tokens=1024, gaps=None, n_runs=3, max_tokens=None,
+          drop_run_tokens=False, host="fixture", model="m"):
+    runs = []
+    for i in range(n_runs):
+        r = dict(tokens=tokens, decode_tps=tps, ttft_s=0.7,
+                 per_token_ms=gaps)
+        if drop_run_tokens:
+            del r["tokens"]   # T8: missing per-run counts
+        runs.append(r)
     return dict(
-        kind="measured", host="fixture", model="m", timestamp="t",
-        max_tokens=tokens, tokens=tokens,
+        kind="measured", host=host, model=model, timestamp="t",
+        max_tokens=(max_tokens if max_tokens is not None else tokens),
+        tokens=tokens,
         decode_tps_median=tps, decode_tps_min=tps - 0.5,
         decode_tps_max=tps + 0.5, ttft_s_median=0.7, omlx_version="0.7.0",
-        runs=[dict(tokens=tokens, decode_tps=tps, ttft_s=0.7,
-                   per_token_ms=gaps)],
+        runs=runs,
         memory_during_run=dict(omlx_actual_gb=28.0,
                                expert_tables_resident_gb=24.5,
                                omlx_full_model_gb=104.0,
@@ -49,6 +61,7 @@ def test_all():
         out = _run(["--test", "A", "--lru", lru, "--prior", prior])
         assert "TRANSFERS" in out["verdicts"][0]
         assert "serial ranking" in out["verdicts"][1]
+        assert out["eligibility"] == []
 
         out = _run(["--test", "B", "--measured", prior])
         assert "IN the pre-registered 13.8-15.7" in out["verdicts"][0]
@@ -59,13 +72,54 @@ def test_all():
         v0 = out["verdicts"][0]
         assert "shape-compatible" in v0 and "transport-provisional" in v0, v0
 
-        # n=128 at cap224 must trip the anti-rule warning
-        short = _path(td, _blob(16.0, tokens=128))
-        out = _run(["--test", "D", "--measured", short])
-        assert any("FORBIDS" in w for w in out["warnings"])
-        # and a valid-length run yields the compute-term verdict
         out = _run(["--test", "D", "--measured", lru])
         assert "compute term follows" in out["verdicts"][0]
+
+        # ---- fail-closed eligibility (T8 adversarial fixtures) ----
+
+        # T8 critical case: max_tokens=1024 request masks actual
+        # 128-token runs -> must REFUSE (old scorer passed silently)
+        masked = _path(td, _blob(16.0, tokens=128, max_tokens=1024))
+        out = _run(["--test", "D", "--measured", masked])
+        assert out["verdicts"][0].startswith("SCORING REFUSED"), out
+        assert "actual n=128" in out["verdicts"][0]
+        assert not any("compute term follows" in v
+                       for v in out["verdicts"])
+
+        # unknown counts (runs[*].tokens missing) -> fail closed
+        unknown = _path(td, _blob(16.0, drop_run_tokens=True))
+        out = _run(["--test", "D", "--measured", unknown])
+        assert out["verdicts"][0].startswith("SCORING REFUSED"), out
+        assert "UNKNOWN" in out["verdicts"][0]
+
+        # only 1 run vs required 3 -> refuse
+        one_run = _path(td, _blob(16.0, tokens=1024, n_runs=1))
+        out = _run(["--test", "D", "--measured", one_run])
+        assert out["verdicts"][0].startswith("SCORING REFUSED"), out
+        assert ">= 3 contributing runs" in out["verdicts"][0]
+
+        # short n at cap>=180 -> refuse even when explicitly requested
+        short = _path(td, _blob(16.0, tokens=128))
+        out = _run(["--test", "B", "--measured", short])
+        assert out["verdicts"][0].startswith("SCORING REFUSED"), out
+        assert "FORBIDS scoring" in out["verdicts"][0]
+        assert "IN the pre-registered" not in out["verdicts"][0]
+
+        # mismatched Test A pair (host/model) -> refuse
+        out = _run(["--test", "A", "--lru", lru,
+                    "--prior", _path(td, _blob(14.2, host="otherbox"))])
+        assert out["verdicts"][0].startswith("SCORING REFUSED"), out
+        assert "matched pair" in out["verdicts"][0]
+
+        # Test C needs known counts but a single valid run is admissible
+        c1 = _path(td, _blob(12.7, tokens=256, n_runs=1,
+                             gaps=[70] * 180 + [150] * 20))
+        out = _run(["--test", "C", "--measured", c1])
+        assert not out["verdicts"][0].startswith("SCORING REFUSED"), out
+        # ...but unknown counts still refuse
+        out = _run(["--test", "C", "--measured",
+                    _path(td, _blob(12.7, drop_run_tokens=True))])
+        assert out["verdicts"][0].startswith("SCORING REFUSED"), out
 
 
 if __name__ == "__main__":

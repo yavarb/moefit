@@ -127,6 +127,7 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
     import statistics
     lat = {}
     run_co = {}
+    run_gg = {}
     all_gaps = []
     for i, r in enumerate(runs):
         gaps = r.get("per_token_ms")
@@ -142,12 +143,29 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
             lat[r.get("run", i)] = latency_stats_from_deltas(gaps)
             all_gaps.extend(gaps)
             co = detect_coalescing(gaps)
-            multi = (r.get("chunk_tokens")
-                     and any(t > 1 for t in r["chunk_tokens"]))
-            if multi and not co["coalesced"]:
-                co = dict(co, coalesced=True,
+            # direct coalescing evidence, two forms: chunk_tokens>1
+            # (server declares multi-token chunks) or usage tokens >
+            # streamed text chunks (oMLX: 86 chunks/256 tok measured on
+            # Santa Cruz — per-run count is authoritative)
+            multi = bool(r.get("chunk_tokens")
+                         and any(t > 1 for t in r["chunk_tokens"]))
+            ntok, nchunks = r.get("tokens"), r.get("streamed_deltas")
+            if not multi and ntok and nchunks and ntok > nchunks:
+                multi = True
+                co = dict(co,
+                          note=f"direct evidence: usage says {ntok} "
+                               f"tokens in {nchunks} text chunks "
+                               f"(~{round(ntok / nchunks, 1)} tok/chunk)")
+            elif multi and not co["coalesced"]:
+                co = dict(co,
                           note="direct evidence: chunk(s) carry >1 token")
+            if multi:
+                co = dict(co, coalesced=True)
+            gg = r.get("gap_granularity") or (
+                "per_chunk (inferred from usage > chunks)"
+                if multi else "per_token")
             run_co[r.get("run", i)] = co
+            run_gg[r.get("run", i)] = gg
     rec = dict(
         kind="silicon",
         source=source,
@@ -181,9 +199,17 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
         rec["tok_gap_ms"] = latency_stats_from_deltas(all_gaps)
         rec["tok_gap_ms_per_run"] = lat
         if any(c.get("coalesced") for c in run_co.values()):
-            # flag with the aggregate over all runs' gaps
-            rec["tok_gap_coalesced"] = detect_coalescing(all_gaps)
+            # aggregate gap stats for reference; coalesced=True comes
+            # from the per-run evidence (burst detector and/or direct
+            # count evidence), which the aggregate recompute must not
+            # discard (a smooth-gapped coalesced run stays flagged)
+            rec["tok_gap_coalesced"] = dict(detect_coalescing(all_gaps),
+                                            coalesced=True)
             rec["tok_gap_coalesced"]["runs_flagged"] = sorted(run_co)
+            rec["tok_gap_coalesced"]["notes"] = [
+                v.get("note") for v in run_co.values() if v.get("note")]
+        gran = sorted(set(run_gg.values()))
+        rec["tok_gap_granularity"] = gran[0] if len(gran) == 1 else gran
     if rec["tps"] is None:
         raise ValueError(f"no decode_tps in measured record {source}")
     errs = validate_record(rec)
@@ -334,11 +360,15 @@ def signature_from_silicon_record(rec: dict) -> dict:
     """S-vs-Q signature for a silicon record, honoring coalescing.
 
     If the record carries tok_gap_coalesced (normalizer flag: SSE chunk
-    coalescing detected in the per-token gaps), the verdict becomes
-    "inadmissible (chunk coalescing ...)" — a coalesced stream
-    misattributes per-token time and can flip the S-vs-Q thresholds
-    (astra_local_exp probe, T8); rerun with per-token timestamps
-    (omlx streams ~1 token/chunk, so collector runs there are clean).
+    coalescing detected — burst gaps and/or usage tokens > streamed text
+    chunks; oMLX itself coalesces ~3 tok/chunk measured on Santa Cruz,
+    86 chunks/256 tok), the verdict becomes "inadmissible (chunk
+    coalescing ...)": a coalesced stream misattributes per-token time
+    and can flip the shape thresholds (astra_local_exp probe, T8). This
+    is EXPECTED for oMLX collector runs, not an error — tps/TTFT from
+    the same blob remain valid (usage tokens + last-token-event
+    interval); use mean-based arbitration instead (Test D / second
+    residency point / sidecar-pread design test, per Amendment 1).
     """
     tg = rec.get("tok_gap_ms")
     if not tg:
@@ -349,9 +379,11 @@ def signature_from_silicon_record(rec: dict) -> dict:
         sig = dict(sig,
                    verdict="inadmissible (chunk coalescing detected: "
                            f"frac<2ms {co.get('frac_sub2ms')}, "
-                           f"frac>5xmed {co.get('frac_gt_5x_median')}) - "
-                           "rerun with per-token timestamps; omlx streams "
-                           "~1 token/chunk")
+                           f"frac>5xmed {co.get('frac_gt_5x_median')}"
+                           + (f"; {co['notes'][0]}" if co.get("notes")
+                              else "") +
+                           ") - tps stays valid; for mechanism "
+                           "arbitration use mean-based tests (Amendment 1)")
         return sig
     prov = rec.get("timing_provenance") or ""
     if not prov.startswith("verified"):
@@ -434,6 +466,8 @@ def gap_report(sim: dict, silicon: dict) -> dict:
         rep["s_vs_q_signature"] = signature_from_silicon_record(silicon)
         if silicon.get("tok_gap_coalesced"):
             rep["tok_gap_coalesced"] = silicon["tok_gap_coalesced"]
+        if silicon.get("tok_gap_granularity"):
+            rep["tok_gap_granularity"] = silicon["tok_gap_granularity"]
     return rep
 
 

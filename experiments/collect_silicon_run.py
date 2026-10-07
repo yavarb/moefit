@@ -66,7 +66,11 @@ def one_run(url, model, prompt, max_tokens, timeout):
             delta = (ch[0].get("delta") or {})
             # thinking models stream reasoning_content; count it as text
             txt = delta.get("content") or delta.get("reasoning_content") or ""
-            n_tok = 1 if txt else 0   # omlx streams ~1 token/chunk
+            # count 1 text chunk = 1 sample; oMLX coalesces (~3
+            # tok/chunk measured on Santa Cruz, 86 chunks/256 tok),
+            # so per_token_ms may be CHUNK gaps — gap_granularity
+            # below says which, and usage tokens stay authoritative
+            n_tok = 1 if txt else 0
             now = time.monotonic()
             if txt:
                 if ttft is None:
@@ -107,6 +111,10 @@ def one_run(url, model, prompt, max_tokens, timeout):
         chunk_ts_s=[round(t - t0, 4) for t in chunk_ts],
         chunk_tokens=chunk_tokens,
         per_token_ms=[round(g, 3) for g in per_token_ms],
+        gap_granularity=("per_token" if tokens <= n_text_chunks
+                         else "per_chunk (server coalesced "
+                         f"~{round(tokens / max(n_text_chunks, 1), 1)} "
+                         "tok/chunk; per_token_ms are chunk gaps)"),
         timing_provenance=("client SSE chunk timestamps (transport-"
                            "provisional; not verified token-level timing)"),
     )

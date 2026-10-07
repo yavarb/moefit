@@ -170,6 +170,23 @@ def test_coalescing_detection_and_inadmissible_verdict():
     clean_rec["tok_gap_ms"] = latency_stats_from_deltas(clean)
     assert not signature_from_silicon_record(clean_rec)["verdict"].startswith(
         "inadmissible")
+    # oMLX-style coalescing caught by usage-vs-chunk COUNT evidence even
+    # when the chunk gaps look smooth (measured on Santa Cruz: 86
+    # chunks / 256 tokens) — the burst detector alone would miss this
+    omlx_blob = dict(SILICON_FIXTURE)
+    omlx_blob["runs"] = [dict(tokens=256, decode_tps=12.7, ttft_s=0.5,
+                              per_token_ms=[230.0] * 85,
+                              streamed_deltas=86,
+                              chunk_tokens=[1] * 86)]
+    orec = silicon_record_from_measured(omlx_blob, "omlx-fixture")
+    co2 = orec.get("tok_gap_coalesced", {})
+    assert co2.get("coalesced"), co2
+    assert any("usage says 256 tokens in 86" in n
+               for n in co2.get("notes", [])), co2
+    assert orec["tok_gap_granularity"].startswith("per_chunk"), orec
+    osig = signature_from_silicon_record(orec)
+    assert osig["verdict"].startswith("inadmissible"), osig
+    assert "tps stays valid" in osig["verdict"]
 
 
 if __name__ == "__main__":
