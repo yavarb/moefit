@@ -1,6 +1,29 @@
 # Changelog
 
+## 2026-10-07 — Public tip = measured KEEP silicon only
+
+Honesty pass after the lab closed correlator / non-repeat arms:
+
+- **T2 exact routing-replay sidecar KEEP (repeat-only):** Santa Cruz
+  3+3 A/B, OFF median **13.95 → ON 20.05** tok/s (**+43.7%**); earlier
+  pair **14.34 → 20.13** (**+40%**); 0 wasted prefetches; bit-identical
+  within session. Artifacts under `results/t2_silicon/`. Not a general
+  non-repeat speedup.
+- **M2c correlator DROP_AS_REPLAY:** the +32%/+37% same-prompt figure was
+  route memory; leak-free ON-first holdout precision 3.0%, Δ −0.31 tok/s
+  (`results/t2_silicon/m2c_replay_off_verdict.json`).
+- **T6 erratum:** earlier CHANGELOG said coalescer FAIL; contiguous
+  expert-ID path later **PASS** at **5.39 GB/s** (1.44×). Random-order
+  still fails. README silicon-proof already had the revision; changelog
+  caught up.
+- **FAQ:** replace bandwidth-model “14–26 / 45.1” expectations with the
+  serial-model numbers (~9.7 @32 GB, ~15.9 @48 GB / 192); 24 GB not
+  recommended.
+- oMLX fork branch `perf/moe-cross-layer-prefetch` remains **NO-GO**;
+  product tip is stock `main`, not that branch.
+
 ## 2026-10-07 — Silicon-proof three (README honesty)
+
 
 Santa Cruz measured silicon-proof for three invention tracks
 ([results/silicon_proof_three/](results/silicon_proof_three/)):
@@ -10,10 +33,11 @@ Santa Cruz measured silicon-proof for three invention tracks
   default IO pool. Confirms the **15.55** n=1024 steady baseline already
   includes oMLX 0.7.0 default-on staging (not a new additive patch).
   Caveat: OFF removes the full pool, so Δ ≫ install-only band.
-- **T6 coalescer:** FAIL on physical SSD (OFF 4.67 / ON 4.44 GB/s vs
-  5.02 peak). Cached ~10.5 GB/s claims invalid as SSD. Not merge-worthy.
-- **T3 LIP:** BLOCKER (KeyError / HTTP 507); formal score refused — do
-  not claim a silicon win.
+- **T6 coalescer:** first-pass random-order FAIL (OFF 4.67 / ON 4.44
+  vs 5.02); **revised** contiguous PASS at **5.39 GB/s** (1.44×). Cached
+  ~10.5 GB/s claims invalid as SSD. Contiguous-only; no tok/s PR.
+- **T3 LIP:** first-pass BLOCKER (507); v3 arm +0.34 n.s. — do not claim
+  a silicon win.
 
 README 36 GB headline updated from short-run **13.0** (n=128) to steady
 **15.55** (n=1024; `results/measured_santa_cruz_36gb_n1024.json`).

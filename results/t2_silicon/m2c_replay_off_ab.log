@@ -1,0 +1,102 @@
+=== M2c replay-OFF A/B start Tue Oct  6 22:52:44 PDT 2026 ===
+port 8000 looks omlx-ish: omlx-server          
+=== install multi_router+980b20e02ad5468bdbf8c63780657c65 with MOEFIT_FL=0 (replay OFF) ===
+mem ok (84%)
+started pid=66970 env=MOEFIT_CORRELATOR=1 MOEFIT_MULTI_ROUTER=1 MOEFIT_FL=0 MOEFIT_PF_THETA=0.37 MOEFIT_CORR_THETA=0.55 MOEFIT_PF_CAP=8
+ready
+=== pre-warm ===
+prewarm ok lines=38
+-rw-r--r--  1 yb  wheel  168 Oct  6 22:52 /tmp/omlx_moe_stats.json
+=== NON-repeat A/B replay-OFF max_tokens=512 ===
+{"tokens": 64, "finish_reason": "length", "ttft_s": 0.522, "decode_s": 6.27, "tps": 10.05, "text_hash": 1411523296, "arm": "WARM", "prompt_id": "WARM", "sidecar": false}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 0.477, "decode_s": 35.148, "tps": 14.54, "text_hash": 439218530, "arm": "P1_unified_para_OFF", "prompt_id": "P1_unified_para", "sidecar": false, "d_hits": 227760, "d_misses": 18888, "d_sc_issued": 0, "d_sc_used": 0, "d_sc_wasted": 0, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": 0, "waste_rate": null, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 0.689, "decode_s": 25.998, "tps": 19.66, "text_hash": 439218530, "arm": "P1_unified_para_ON", "prompt_id": "P1_unified_para", "sidecar": true, "d_hits": 225846, "d_misses": 20962, "d_sc_issued": 20214, "d_sc_used": 19236, "d_sc_wasted": 974, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": 1, "waste_rate": 0.0482, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 7.404, "decode_s": 40.965, "tps": 12.47, "text_hash": 4037700773, "arm": "P2_new_compilers_OFF", "prompt_id": "P2_new_compilers", "sidecar": false, "d_hits": 226857, "d_misses": 32934, "d_sc_issued": 507, "d_sc_used": 366, "d_sc_wasted": 145, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": -1, "waste_rate": 0.286, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 0.797, "decode_s": 28.294, "tps": 18.06, "text_hash": 4037700773, "arm": "P2_new_compilers_ON", "prompt_id": "P2_new_compilers", "sidecar": true, "d_hits": 217180, "d_misses": 25087, "d_sc_issued": 24397, "d_sc_used": 22631, "d_sc_wasted": 1719, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": 1, "waste_rate": 0.0705, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 6.734, "decode_s": 43.139, "tps": 11.85, "text_hash": 1318583030, "arm": "P3_new_networking_OFF", "prompt_id": "P3_new_networking", "sidecar": false, "d_hits": 225896, "d_misses": 35315, "d_sc_issued": 1037, "d_sc_used": 895, "d_sc_wasted": 189, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": -1, "waste_rate": 0.1823, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 0.769, "decode_s": 31.296, "tps": 16.33, "text_hash": 1318583030, "arm": "P3_new_networking_ON", "prompt_id": "P3_new_networking", "sidecar": true, "d_hits": 216361, "d_misses": 28368, "d_sc_issued": 27473, "d_sc_used": 24916, "d_sc_wasted": 2407, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": 1, "waste_rate": 0.0876, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 6.759, "decode_s": 38.284, "tps": 13.35, "text_hash": 650472856, "arm": "P4_new_databases_OFF", "prompt_id": "P4_new_databases", "sidecar": false, "d_hits": 229957, "d_misses": 29012, "d_sc_issued": 1036, "d_sc_used": 1030, "d_sc_wasted": 156, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": -1, "waste_rate": 0.1506, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 0.705, "decode_s": 29.46, "tps": 17.35, "text_hash": 650472856, "arm": "P4_new_databases_ON", "prompt_id": "P4_new_databases", "sidecar": true, "d_hits": 223114, "d_misses": 21875, "d_sc_issued": 21029, "d_sc_used": 18733, "d_sc_wasted": 2221, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": 1, "waste_rate": 0.1056, "server_pid": ["66970"]}
+{
+ "kind": "measured_nonrepeat",
+ "host": "santacruz",
+ "timestamp": "2026-10-06T22:58:32-0700",
+ "max_tokens": 512,
+ "on_first": false,
+ "prompt_set": "default",
+ "n_prompts": 4,
+ "median_tps_off": 12.91,
+ "median_tps_on": 17.7,
+ "median_delta_tps": 4.79,
+ "median_pct": 37.1,
+ "all_hash_match": true,
+ "waste_rates": [
+  0.0482,
+  0.0705,
+  0.0876,
+  0.1056
+ ],
+ "server_pid_stable": true,
+ "verdict": "PASS",
+ "merge_bar": "median ON>=OFF+1.5 tok/s OR +10%; bit-identical; >=4 non-repeat; waste reported",
+ "note": "ON arm uses whatever sidecar/multi-router is installed; exact-replay alone is expected FAIL on true non-repeat"
+}
+=== LEAK-FREE ON-first pass, holdout prompts, max_tokens=512 ===
+{"tokens": 512, "finish_reason": "length", "ttft_s": 9.238, "decode_s": 60.5, "tps": 8.45, "text_hash": 2884928997, "arm": "code_py_review2_ON", "prompt_id": "code_py_review2", "sidecar": true, "d_hits": 216011, "d_misses": 47295, "d_sc_issued": 45961, "d_sc_used": 1379, "d_sc_wasted": 44657, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": 0, "waste_rate": 0.9716, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 0.721, "decode_s": 51.032, "tps": 10.01, "text_hash": 2884928997, "arm": "code_py_review2_OFF", "prompt_id": "code_py_review2", "sidecar": false, "d_hits": 210289, "d_misses": 36842, "d_sc_issued": 0, "d_sc_used": 0, "d_sc_wasted": 0, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": -1, "waste_rate": null, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 6.923, "decode_s": 48.97, "tps": 10.43, "text_hash": 2901936540, "arm": "agent_edit2_ON", "prompt_id": "agent_edit2", "sidecar": true, "d_hits": 214221, "d_misses": 43103, "d_sc_issued": 0, "d_sc_used": 0, "d_sc_wasted": 0, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": 1, "waste_rate": null, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 0.731, "decode_s": 46.742, "tps": 10.93, "text_hash": 2901936540, "arm": "agent_edit2_OFF", "prompt_id": "agent_edit2", "sidecar": false, "d_hits": 212455, "d_misses": 34885, "d_sc_issued": 0, "d_sc_used": 0, "d_sc_wasted": 0, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": -1, "waste_rate": null, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 6.597, "decode_s": 42.953, "tps": 11.9, "text_hash": 3435750070, "arm": "legal_contract2_ON", "prompt_id": "legal_contract2", "sidecar": true, "d_hits": 222101, "d_misses": 33390, "d_sc_issued": 0, "d_sc_used": 0, "d_sc_wasted": 0, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": 1, "waste_rate": null, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 0.907, "decode_s": 42.532, "tps": 12.01, "text_hash": 3435750070, "arm": "legal_contract2_OFF", "prompt_id": "legal_contract2", "sidecar": false, "d_hits": 221823, "d_misses": 27040, "d_sc_issued": 0, "d_sc_used": 0, "d_sc_wasted": 0, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": -1, "waste_rate": null, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 7.899, "decode_s": 39.678, "tps": 12.88, "text_hash": 2268807156, "arm": "prose_novel2_ON", "prompt_id": "prose_novel2", "sidecar": true, "d_hits": 226278, "d_misses": 30056, "d_sc_issued": 0, "d_sc_used": 0, "d_sc_wasted": 0, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": 1, "waste_rate": null, "server_pid": ["66970"]}
+{"tokens": 512, "finish_reason": "length", "ttft_s": 0.826, "decode_s": 36.987, "tps": 13.82, "text_hash": 2268807156, "arm": "prose_novel2_OFF", "prompt_id": "prose_novel2", "sidecar": false, "d_hits": 221627, "d_misses": 21999, "d_sc_issued": 0, "d_sc_used": 0, "d_sc_wasted": 0, "d_sc_aligned": 0, "d_sc_lost": 0, "d_sidecar_on": -1, "waste_rate": null, "server_pid": ["66970"]}
+{
+ "kind": "measured_nonrepeat",
+ "host": "santacruz",
+ "timestamp": "2026-10-06T23:05:44-0700",
+ "max_tokens": 512,
+ "on_first": true,
+ "prompt_set": "holdout",
+ "n_prompts": 4,
+ "median_tps_off": 11.47,
+ "median_tps_on": 11.16,
+ "median_delta_tps": -0.31,
+ "median_pct": -2.7,
+ "all_hash_match": true,
+ "waste_rates": [
+  0.9716
+ ],
+ "server_pid_stable": true,
+ "verdict": "FAIL",
+ "merge_bar": "median ON>=OFF+1.5 tok/s OR +10%; bit-identical; >=4 non-repeat; waste reported",
+ "note": "ON arm uses whatever sidecar/multi-router is installed; exact-replay alone is expected FAIL on true non-repeat"
+}
+=== verdict vs prereg / owner bar ===
+summary {'kind': 'measured_nonrepeat', 'host': 'santacruz', 'timestamp': '2026-10-06T22:58:32-0700', 'max_tokens': 512, 'on_first': False, 'prompt_set': 'default', 'n_prompts': 4, 'median_tps_off': 12.91, 'median_tps_on': 17.7, 'median_delta_tps': 4.79, 'median_pct': 37.1, 'all_hash_match': True, 'waste_rates': [0.0482, 0.0705, 0.0876, 0.1056], 'server_pid_stable': True, 'verdict': 'PASS', 'merge_bar': 'median ON>=OFF+1.5 tok/s OR +10%; bit-identical; >=4 non-repeat; waste reported', 'note': 'ON arm uses whatever sidecar/multi-router is installed; exact-replay alone is expected FAIL on true non-repeat'}
+OWNER_VERDICT KEEP_CORRELATOR_SIGNAL delta=4.79 pct=37.1 hashes=True
+PREREG_NOTE: <=0.5 => replay-attributed; 0.5-1.5 wash; >=1.5 falsifies instance wash
+{
+  "kind": "m2c_replay_off_ab_verdict",
+  "owner_bar": ">=+1.5 tok/s bit-identical else DROP_AS_REPLAY",
+  "median_delta_tps": 4.79,
+  "median_pct": 37.1,
+  "all_hash_match": true,
+  "waste_rates": [
+    0.0482,
+    0.0705,
+    0.0876,
+    0.1056
+  ],
+  "owner_verdict": "KEEP_CORRELATOR_SIGNAL",
+  "prereg": "results/t5_m2c_attribution_prereg.json",
+  "env": "MOEFIT_FL=0 MOEFIT_CORRELATOR=1 MOEFIT_MULTI_ROUTER=1",
+  "patch_md5": "980b20e02ad5468bdbf8c63780657c65"
+}
+=== restore d9850d99 + default env (ec=0) Tue Oct  6 23:05:44 PDT 2026 ===
+experiments/m2c_replay_off_ab.sh: line 66: 66970 Terminated: 15          nohup env -u OMLX_ADMISSION "$@" omlx serve --model-dir "$OMLX_BASE/models" --port "$PORT" --max-concurrent-requests 1 --memory-guard aggressive > "$SERVE_LOG" 2>&1
+restored md5=d9850d99ab0be7ee723fee72e360adbc (want d9850d99ab0be7ee723fee72e360adbc)
+mem ok (84%)
+started pid=71655 env=
+ready
+post-restore health: {"status":"healthy","default_model":"Qwen3.8-Flash-Next-oQ4e-mtp","engine_pool":{"model_count":1,"loaded_count":0,"final_ceiling":29461914044,"current_model_memory":0},"mcp":null}
+=== M2c replay-OFF A/B end Tue Oct  6 23:05:58 PDT 2026 lock cleared ===

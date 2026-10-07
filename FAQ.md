@@ -1,21 +1,24 @@
 # FAQ for someone about to buy a 32 GB Mac for this
 
 **Will it be as fast as my friend's 128 GB Mac?**
-No, and the gap comes from the chip before it comes from the RAM. A base
-M4 or M4 Pro has far less memory bandwidth than an M4 Max, and decode on
-this model reads about 1.26 GB of expert weights per token from DRAM, so
-the chip sets the ceiling: 23.6 tok/s simulated on an M4 Pro with full
-LRU, 45.1 on an M4 Max (55 with a pinned hot-set). The 128 GB M4 Max
-measured 57.4 tok/s. A 32 GB M4 Pro with 64 to 128 experts per layer
-resident simulates at 14 to 26 tok/s\. Paging costs
-you a little at the tight end, and the chip costs you the rest.
+No. Decode still reads about 1.26 GB of expert weights per token from
+DRAM, so the chip's memory bandwidth sets the floor, and paging SSD
+stalls add more when the model does not fit. Prefer the **serial-latency**
+expectations (calibrated on Santa Cruz), not the older bandwidth-model
+ceilings: ~**9.7 tok/s** simulated on a 32 GB M4 Pro at 128 experts/layer,
+~**11.8–15.9** on a 48 GB M4 Max at 128–192, ~**4.9** on 24 GB (not
+recommended). The 128 GB M4 Max measured **57.4 tok/s** full-fit; a 36 GB
+M4 Max measured **15.55 tok/s** steady with stock oMLX paging. Exact
+routing-replay can add ~**+40%** on *repeated* prompts only — not on
+fresh ones. Older FAQ figures (14–26 / 45.1 / 55) were bandwidth-model
+optimism.
 
 **Will this kill my SSD?**
 Reads do not wear flash; only writes do, and this scheme writes nothing
 to the SSD during decode. The expert files are read from SSD into RAM
 and re-read as needed. What you should care about is read bandwidth and
 heat: plain LRU streams about 177 to 560 MB per token depending on how
-many experts per layer stay resident (128 down to 32), which at 15 tok/s
+many experts per layer stay resident (128 down to 32), which at ~15 tok/s
 is several terabytes read per day. The pinned hot-set at 192 experts per
 layer on a 48 GB Mac streams 138 MB per token. Choose the row of the
 SETUP.md table with the lowest SSD traffic you can afford.
