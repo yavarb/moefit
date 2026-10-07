@@ -213,6 +213,44 @@ class LayeredReplaySession:
                         return tuple(plan)
         return tuple(plan)
 
+    def plan_complete_layers(self, resident, expert_bytes, max_bytes):
+        """Plan only complete nonresident sets of cached CURRENT-token layers.
+
+        Greedy layer order, not a knapsack optimum. Oversized layer groups are
+        skipped intact; later groups may fit. No IO, deadline guarantee, cache
+        refresh or install. Backend must recheck residency and coordinate IO.
+        Caller supplies a stable residency snapshot and pure size callback.
+        """
+        if self.next_layer != 0:
+            raise RuntimeError('plan before executing layer0')
+        if not isinstance(max_bytes, (int, np.integer)) or max_bytes < 0:
+            raise ValueError('byte budget must be a nonnegative integer')
+        if not self.enabled or max_bytes == 0:
+            return ()
+        remaining = int(max_bytes)
+        plan = []
+        for layer in range(self.layers):
+            entry = self.cache.entries.get(((self.namespace, self.layers, layer), self.prefix))
+            if entry is None:
+                continue
+            group, seen, total = [], set(), 0
+            for raw in entry[0].indices[0]:
+                expert = int(raw)
+                if expert in seen or expert in resident.get(layer, ()):
+                    continue
+                seen.add(expert)
+                size = expert_bytes(layer, expert)
+                if not isinstance(size, (int, np.integer)) or size <= 0:
+                    raise ValueError('expert byte size must be positive integer')
+                total += int(size)
+                group.append((layer, expert, int(size)))
+            if total <= remaining:
+                plan.extend(group)
+                remaining -= total
+                if remaining == 0:
+                    break
+        return tuple(plan)
+
     def route(self, layer, compute):
         if layer != self.next_layer or layer >= self.layers:
             raise RuntimeError('layers must execute once in ascending order')
