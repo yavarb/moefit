@@ -1,0 +1,41 @@
+{
+ "sim_source": "results/sim_paging_matched_cap143.json#lru/cap143",
+ "silicon_source": "results/measured_santa_cruz_36gb.json",
+ "tps": {
+  "sim": 36.6,
+  "silicon": 13.0,
+  "ratio": 2.815,
+  "gap_pct": 181.5
+ },
+ "residency": {
+  "sim": 0.279296875,
+  "silicon": 0.28,
+  "delta": -0.001
+ },
+ "footprint_gib": {
+  "sim": 22.63,
+  "silicon": 22.61,
+  "delta": 0.02
+ },
+ "expert_gib_resident": {
+  "sim": 18.03,
+  "silicon": 18.98,
+  "delta": -0.95
+ },
+ "ttft_s": null,
+ "sim_terms_ms": {
+  "compute": 18.1,
+  "stream": 27.3,
+  "limiter": "stream"
+ },
+ "sim_derived": {
+  "dram_eff_gbs": 293.0,
+  "implied_ms_per_tok": 27.3,
+  "implied_tps": 36.63
+ },
+ "reconciliation": {
+  "dram_eff_gbs_silicon_needed_if_compute_bound": 68.9,
+  "silicon_ms_per_tok": 76.9,
+  "unexplained_ms_per_tok": 49.6
+ }
+}

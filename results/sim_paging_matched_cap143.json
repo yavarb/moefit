@@ -1,0 +1,18 @@
+[
+ {
+  "cap": 143,
+  "mode": "lru",
+  "probe_picks": 0,
+  "throttle": "legacy",
+  "served_48GB-M4M": 0.84,
+  "tps_48GB-M4M": 36.6,
+  "ct_48GB-M4M": 18.1,
+  "st_48GB-M4M": 27.3,
+  "ssdMB_48GB-M4M": 207.0,
+  "served_64GB-M4X": 0.84,
+  "tps_64GB-M4X": 36.6,
+  "ct_64GB-M4X": 18.1,
+  "st_64GB-M4X": 27.3,
+  "ssdMB_64GB-M4X": 207.0
+ }
+]
