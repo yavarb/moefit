@@ -1,0 +1,17 @@
+{
+  "scope": "Executed tiny SYNTHETIC file IO counters/correctness, NOT bandwidth or decode",
+  "baseline": {
+    "calls": 42,
+    "bytes": 1056
+  },
+  "read_many": {
+    "calls": 19,
+    "bytes": 656
+  },
+  "component_comparisons": 9639,
+  "random_batches": 100,
+  "invalid_id_zero_io_cases": 4,
+  "empty_zero_io": true,
+  "independent_dicts_shared_immutable_payload": true,
+  "post_close_payload_valid": true
+}

@@ -36,6 +36,28 @@ class HybridExpertPack:
         return {c['name']:memoryview(exact_pread(self.fds[c['file']],c['size'],
                     c['offset']+eid*c['size'])) for c in self.parts}
 
+    def read_many(self, ids, *, max_experts_per_span=4):
+        """Deduplicate within this call, coalesce packed IDs, retain input order.
+
+        No persistent cache/admission. Duplicate outputs share immutable payload
+        buffers, but have independent dictionaries. All IDs validated before IO.
+        """
+        from moefit.pack_batch import read_pack_batch
+        if self.closed: raise ValueError('Store is closed')
+        ids = list(ids)
+        if any(type(e) is not int or not 0 <= e < self.parts[0]['experts'] for e in ids):
+            raise ValueError('Invalid expert ID')
+        if type(max_experts_per_span) is not int or max_experts_per_span < 1:
+            raise ValueError('max_experts_per_span must be positive integer')
+        unique = list(dict.fromkeys(ids))
+        packed = [e for e in unique if e in self.pack.positions]
+        groups, _ = read_pack_batch(self.pack, packed,
+                                    max_experts_per_span=max_experts_per_span)
+        found = dict(zip(packed, groups))
+        for e in unique:
+            if e not in found: found[e] = self.read(e)
+        return [dict(found[e]) for e in ids]
+
     def close(self):
         if not self.closed:
             for fd in self.fds.values():os.close(fd)
