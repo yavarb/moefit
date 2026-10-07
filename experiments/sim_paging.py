@@ -110,12 +110,23 @@ def per_layer_caps(cap):
 
 
 def simulate(gold, picks, prior_rank, cap, mode, pick, async_allow,
-             audit=True, avail=None, pin_counts=None):
+             audit=True, avail=None, pin_counts=None,
+             hit_refresh=False, want_misses=False):
     """One pass with hard capacity: res[li] never exceeds caps[li] experts.
     pin[li] = predicted experts pinned for token t+1 (free SSD slots up to
     async_allow). Non-pinned residents evicted LRU. sync = expert read at
     hit time (stalls); async = read at prefetch time (hidden by design,
     charged to SSD).
+
+    hit_refresh=False (default, SHIPPED semantics): a hit does not refresh
+    the resident's LRU timestamp, so eviction order is insertion order.
+    hit_refresh=True: true LRU (oMLX 0.7.0 ExpertCache semantics, which
+    move_to_end()s on hit). At cap=143 synth traces this moves served
+    0.840->0.879 and miss bytes 206.8->156.9 MB/token
+    (results/fidelity_miss_model.json).
+
+    want_misses=True appends M to the return: (T, L) int16 per-token
+    per-layer SYNC miss counts (needed by the serial-latency time model).
 
     mode="sidecar_probe" (hybrid): avail is a per-token bool array; when
     avail[t+1] is True the routing sidecar has the answer and gold is
@@ -185,6 +196,7 @@ def simulate(gold, picks, prior_rank, cap, mode, pick, async_allow,
         return True
 
     served = sync = async_ = 0
+    M = np.zeros((T, L), dtype=np.int16) if want_misses else None
     if mode == "prior":
         for li in range(L):
             for e in prior_rank[li][:caps[li] - dyn_cap[li]]:
@@ -198,9 +210,13 @@ def simulate(gold, picks, prior_rank, cap, mode, pick, async_allow,
                 e = int(e)
                 if e in res[li]:
                     served += 1
+                    if hit_refresh and e not in pin[li]:
+                        set_ts(li, e, t)
                 else:
                     touch_dyn(li, e, t)
                     sync += 1
+                    if M is not None:
+                        M[t, li] += 1
         if t + 1 < T and n_pf_slot:
             newpin = [set() for _ in range(L)]
             used = 0
@@ -228,7 +244,8 @@ def simulate(gold, picks, prior_rank, cap, mode, pick, async_allow,
                         f"capacity leak: layer {li} holds {len(res[li])} > "
                         f"{caps[li]} at token {t} (mode={mode})")
     n = T * L * K
-    return served / n, sync * EXPERT_MIB / T, async_ * EXPERT_MIB / T
+    out = (served / n, sync * EXPERT_MIB / T, async_ * EXPERT_MIB / T)
+    return out + (M,) if want_misses else out
 
 
 DRAM_EFF = 293.0 / 546.0
@@ -243,6 +260,79 @@ def _times(spec, sync_mb, async_mb):
     st_ms = (sync_mb + async_mb + PLE_STREAM_MIB) / 1024.0 \
         / spec["ssd"] * 1000.0
     return c_ms, st_ms
+
+
+# ---- serial-latency time model (T3, 2026-10-07) -------------------------
+# MEASURED on Santa Cruz (M4 Max 36 GB, oMLX 0.7.0) by lead_silicon,
+# results/microbench_expert_reads_santa_cruz.json (commit 463c856):
+#   per-layer-step k-miss cold reads (9 preads/expert, 12 threads):
+#     k=1..4 -> 0.72/1.26/1.78/2.28 ms  ~= IO_A + IO_B * k
+#   host->slot install 0.27-0.35 ms/expert; tiny per-layer device sync 0.12 ms
+# The bandwidth model above (_times) assumes misses stream at spec SSD
+# bandwidth and overlap compute; the measured runtime resolves misses
+# SERIALLY per layer (sync -> miss reads -> install -> compute, nothing
+# overlaps across layers). Validated out of sample at 3 measured points
+# (results/fidelity_serial_validate.json): steady cap143 12.1 vs measured
+# 12.7/13.0 tok/s, cap92 8.9 vs 7.8 (crowded), cold 16-token transient
+# 5.0 vs 6.43. Constants are Santa-Cruz-specific: applying this model to
+# other tiers is EXTRAPOLATION until their constants are measured.
+SERIAL_IO_A_MS = 0.20
+SERIAL_IO_B_MS = 0.52
+SERIAL_INSTALL_MS = 0.30
+SERIAL_SYNC_MS = 0.122
+# 36 GB M4 Max is the 410 GB/s DRAM bin (Santa Cruz). usable=0.75*36-3.
+TIERS["36GB-M4M36"] = dict(dram=410.0, ssd=7.4, usable=24.0)
+
+
+def serial_ms(M, compute_ms):
+    """Per-token serial-latency ms given (T, L) per-token per-layer
+    SYNC miss counts M (from simulate(..., want_misses=True)).
+    tok_ms = compute + sum_layers(A + B*k | k>0) + install*misses + L*sync
+    """
+    k = np.asarray(M, dtype=np.float64)
+    io = np.where(k > 0, SERIAL_IO_A_MS + SERIAL_IO_B_MS * k, 0.0).sum(axis=1)
+    return (compute_ms + io + SERIAL_INSTALL_MS * k.sum(axis=1)
+            + L * SERIAL_SYNC_MS)
+
+
+def solve_policy_serial(gold, prior_rank, cap, mode, spec,
+                        hit_refresh=True, warmup=200):
+    """Serial-latency solve for prefetch-free modes (lru, prior).
+
+    hit_refresh=True by default: mirrors oMLX 0.7.0 ExpertCache (true
+    LRU). The shipped bandwidth-model rows are FIFO-ish (no refresh) —
+    do not compare the two without noting this.
+
+    compute_ms is the model's one unmeasured knob on the 36 GB box; we
+    use the bandwidth model's DRAM term at the tier's dram spec.
+    Returns dict(tps, compute_ms, io_ms, install_ms, sync_ms,
+    misses_per_tok, served).
+    """
+    if mode not in ("lru", "prior"):
+        raise ValueError("serial model v1 covers lru/prior only; "
+                         "prefetch modes need an overlap model")
+    T = len(gold)
+    picks = np.zeros((T, L, 1), np.int16)
+    srv, sync_mb, _a, M = simulate(gold, picks, prior_rank, cap, mode, 0,
+                                   0, want_misses=True,
+                                   hit_refresh=hit_refresh)
+    assert M is not None
+    compute_ms = (READ_FLOOR_MIB + GOLD_MIB) / 1024.0 \
+        / (spec["dram"] * DRAM_EFF) * 1000.0
+    ms = serial_ms(M[warmup:], compute_ms)
+    io = float(np.where(M[warmup:] > 0,
+                        SERIAL_IO_A_MS + SERIAL_IO_B_MS * M[warmup:],
+                        0.0).sum() / max(T - warmup, 1))
+    return dict(tps=round(1000.0 / ms.mean(), 1),
+                compute_ms=round(compute_ms, 1),
+                io_ms=round(io, 1),
+                install_ms=round(SERIAL_INSTALL_MS
+                                 * float(M[warmup:].sum())
+                                 / max(T - warmup, 1), 1),
+                sync_ms=round(L * SERIAL_SYNC_MS, 1),
+                misses_per_tok=round(float(M[warmup:].sum())
+                                     / max(T - warmup, 1), 1),
+                served=round(srv, 3))
 
 
 def solve_policy(gold, picks, prior_rank, cap, mode, pick, spec,
