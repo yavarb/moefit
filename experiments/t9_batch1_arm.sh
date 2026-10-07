@@ -21,10 +21,15 @@ LOG=~/.omlx/logs/moefit-serve.log
 URL=http://127.0.0.1:8000/v1/chat/completions
 MODEL=Qwen3.8-Flash-Next-oQ4e-mtp
 
-if pgrep -f "collect_silicon_run|t9_collect|t2_sidecar_aba|t6_ssd_proof|score_lip|lip_on" >/dev/null; then
-  echo "another bench is running; refusing"; pgrep -fl "collect|aba|t6_" ; exit 2
+for L in "$B"/SLOT_LOCK_*; do
+  [ -e "$L" ] && [ "$L" != "$B/SLOT_LOCK_T9" ] && { echo "slot held: $L; refusing"; cat "$L"; exit 2; }
+done
+if pgrep -f "collect_silicon_run|t9_collect|t2_sidecar_aba|t6_ssd_proof|t6_phys|score_lip|lip_arm" >/dev/null; then
+  echo "another bench is running; refusing"; pgrep -fl "collect|aba|t6_|lip_arm" ; exit 2
 fi
 [ -e /tmp/omlx_sidecar_on ] && { echo "sidecar flag present; refusing"; exit 2; }
+echo "silicon_dbuf T9 batch1 arm $(date)" >"$B/SLOT_LOCK_T9"
+trap 'rm -f "$B/SLOT_LOCK_T9"' EXIT
 
 restart() {  # $@ = extra env assignments
   local P; P=$(cat "$PIDF")
