@@ -1,0 +1,138 @@
+{
+ "kind": "simulated",
+ "note": "serial constants measured on Santa Cruz only; non-36GB rows are extrapolations of the oMLX serial-resolve discipline, not of the drive. compute_ms per tier = bandwidth-model DRAM term.",
+ "rows": [
+  {
+   "tier": "24GB-M4",
+   "cap": 64,
+   "mode": "lru",
+   "bandwidth_model_tps": 12.0,
+   "serial_model_tps": 4.9,
+   "serial_misses_per_tok": 128.1,
+   "serial_compute_ms": 82.5,
+   "readme_claim": "11.8 tok/s ceiling (bandwidth model)",
+   "extrapolated_serial_constants": true
+  },
+  {
+   "tier": "24GB-M4",
+   "cap": 64,
+   "mode": "prior",
+   "bandwidth_model_tps": 10.6,
+   "serial_model_tps": 4.4,
+   "serial_misses_per_tok": 158.9,
+   "serial_compute_ms": 82.5,
+   "readme_claim": "11.8 tok/s ceiling (bandwidth model)",
+   "extrapolated_serial_constants": true
+  },
+  {
+   "tier": "32GB-M4P",
+   "cap": 128,
+   "mode": "lru",
+   "bandwidth_model_tps": 26.3,
+   "serial_model_tps": 9.7,
+   "serial_misses_per_tok": 65.1,
+   "serial_compute_ms": 36.3,
+   "readme_claim": "23.6 -> 25.7 (bandwidth model, LRU->pinned)",
+   "extrapolated_serial_constants": true
+  },
+  {
+   "tier": "32GB-M4P",
+   "cap": 128,
+   "mode": "prior",
+   "bandwidth_model_tps": 22.8,
+   "serial_model_tps": 8.5,
+   "serial_misses_per_tok": 82.3,
+   "serial_compute_ms": 36.3,
+   "readme_claim": "23.6 -> 25.7 (bandwidth model, LRU->pinned)",
+   "extrapolated_serial_constants": true
+  },
+  {
+   "tier": "36GB-M4M36",
+   "cap": 143,
+   "mode": "lru",
+   "bandwidth_model_tps": 36.6,
+   "serial_model_tps": 11.9,
+   "serial_misses_per_tok": 57.4,
+   "serial_compute_ms": 24.1,
+   "readme_claim": "13.0 MEASURED (oMLX, 0.28 residency)",
+   "extrapolated_serial_constants": false
+  },
+  {
+   "tier": "36GB-M4M36",
+   "cap": 143,
+   "mode": "prior",
+   "bandwidth_model_tps": 31.7,
+   "serial_model_tps": 10.4,
+   "serial_misses_per_tok": 72.0,
+   "serial_compute_ms": 24.1,
+   "readme_claim": "13.0 MEASURED (oMLX, 0.28 residency)",
+   "extrapolated_serial_constants": false
+  },
+  {
+   "tier": "48GB-M4M",
+   "cap": 128,
+   "mode": "lru",
+   "bandwidth_model_tps": 32.5,
+   "serial_model_tps": 11.8,
+   "serial_misses_per_tok": 65.1,
+   "serial_compute_ms": 18.1,
+   "readme_claim": "29.1/54.8 (bandwidth model) \u2014 48GB milestone target",
+   "extrapolated_serial_constants": true
+  },
+  {
+   "tier": "48GB-M4M",
+   "cap": 128,
+   "mode": "prior",
+   "bandwidth_model_tps": 28.1,
+   "serial_model_tps": 10.1,
+   "serial_misses_per_tok": 82.3,
+   "serial_compute_ms": 18.1,
+   "readme_claim": "29.1/54.8 (bandwidth model) \u2014 48GB milestone target",
+   "extrapolated_serial_constants": true
+  },
+  {
+   "tier": "48GB-M4M",
+   "cap": 192,
+   "mode": "lru",
+   "bandwidth_model_tps": 52.0,
+   "serial_model_tps": 15.9,
+   "serial_misses_per_tok": 41.1,
+   "serial_compute_ms": 18.1,
+   "readme_claim": "29.1/54.8 (bandwidth model) \u2014 48GB milestone target",
+   "extrapolated_serial_constants": true
+  },
+  {
+   "tier": "48GB-M4M",
+   "cap": 192,
+   "mode": "prior",
+   "bandwidth_model_tps": 46.7,
+   "serial_model_tps": 14.5,
+   "serial_misses_per_tok": 47.7,
+   "serial_compute_ms": 18.1,
+   "readme_claim": "29.1/54.8 (bandwidth model) \u2014 48GB milestone target",
+   "extrapolated_serial_constants": true
+  },
+  {
+   "tier": "64GB-M4X",
+   "cap": 192,
+   "mode": "lru",
+   "bandwidth_model_tps": 52.0,
+   "serial_model_tps": 15.9,
+   "serial_misses_per_tok": 41.1,
+   "serial_compute_ms": 18.1,
+   "readme_claim": "bandwidth model row",
+   "extrapolated_serial_constants": true
+  },
+  {
+   "tier": "64GB-M4X",
+   "cap": 192,
+   "mode": "prior",
+   "bandwidth_model_tps": 46.7,
+   "serial_model_tps": 14.5,
+   "serial_misses_per_tok": 47.7,
+   "serial_compute_ms": 18.1,
+   "readme_claim": "bandwidth model row",
+   "extrapolated_serial_constants": true
+  }
+ ]
+}
