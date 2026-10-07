@@ -44,6 +44,12 @@ class RoutingReplayCache:
             raise ValueError('nonempty opaque context namespace required')
         return ReplaySession(self, namespace, deterministic)
 
+    def layered_session(self, namespace, layers, *, deterministic=False):
+        """Route each layer lazily; never skip expert/KV execution on hits."""
+        if not isinstance(namespace, bytes) or not namespace or layers <= 0:
+            raise ValueError('namespace and positive layer count required')
+        return LayeredReplaySession(self, namespace, layers, deterministic)
+
     def clear(self):
         self.entries.clear()
         self.bytes = 0
@@ -59,7 +65,8 @@ class RoutingReplayCache:
         if enabled:
             # Conservative accounting for Python tuple/int key overhead;
             # payload capacity is bounded, not a process RSS guarantee.
-            size = value.indices.nbytes + value.weights.nbytes + len(key[0]) + 128 + 40*len(key[1])
+            namespace_size = len(key[0]) if isinstance(key[0], bytes) else len(key[0][0]) + 96
+            size = value.indices.nbytes + value.weights.nbytes + namespace_size + 128 + 40*len(key[1])
             if size <= self.max_bytes:
                 while self.bytes + size > self.max_bytes:
                     _, (_, removed) = self.entries.popitem(last=False)
@@ -88,3 +95,37 @@ class ReplaySession:
         value, hit = self.cache._resolve((self.namespace, prefix), compute, self.enabled)
         self.prefix = prefix  # callback failure does not advance session
         return value, hit
+
+
+class LayeredReplaySession:
+    """Per-token transaction: layers must run in order before next token.
+
+    On a layer failure discard the session AND roll back caller hidden/KV
+    state. Completed deterministic layer entries may safely remain cached.
+    Separate tagged namespaces prevent collision with whole-token entries.
+    """
+    def __init__(self, cache, namespace, layers, enabled):
+        self.cache, self.namespace = cache, namespace
+        self.layers, self.enabled = layers, enabled
+        self.prefix = ()
+        self.next_layer = layers
+
+    def begin_token(self, token_id):
+        if self.next_layer != self.layers:
+            raise RuntimeError('previous token has unfinished layers')
+        if not isinstance(token_id, (int, np.integer)) or token_id < 0:
+            raise ValueError('invalid token id')
+        self.prefix += (int(token_id),)
+        self.next_layer = 0
+
+    def route(self, layer, compute):
+        if layer != self.next_layer or layer >= self.layers:
+            raise RuntimeError('layers must execute once in ascending order')
+        # tuple tag cannot equal the bytes namespace of whole-token entries.
+        key = ((self.namespace, self.layers, int(layer)), self.prefix)
+        def wrapped():
+            indices, weights = compute()
+            return np.asarray(indices)[None, :], np.asarray(weights)[None, :]
+        value, hit = self.cache._resolve(key, wrapped, self.enabled)
+        self.next_layer += 1
+        return value.indices[0], value.weights[0], hit

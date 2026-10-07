@@ -1,0 +1,98 @@
+{
+  "kind": "MEASURED local constructed causal CPU MoE, not production LLM decode",
+  "geometry": {
+    "layers": 8,
+    "hidden": 64,
+    "experts": 256,
+    "top_k": 4
+  },
+  "tokens": 144,
+  "trials": [
+    {
+      "baseline": {
+        "seconds": 0.02745450000000002,
+        "router_calls": 1152,
+        "route_hits": 0,
+        "expert_layer_calls": 1152,
+        "cache_bytes": 0
+      },
+      "replay": {
+        "seconds": 0.024383582999999986,
+        "router_calls": 576,
+        "route_hits": 576,
+        "expert_layer_calls": 1152,
+        "cache_bytes": 817920
+      }
+    },
+    {
+      "baseline": {
+        "seconds": 0.027502582999999997,
+        "router_calls": 1152,
+        "route_hits": 0,
+        "expert_layer_calls": 1152,
+        "cache_bytes": 0
+      },
+      "replay": {
+        "seconds": 0.02432616700000001,
+        "router_calls": 576,
+        "route_hits": 576,
+        "expert_layer_calls": 1152,
+        "cache_bytes": 817920
+      }
+    },
+    {
+      "baseline": {
+        "seconds": 0.027558832999999977,
+        "router_calls": 1152,
+        "route_hits": 0,
+        "expert_layer_calls": 1152,
+        "cache_bytes": 0
+      },
+      "replay": {
+        "seconds": 0.024872292000000018,
+        "router_calls": 576,
+        "route_hits": 576,
+        "expert_layer_calls": 1152,
+        "cache_bytes": 817920
+      }
+    },
+    {
+      "baseline": {
+        "seconds": 0.02880929099999996,
+        "router_calls": 1152,
+        "route_hits": 0,
+        "expert_layer_calls": 1152,
+        "cache_bytes": 0
+      },
+      "replay": {
+        "seconds": 0.02458054200000004,
+        "router_calls": 576,
+        "route_hits": 576,
+        "expert_layer_calls": 1152,
+        "cache_bytes": 817920
+      }
+    },
+    {
+      "baseline": {
+        "seconds": 0.028083875000000036,
+        "router_calls": 1152,
+        "route_hits": 0,
+        "expert_layer_calls": 1152,
+        "cache_bytes": 0
+      },
+      "replay": {
+        "seconds": 0.024654167000000005,
+        "router_calls": 576,
+        "route_hits": 576,
+        "expert_layer_calls": 1152,
+        "cache_bytes": 817920
+      }
+    }
+  ],
+  "hit_rate": 0.5,
+  "output_bit_exact": true,
+  "baseline_median_tokens_per_s": 5225.184970640815,
+  "replay_median_tokens_per_s": 5858.292302911782,
+  "speedup": 1.1211645780634103,
+  "caveat": "Synthetic model with recurrent context, no attention/KV/SSD. Router reuse only; all expert layers and context updates executed. Not wired to oMLX."
+}
