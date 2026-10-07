@@ -1,0 +1,14 @@
+{
+ "k_per_step_with_miss": 1.76,
+ "clusters_per_step_with_miss": 1.15,
+ "steps_with_miss_per_tok": 33.2,
+ "packed_batches_per_tok": 38.1,
+ "A_unpacked_ms_tok": 6.65,
+ "A_packed_ms_tok": 7.62,
+ "A_saved_ms_tok": -0.97,
+ "base_ms_tok": 78.5,
+ "base_tps": 12.74,
+ "packed_ms_tok": 79.4,
+ "packed_tps": 12.59,
+ "pct_steps_multi_cluster": 0.133
+}
