@@ -28,3 +28,17 @@ requests): (a) absorption ≤ ~6% — currently argument-bounded; (b) the
 overlap bracket — sidecar-pread test; (c) 48GB bin (Tests A/D); (d)
 real-trace completion; (e) scorer A/B/D fail-close before any sweep is
 scored.
+
+## Update 2026-10-08 (cycles 49–52): the silicon arm, and the ledger-relevant aftermath
+
+| # | Claim (cycle) | Status | Notes |
+|---|--------------|--------|-------|
+| 15 | "T3 LIP v3 silicon arm: +0.34 tps = TRANSFERS by letter" (c49, bea1d24) | STANDS with explicit qualification | Measured ON median 15.98 vs OFF 15.64 (3x1024/arm, same-prompt family 87eb8e91, all finish=length). TRANSFERS is the mechanical pre-registered verdict (>=+0.30) and stands as recorded — but the SAME entry carried the honest statistical reading (bootstrap CI95 [-1.16,+0.80], P(d<=0)=0.45, observed sd ~0.43 -> 3-run floor ~0.7 tps): INCONCLUSIVE in substance. Do not cite "+0.34 TRANSFERS" without the CI. Artifacts: results/t3_lip_scored.json (incl. follow-ups: 507 provenance = pre-v3 attempt; demotion overhead <=0.17 ms/tok = -0.04 tps upper bound; T4's flags-off probe 15.78 in-band; T9's measured install exposure re-price below). |
+| 16 | KeyError root cause + freeze compliance (c47-49) | STANDS — CLOSED | Root cause confirmed by 3 independent agents (T3/T9/T4): per-install front-insert evicts before gather. v3 (post-call-tail demotion, d9850d99) is the fix the freeze specified; arm ran under the guarded runbook. Full autopsy: results/T3_DIP_HANDOFF.md (8182706, updated 72b8076). |
+| 17 | "Per-miss value under DB-ON bounded [0.58, 0.71] ms/miss" (T5's bound, cited in my c52) | SETTLED — MEASURED ~0.65 | T9's corrected BATCH1 window (b6bd72f: m=38.2 from the server's lifetime, not the cross-process 9.58 artifact) gives D/m = 0.124–0.134 ms/miss install exposure -> S = 0.52 + 0.13 = ~0.65 ms/miss, mid-interval of the bound. Consequence for #3/#15-scale claims: any online-policy miss-rate gain prices at ~+0.10 tps per miss/tok saved (warm-suffix); LIP's -1.291 miss/tok = +0.21 tps expected = exactly the 3-run power floor; real short-prompt regime ~0. The eviction lane remains dead in tps terms under MEASURED constants — every DROP verdict (#3 family, c36-38 idle-decay, admission v1-v3) is now measured-priced, not model-priced. |
+| 18 | "8-run/arm LIP resolving session would settle +0.34 vs 0" (c49) | RETIRED — SUPERSEDED by M1 | Registered in the DIP handoff: if M1's DIP ships code-green, score DIP; re-running LIP v3 at n=8 has no independent value. |
+
+Net ledger state after the arm: no standing T3 claim has been weakened by the silicon
+result; the ranking-flip/DROP family (#3, #17) is now grounded in MEASURED constants
+(S ~0.65 ms/miss), and the only conditional claims (#8/#9, absorption/compute) are
+unchanged — their settlers (matched-window logical counters, Tests B/D) remain queued.
