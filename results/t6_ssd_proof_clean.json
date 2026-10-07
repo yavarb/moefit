@@ -1,0 +1,121 @@
+{
+  "host": "santacruz",
+  "kind": "REAL_CHECKPOINT_READS_WITH_PHYSICAL_DISK0_COUNTERS",
+  "idle_read_Bps": 13160859.928897087,
+  "workers": 4,
+  "experts_per_batch": 10,
+  "layers": 48,
+  "validation_sha256": [
+    "40e212118f6ba8632c1caecda8bd97a669d184ee2430f3d88c47f1bd392d1f89",
+    "bf84a59b92774755f64c35c74475028b0d20284da8c3ae21a5980b6cb4b41684",
+    "00972b6a572959fd343ed14f37b540262ed434c828c8a8a5475015433dc50df5"
+  ],
+  "cache_control": "F_NOCACHE=1,F_RDAHEAD=0; no global purge",
+  "rows": [
+    {
+      "rep": 0,
+      "order": "random",
+      "arm": "OFF",
+      "seconds": 2.8991042500000006,
+      "useful_bytes": 10616832000,
+      "idle_before_Bps": 634718.1502555739,
+      "useful_GBps": 3.6621077010252385,
+      "physical_bytes": 11126001664,
+      "physical_over_useful": 1.0479587191358024,
+      "physical_GBps": 3.8377376957037668,
+      "checksum": 4540168
+    },
+    {
+      "rep": 0,
+      "order": "random",
+      "arm": "ON",
+      "seconds": 2.975927125,
+      "useful_bytes": 10616832000,
+      "idle_before_Bps": 1587547.4363945494,
+      "useful_GBps": 3.567571232108044,
+      "physical_bytes": 10983636992,
+      "physical_over_useful": 1.0345493827160495,
+      "physical_GBps": 3.690828615972913,
+      "checksum": 4540168
+    },
+    {
+      "rep": 0,
+      "order": "sequential",
+      "arm": "OFF",
+      "seconds": 2.9905490839999995,
+      "useful_bytes": 10616832000,
+      "idle_before_Bps": 38043929.52096196,
+      "useful_GBps": 3.550127987131878,
+      "physical_bytes": 11232043008,
+      "physical_over_useful": 1.0579467592592593,
+      "physical_GBps": 3.7558463989417676,
+      "checksum": 4543738
+    },
+    {
+      "rep": 0,
+      "order": "sequential",
+      "arm": "ON",
+      "seconds": 1.9782612919999991,
+      "useful_bytes": 10616832000,
+      "idle_before_Bps": 6894826.383184786,
+      "useful_GBps": 5.366749095750898,
+      "physical_bytes": 10719096832,
+      "physical_over_useful": 1.0096323302469137,
+      "physical_GBps": 5.4184433953934965,
+      "checksum": 4543738
+    },
+    {
+      "rep": 1,
+      "order": "sequential",
+      "arm": "ON",
+      "seconds": 1.9633445840000014,
+      "useful_bytes": 10616832000,
+      "idle_before_Bps": 26186.109042534514,
+      "useful_GBps": 5.40752351192978,
+      "physical_bytes": 10644447232,
+      "physical_over_useful": 1.0026010802469136,
+      "physical_GBps": 5.421588914521381,
+      "checksum": 4543738
+    },
+    {
+      "rep": 1,
+      "order": "sequential",
+      "arm": "OFF",
+      "seconds": 2.6841502499999983,
+      "useful_bytes": 10616832000,
+      "idle_before_Bps": 75362.81923813731,
+      "useful_GBps": 3.955379174470582,
+      "physical_bytes": 10951192576,
+      "physical_over_useful": 1.0314934413580248,
+      "physical_GBps": 4.079947676550524,
+      "checksum": 4543738
+    },
+    {
+      "rep": 1,
+      "order": "random",
+      "arm": "ON",
+      "seconds": 3.0121172079999994,
+      "useful_bytes": 10616832000,
+      "idle_before_Bps": 793257.8490872316,
+      "useful_GBps": 3.5247074621805363,
+      "physical_bytes": 11056922624,
+      "physical_over_useful": 1.0414521604938272,
+      "physical_GBps": 3.670814201596634,
+      "checksum": 4540168
+    },
+    {
+      "rep": 1,
+      "order": "random",
+      "arm": "OFF",
+      "seconds": 2.7401101249999975,
+      "useful_bytes": 10616832000,
+      "idle_before_Bps": 60477.435485945316,
+      "useful_GBps": 3.87460047796437,
+      "physical_bytes": 11058483200,
+      "physical_over_useful": 1.041599151234568,
+      "physical_GBps": 4.035780569220739,
+      "checksum": 4540168
+    }
+  ],
+  "caveat": "Physical counters are whole disk, include metadata/background; before/after counter subprocess overhead outside useful timing. No decode speed claim."
+}
