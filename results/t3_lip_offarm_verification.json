@@ -1,0 +1,23 @@
+{
+ "kind": "T3 LIP OFF-arm usability verification (read-only; no silicon IO)",
+ "off_arm_candidate": "/tmp/moefit-bench/t9_on_A2.json (T9 ON2, default env, merged 214e8823, flags off)",
+ "verified": {
+  "runs": 3,
+  "tokens_each": 1024,
+  "finish_reason": "length",
+  "tps": [
+   15.52,
+   16.63,
+   15.64
+  ],
+  "prompt_sha256": null,
+  "collector": "t9_collect.py (pre-hash fork)"
+ },
+ "prompt_identity": {
+  "method": "byte-identical prompt literal verified by regex extraction + diff between t9_collect.py and experiments/collect_silicon_run.py",
+  "full_sha256": "87eb8e913d26cca9fc5c9eff4f245d2249848a1a6e4110755c24b7691351117a",
+  "expected_blob_field": "87eb8e913d26cca9",
+  "note": "any LIP ON blob collected with the current repo collector MUST carry prompt_sha256 == 87eb8e913d26cca9 (16-hex truncation); matching that value makes the t9_on_A2 OFF arm a valid same-prompt match under --accept-unhashed-prompt (attestation now grounded in a verified hash, not just convention)"
+ },
+ "scoring": "python3 experiments/score_lip_aba.py --off t9_on_A2.json --on lip_on.json --accept-unhashed-prompt --stats-off offS0 offS1 --stats-on onS0 onS1"
+}
