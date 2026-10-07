@@ -1,0 +1,44 @@
+{
+  "kind": "implemented routing cache; local CPU kernel measurement and trace replay, NOT LLM silicon decode",
+  "trace_sha256": "6d6c93c7887b247c41571bcc5e5b78bd36e3291831eacfbad897893638bacca9",
+  "trace_replay": [
+    {
+      "pass_id": 0,
+      "positions": 143,
+      "hits": 0,
+      "elapsed_s": 0.0012948340000000017
+    },
+    {
+      "pass_id": 1,
+      "positions": 143,
+      "hits": 143,
+      "elapsed_s": 0.0006567920000000033
+    },
+    {
+      "pass_id": 2,
+      "positions": 143,
+      "hits": 143,
+      "elapsed_s": 0.000624874999999997
+    }
+  ],
+  "real_trace_caveat": "Same captured payload reinserted/retrieved; does not establish cross-run model determinism or weights-as-gating equivalence.",
+  "local_kernel": {
+    "positions": 192,
+    "layers": 48,
+    "experts": 512,
+    "hidden_width": 128,
+    "top_k": 10,
+    "hits": 96,
+    "hit_rate": 0.5,
+    "compute_calls": 96,
+    "exact_positions": 192,
+    "baseline_seconds": 0.078841541,
+    "replay_seconds": 0.039727625000000016,
+    "baseline_routing_positions_per_s": 2435.2644248797724,
+    "replay_routing_positions_per_s": 4832.909090337012,
+    "speedup": 1.9845520843493656,
+    "cache_accounted_bytes": 436832
+  },
+  "deployment": "Not wired into oMLX. Enable only deterministic execution with full context namespace; route hits do not replace expert compute or KV updates. Full-prefix equality; no speculative suffix reuse.",
+  "verdict": "KEEP prototype for repeated-prefix routing; end-to-end LLM tok/s unmeasured."
+}
