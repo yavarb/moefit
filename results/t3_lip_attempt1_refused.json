@@ -1,0 +1,41 @@
+{
+ "test": "T3 LIP admission A/B/A",
+ "kind": "ON (OMLX_ADMISSION=1, env at process start) vs OFF (unset), default DB-ON env, restored patched server; Chief mandate",
+ "prereg_chain": [
+  "results/T3_ADMISSION_SILICON_PREREG.md",
+  "results/t3_admission_prereg_amendment1.json (34e7523)",
+  "results/t3_admission_power_analysis.json (2822e66)"
+ ],
+ "prediction": {
+  "single_prompt_band_tps": [
+   -0.04,
+   0.17
+  ],
+  "decision_thresholds": {
+   "transfers": 0.3,
+   "falsifies": -0.3
+  },
+  "power": {
+   "three_run_floor_tps": 0.21,
+   "wash_is_forced_below": 0.17
+  }
+ },
+ "median_off_tps": 15.64,
+ "median_on_tps": 3.91,
+ "delta_tps": null,
+ "verdict": "SCORING REFUSED (fail-closed eligibility)",
+ "prompt_note": "prompt identity NOT mechanically verified (pre-prompt_sha256 blobs; operator attestation)",
+ "counters": {},
+ "errors": [
+  "run 0: stream incomplete (finish_reason=None) - FAIL CLOSED",
+  "run 1: stream incomplete (finish_reason=None) - FAIL CLOSED",
+  "run 2: stream incomplete (finish_reason=None) - FAIL CLOSED",
+  "run 0: stream integrity problems: missing_or_unsupported_finish; no_authoritative_count",
+  "run 1: stream integrity problems: missing_or_unsupported_finish; no_authoritative_count",
+  "run 2: stream integrity problems: missing_or_unsupported_finish; no_authoritative_count",
+  "t3_lip_on.json: actual run tokens 5 < 1024 (request max_tokens does NOT gate) - FAIL CLOSED",
+  "t3_lip_on.json: actual run tokens 4 < 1024 (request max_tokens does NOT gate) - FAIL CLOSED",
+  "t3_lip_on.json: actual run tokens 6 < 1024 (request max_tokens does NOT gate) - FAIL CLOSED"
+ ],
+ "provenance": "Attempt 1 of the LIP ON arm, executed by chief-silicon-exec at ~21:00-21:02 box time CONCURRENTLY with design_inventor's t2_sidecar_aba.py (started 20:59, still running at 21:03) \u2014 the two scripts' server restarts collided. All 3 ON runs truncated at 4-6 tokens with finish_reason=None; tps 3.79-6.66 is stream-death artifact, NOT LIP performance. The scorer's fail-closed eligibility refused to emit any verdict. lip_onS0.json captured STALE old-process counters (file not yet rewritten by the new process); lip_onS1.json (24,403 hits / 4,174 misses) is from the broken window and carries NO information about LIP. Server restored to stock (default env, DONE_LIP_ARM). ARM MUST BE RE-RUN in a non-overlapping window: restart with OMLX_ADMISSION=1 on the merged file (re-install from /tmp/omlx_t2_sidecar_plus_lip.py, md5 214e8823, since stock restore may have swapped the file back), 3x n=1024, snapshots before/after."
+}

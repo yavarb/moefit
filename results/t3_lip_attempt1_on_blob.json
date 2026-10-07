@@ -1,0 +1,173 @@
+{
+ "label": "T3 LIP ON (OMLX_ADMISSION=1, default IO_WORKERS) n1024",
+ "kind": "measured",
+ "timestamp": "2026-10-06T21:02:33-0700",
+ "host": "santacruz",
+ "ram_gib": 36.0,
+ "model": "Qwen3.8-Flash-Next-oQ4e-mtp",
+ "max_tokens": 1024,
+ "runs": [
+  {
+   "tokens": 5,
+   "count_source": "streamed_deltas",
+   "streamed_deltas": 5,
+   "ttft_s": 0.5794,
+   "decode_s": 1.022,
+   "decode_tps": 3.91,
+   "wall_s": 1.757,
+   "last_token_event_s": 1.601,
+   "n_control_chunks": 3,
+   "finish_reason": null,
+   "prompt_tokens": null,
+   "chunk_ts_s": [
+    0.0118,
+    0.0122,
+    0.5794,
+    0.7736,
+    1.0245,
+    1.2648,
+    1.6012,
+    1.7564
+   ],
+   "chunk_tokens": [
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0
+   ],
+   "per_token_ms": [
+    194.169,
+    250.858,
+    240.302,
+    336.448
+   ],
+   "gap_granularity": "per_token",
+   "timing_provenance": "client SSE chunk timestamps (transport-provisional; not verified token-level timing)",
+   "stream_integrity": {
+    "eligible": false,
+    "done": true,
+    "finish_reason": null,
+    "usage_tokens": null,
+    "parse_errors": 0,
+    "problems": [
+     "missing_or_unsupported_finish",
+     "no_authoritative_count"
+    ]
+   }
+  },
+  {
+   "tokens": 4,
+   "count_source": "streamed_deltas",
+   "streamed_deltas": 4,
+   "ttft_s": 0.266,
+   "decode_s": 0.45,
+   "decode_tps": 6.66,
+   "wall_s": 0.723,
+   "last_token_event_s": 0.716,
+   "n_control_chunks": 3,
+   "finish_reason": null,
+   "prompt_tokens": null,
+   "chunk_ts_s": [
+    0.0103,
+    0.0106,
+    0.266,
+    0.4205,
+    0.5678,
+    0.7165,
+    0.7225
+   ],
+   "chunk_tokens": [
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    0
+   ],
+   "per_token_ms": [
+    154.478,
+    147.253,
+    148.705
+   ],
+   "gap_granularity": "per_token",
+   "timing_provenance": "client SSE chunk timestamps (transport-provisional; not verified token-level timing)",
+   "stream_integrity": {
+    "eligible": false,
+    "done": true,
+    "finish_reason": null,
+    "usage_tokens": null,
+    "parse_errors": 0,
+    "problems": [
+     "missing_or_unsupported_finish",
+     "no_authoritative_count"
+    ]
+   }
+  },
+  {
+   "tokens": 6,
+   "count_source": "streamed_deltas",
+   "streamed_deltas": 6,
+   "ttft_s": 0.4494,
+   "decode_s": 1.318,
+   "decode_tps": 3.79,
+   "wall_s": 1.778,
+   "last_token_event_s": 1.767,
+   "n_control_chunks": 3,
+   "finish_reason": null,
+   "prompt_tokens": null,
+   "chunk_ts_s": [
+    0.007,
+    0.0074,
+    0.4494,
+    0.6391,
+    0.9483,
+    1.2174,
+    1.4168,
+    1.7674,
+    1.7782
+   ],
+   "chunk_tokens": [
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    0
+   ],
+   "per_token_ms": [
+    189.629,
+    309.266,
+    269.101,
+    199.331,
+    350.646
+   ],
+   "gap_granularity": "per_token",
+   "timing_provenance": "client SSE chunk timestamps (transport-provisional; not verified token-level timing)",
+   "stream_integrity": {
+    "eligible": false,
+    "done": true,
+    "finish_reason": null,
+    "usage_tokens": null,
+    "parse_errors": 0,
+    "problems": [
+     "missing_or_unsupported_finish",
+     "no_authoritative_count"
+    ]
+   }
+  }
+ ],
+ "decode_tps_median": 3.91,
+ "decode_tps_min": 3.79,
+ "decode_tps_max": 6.66,
+ "ttft_s_median": 0.4494,
+ "method": "greedy streaming chat completion; decode_tps = (tokens-1)/(first->last streamed token); per_token_ms from monotonic chunk timestamps",
+ "git_commit": null
+}

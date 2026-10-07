@@ -56,11 +56,13 @@ Patched:
             # recurrent misses are protected. A hit or recurrent miss
             # re-inserts MRU via the existing hit path. Cache-fullness
             # bypass: while free slots remain, insert MRU as stock (warm).
+            _margin = min(64, len(self.slot_of) - 1)
             slot_val = self.slot_of.pop(e)
             rest = list(self.slot_of.items())
             self.slot_of.clear()
+            self.slot_of.update(rest[:_margin])
             self.slot_of[e] = slot_val
-            self.slot_of.update(rest)
+            self.slot_of.update(rest[_margin:])
         self.warm = len(self.slot_of) == self.n_experts
         return slot
 ```
@@ -86,3 +88,25 @@ finish_reason, stream_integrity), fail-closed scorer gates. Verdict per the
 prereg decision rules: |d| < 0.30 tps = WASH (expected; the sim gain is a
 multi-prompt steady-state effect the single-prompt bench cannot resolve);
 >= +0.30 = TRANSFERS; ON < OFF by > 0.30 = falsifies single-prompt transfer.
+
+
+## V2 CORRECTION (2026-10-06 ~21:20 PT, from SILICON failure)
+
+V1 (front insert) CRASHES on the windowed path: `_glu_routes` reads
+`slot_of[e]` for the call's pending misses AFTER later installs in the
+same read-ahead window (48) run; a front-inserted first-lifetime miss
+is the immediate next victim and gets evicted by the next install in
+its own burst -> `KeyError: <expert>` -> request dies at ~5-8 tokens.
+Reproduced 3x (attempts 1-3; server_error chunk + traceback in
+/tmp/moefit-bench/pair_lip.log). NOT a concurrency or memory artifact
+— default env completes under identical conditions (pair test:
+finish=length vs server_error).
+
+V2: insert after the 64 oldest entries (margin > window 48, well below
+the cap-143 hot core) — the in-flight expert survives its own gather
+burst while remaining in the next-victim class. Composed file
+patches/omlx_t2_sidecar_plus_lip.py md5 c704058a3378731c4629578a72861ae7
+(deployed on Santa Cruz; box reconciler independently reached the same
+diagnosis: "KeyError in _glu_routes slot_of until demotion is moved
+after _ensure_ids install loop"). LIP retries on the box are FORBIDDEN
+by the reconciler until this fix is run under a coordinated window.

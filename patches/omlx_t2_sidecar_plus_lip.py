@@ -491,14 +491,22 @@ class ExpertCache:
             and self._miss_hist.get(e, 0) == 1
             and not self.free
         ):
-            # LIP insertion (Qureshi ISCA'07): first-lifetime miss installs at
-            # the LRU position (next eviction victim), not MRU. Warm/free-slot
-            # phase inserts stock.
+            # LIP insertion (Qureshi ISCA'07) with IN-FLIGHT MARGIN: a
+            # first-lifetime miss is installed LOW in the LRU order (next
+            # eviction victim class) instead of MRU, but not at the very
+            # front: _glu_routes reads slot_of[e] for this call's pending
+            # misses AFTER later installs in the same read-ahead window
+            # (default 48) have run, and a front insert would be evicted
+            # by the next install before its gather -> KeyError (found on
+            # silicon, 2026-10-06). Margin 64 > window 48 protects the
+            # in-flight expert while keeping it far below the hot core.
+            _margin = min(64, len(self.slot_of) - 1)
             slot_val = self.slot_of.pop(e)
             rest = list(self.slot_of.items())
             self.slot_of.clear()
+            self.slot_of.update(rest[:_margin])
             self.slot_of[e] = slot_val
-            self.slot_of.update(rest)
+            self.slot_of.update(rest[_margin:])
         self.warm = len(self.slot_of) == self.n_experts
         return slot
 
