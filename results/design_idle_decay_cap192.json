@@ -1,0 +1,22 @@
+{
+ "cap": 192,
+ "kind": "simulated",
+ "lru": {
+  "miss_global": 41.11,
+  "miss_suffix": 28.296,
+  "tps_suffix": 17.39,
+  "tps_global": 14.5
+ },
+ "omlx_decay": {
+  "miss_global": 41.015,
+  "miss_suffix": 28.181,
+  "tps_suffix": 17.42,
+  "tps_global": 14.51
+ },
+ "idle_decay": {
+  "miss_global": 40.993,
+  "miss_suffix": 28.175,
+  "tps_suffix": 17.42,
+  "tps_global": 14.52
+ }
+}
