@@ -89,5 +89,33 @@
   },
   "runtime_s": 0.3
  },
- "probe_verdict": "ridge probe has ~no next-token signal on synth: precision 0.002 overall, 1.1% conditioned on non-resident installs (coact baseline p@10=0.157, 14x better); 83% of picks re-install already-resident hot experts; serial-model net NEGATIVE at both budgets"
+ "probe_verdict": "ridge probe has ~no next-token signal on synth: precision 0.002 overall, 1.1% conditioned on non-resident installs (coact baseline p@10=0.157, 14x better); 83% of picks re-install already-resident hot experts; serial-model net NEGATIVE at both budgets",
+ "probe_throttle_sweep": {
+  "note": "budget-capped probe prefetch (allow N new installs/token), serial model, compute 18.1; baseline no-prefetch miss 57.4 tps 12.88",
+  "allow_all": {
+   "miss": 67.9,
+   "tps": 11.49
+  },
+  "allow_71": {
+   "miss": 67.9,
+   "tps": 11.49
+  },
+  "allow_20": {
+   "miss": 62.0,
+   "tps": 12.23
+  },
+  "allow_0": {
+   "miss": 57.4,
+   "tps": 12.88
+  },
+  "verdict": "monotone: ANY probe prefetching hurts; no budget makes it pay on synth traffic"
+ },
+ "packed_layout": {
+  "k_per_step_with_miss": 1.76,
+  "clusters_per_step_with_miss": 1.15,
+  "A_merge_bound_tps": 13.42,
+  "A_merge_bound_pct": "+4.2% (perfect merge of ALL co-misses)",
+  "covisit_cluster_packing_tps": 12.59,
+  "verdict": "co-visit cluster packing is NET-NEGATIVE vs per-step serial A (86.7% of miss-steps already single-cluster); the real byte-side lever is duty-cycle: 2x duty on io 36.5 ms/tok -> 16.8 tps (+31%)"
+ }
 }
