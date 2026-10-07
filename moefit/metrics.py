@@ -241,6 +241,36 @@ def serial_model_from_misses(M, constants=None, compute_ms=18.1):
     )
 
 
+def serial_signature_check(tok_gap_ms):
+    """S-vs-Q discriminator (T7's falsifiable signature, 2026-10-07).
+
+    Model S (serial-latency miss resolution) predicts a bursty per-token
+    gap: p95/mean ~ 1.47-1.51 (locked synth, cap143 true-LRU). A
+    smoothed byte-backlog model (Q) with the same mean predicts
+    p95/mean ~ 1.0. Accepts a tok_gap_ms stats dict (from
+    latency_stats_from_deltas) or a raw list of per-token gaps.
+    Returns dict(ratio, verdict) with verdict in
+    {"serial (S)", "byte-backlog (Q)", "ambiguous"}.
+    Threshold 1.3 per results/MEASURED_VS_SIM_36GB.md.
+    """
+    if isinstance(tok_gap_ms, dict):
+        mean, p95 = tok_gap_ms["mean"], tok_gap_ms["p95"]
+    else:
+        s = latency_stats_from_deltas(tok_gap_ms)
+        mean, p95 = s["mean"], s["p95"]
+    if mean <= 0:
+        raise ValueError("mean must be > 0")
+    ratio = round(p95 / mean, 3)
+    if ratio >= 1.3:
+        verdict = "serial (S)"
+    elif ratio <= 1.1:
+        verdict = "byte-backlog (Q)"
+    else:
+        verdict = "ambiguous"
+    return dict(p95_over_mean=ratio, verdict=verdict,
+                s_threshold=1.3, q_threshold=1.1)
+
+
 def gap_report(sim: dict, silicon: dict) -> dict:
     """Field-by-field sim↔silicon comparison + roofline attribution.
 
@@ -307,6 +337,7 @@ def gap_report(sim: dict, silicon: dict) -> dict:
     tg = silicon.get("tok_gap_ms")
     if tg:
         rep["tok_gap_ms"] = tg
+        rep["s_vs_q_signature"] = serial_signature_check(tg)
     return rep
 
 
@@ -357,4 +388,10 @@ def format_gap_report(rep: dict) -> str:
         lines.append(f"  tok-gap ms: p50 {tg['p50']} p90 {tg['p90']}"
                      f" p95 {tg['p95']} p99 {tg['p99']}"
                      f" max {tg['max']} (n={tg['n']})")
+    sig = rep.get("s_vs_q_signature")
+    if sig:
+        lines.append(f"  S-vs-Q signature: p95/mean {sig['p95_over_mean']}"
+                     f" -> {sig['verdict']}"
+                     f" (S predicts ~1.5, byte-backlog ~1.0;"
+                     f" thresholds {sig['s_threshold']}/{sig['q_threshold']})")
     return "\n".join(lines)

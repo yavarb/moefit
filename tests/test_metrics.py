@@ -105,10 +105,37 @@ def test_serial_model_from_misses():
     assert ser["tps"] == round(1000.0 / 20.284, 2)
 
 
+def test_serial_signature_check():
+    import numpy as np
+    from moefit.metrics import serial_signature_check, latency_stats_from_deltas
+    # S-shaped bursty gaps: mostly ~70ms, miss-burst tail to ~180ms
+    rng = np.random.default_rng(3)
+    gaps = list(np.concatenate([
+        rng.normal(70, 8, 200), rng.normal(150, 20, 30)]).clip(5, None))
+    s = latency_stats_from_deltas(gaps)
+    sc = serial_signature_check(s)
+    assert sc["verdict"] == "serial (S)", sc
+    # flat gaps -> byte-backlog
+    flat = latency_stats_from_deltas([78.0] * 100)
+    sc2 = serial_signature_check(flat)
+    assert sc2["verdict"] == "byte-backlog (Q)", sc2
+    # raw list input path
+    assert serial_signature_check(gaps)["verdict"] == "serial (S)"
+    # wired into gap_report output
+    rec = silicon_record_from_measured(SILICON_FIXTURE, "fixture")
+    rec["tok_gap_ms"] = s
+    sim = sim_record_from_row(SIM_ROW, "48GB-M4M", "fixture")
+    rep = gap_report(sim, rec)
+    assert rep["s_vs_q_signature"]["verdict"] == "serial (S)"
+    txt = format_gap_report(rep)
+    assert "S-vs-Q signature" in txt
+
+
 if __name__ == "__main__":
     for fn in [test_validate_record, test_sim_record_from_row,
                test_silicon_record_and_gap,
                test_silicon_ssd_blob_and_measured_accounting,
-               test_serial_model_from_misses]:
+               test_serial_model_from_misses,
+               test_serial_signature_check]:
         fn()
         print("ok", fn.__name__)
