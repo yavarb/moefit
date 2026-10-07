@@ -85,6 +85,25 @@ class RoutingReplayCache:
         self.entries.clear()
         self.bytes = 0
 
+    def resize(self, max_bytes):
+        """Set accounted capacity and evict LRU entries now; return removed count.
+
+        Zero releases all cache-owned entries and disables admission until grown.
+        Returned arrays/live session prefixes can retain memory outside this
+        budget. No RSS guarantee, KV management, or thread safety is implied.
+        """
+        if (not isinstance(max_bytes, (int, np.integer))
+                or isinstance(max_bytes, (bool, np.bool_)) or max_bytes < 0):
+            raise ValueError('max_bytes must be a nonnegative integer')
+        self.max_bytes = int(max_bytes)
+        removed_count = 0
+        while self.bytes > self.max_bytes:
+            _, (_, removed) = self.entries.popitem(last=False)
+            self.bytes -= removed
+            self.evictions += 1
+            removed_count += 1
+        return removed_count
+
     def invalidate_namespace(self, namespace):
         """Remove cached routes for exactly one context; return removed count.
 

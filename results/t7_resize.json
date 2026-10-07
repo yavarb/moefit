@@ -1,0 +1,26 @@
+{
+  "kind": "EXECUTED tiny synthetic lifecycle checks, no timing",
+  "rows": [
+    {
+      "compact": false,
+      "initial_entries": 8,
+      "initial_bytes": 2896,
+      "shrunk_entries": 2,
+      "shrunk_bytes": 604,
+      "survivor_hits": 2,
+      "zero_budget_hits": 0,
+      "regrown_repeat_hits": 8
+    },
+    {
+      "compact": true,
+      "initial_entries": 8,
+      "initial_bytes": 2176,
+      "shrunk_entries": 2,
+      "shrunk_bytes": 532,
+      "survivor_hits": 2,
+      "zero_budget_hits": 0,
+      "regrown_repeat_hits": 8
+    }
+  ],
+  "caveat": "Accounted cache capacity, not process RSS; external route arrays and session prefixes may retain memory. No backend memory-pressure hook installed."
+}
