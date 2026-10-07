@@ -1,0 +1,42 @@
+{
+  "kind": "MEASURED T6 coalescer physical SSD on Santa Cruz",
+  "sim_local_claim": "~10.5 GB/s (1.91x) on CACHED file \u2014 INVALID as SSD proof",
+  "baseline_random_chunk_peak_GBps": 5.02,
+  "real_checkpoint": {
+    "verdict": "FAIL_NO_MARGIN",
+    "median": {
+      "OFF": {
+        "useful": 3.1059428301452034,
+        "physical": 4.666489803875149,
+        "phys_ratio": 1.5024965277777778
+      },
+      "ON": {
+        "useful": 2.695086882856069,
+        "physical": 4.437832205347892,
+        "phys_ratio": 1.6499675925925925
+      }
+    },
+    "speedup_physical_ON_vs_OFF": 0.9510000861166834,
+    "vs_baseline_peak": {
+      "OFF": 0.929579642206205,
+      "ON": 0.8840303197904168
+    },
+    "physical_approx_useful": true,
+    "host": "santacruz",
+    "batches": 64
+  },
+  "synthetic_fnocache_note": {
+    "verdict": "FAIL_CACHE_ONLY",
+    "median_physical": {
+      "individual": 0.0,
+      "lanes": 0.0013723283961302748
+    },
+    "median_useful": {
+      "individual": 5.34885624493713,
+      "lanes": 8.98656997253847
+    },
+    "note": "Synthetic 288MB fixture completed with physical\u22480 \u2192 page/controller cache; NOT used for PASS/FAIL"
+  },
+  "decision": "PASS requires real SSD coalescer beat serial by clear margin on physical bytes/time. Measured physical ON/OFF\u22480.95x near 5.02 peak \u2192 FAIL (no coalescer win on silicon).",
+  "merge_worthy": false
+}

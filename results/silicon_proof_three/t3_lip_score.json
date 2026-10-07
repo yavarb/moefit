@@ -1,0 +1,23 @@
+{
+  "kind": "BLOCKER \u2014 T3 LIP silicon A/B/A incomplete",
+  "sim_claim": "WASH predicted \u22120.05..+0.25 tps on 15.55 baseline (design_admission_lip / T3_ADMISSION_SILICON_PREREG)",
+  "silicon_arm": "OMLX_ADMISSION=1 LIP insertion (code merged in moe_expert_offload.md5 214e8823)",
+  "completed": false,
+  "blocker": {
+    "evidence": [
+      "HTTP 507 Insufficient Storage after T2 sidecar A/B/A + repeated LIP restarts: dynamic ceiling ~18GB < model 23.77GB",
+      "Address-already-in-use races during fast restart cycles",
+      "Partial LIP ON collect interrupted by T2 SLOT_LOCK mid-run (run2 tokens=0)"
+    ],
+    "reclaimable_note": "Stock restore succeeded after 45s purge cooldown (warm 86.6s). LIP needs another clean window."
+  },
+  "partial_lip_on_valid_tps": [
+    15.66,
+    14.49
+  ],
+  "partial_median": 15.075,
+  "informal_vs_baseline": -0.4750000000000014,
+  "scoring": "SCORING REFUSED \u2014 need \u22653 n\u22651024 matched A/B/A pairs; partial only",
+  "expected_if_complete": "WASH (prereg)",
+  "merge_worthy": "pending \u2014 do not merge LIP on partial"
+}

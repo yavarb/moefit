@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-10-07 — Silicon-proof three (README honesty)
+
+Santa Cruz measured silicon-proof for three invention tracks
+([results/silicon_proof_three/](results/silicon_proof_three/)):
+
+- **T9/T4 staged IO / double-buffer:** TRANSFERS. ON ~15.75 / ON2 ~15.64
+  vs OFF (`IO_WORKERS=1`) ~9.2 tok/s; paired Δ median +6.54. Keep the
+  default IO pool. Confirms the **15.55** n=1024 steady baseline already
+  includes oMLX 0.7.0 default-on staging (not a new additive patch).
+  Caveat: OFF removes the full pool, so Δ ≫ install-only band.
+- **T6 coalescer:** FAIL on physical SSD (OFF 4.67 / ON 4.44 GB/s vs
+  5.02 peak). Cached ~10.5 GB/s claims invalid as SSD. Not merge-worthy.
+- **T3 LIP:** BLOCKER (KeyError / HTTP 507); formal score refused — do
+  not claim a silicon win.
+
+README 36 GB headline updated from short-run **13.0** (n=128) to steady
+**15.55** (n=1024; `results/measured_santa_cruz_36gb_n1024.json`).
+
 ## 2026-10-07 — Ship serial miss model as default simulator
 
 `experiments/sim_paging.py` now defaults to `--time-model serial`:

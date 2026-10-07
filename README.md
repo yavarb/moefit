@@ -42,7 +42,7 @@ report measured numbers back to me.
 | Your Mac | Experts kept in RAM per layer | Decode (LRU) | Notes |
 |---|---|---|---|
 | M4 Max, 128 GB | all (model fits) | **57.4 tok/s — measured** | baseline; you don’t need moefit |
-| M4 Max, 36 GB | 143 (fraction 0.28) | **13.0 tok/s — measured** ([results/measured_santa_cruz_36gb.json](results/measured_santa_cruz_36gb.json)) | oMLX 0.7.0 expert offload, PLE table on SSD, MTP off; idle box (~85% free before load) |
+| M4 Max, 36 GB | 143 (fraction 0.28) | **15.55 tok/s — measured** ([results/measured_santa_cruz_36gb_n1024.json](results/measured_santa_cruz_36gb_n1024.json)) | oMLX 0.7.0 expert offload with **default IO pool** (IO_WORKERS=12), PLE on SSD, MTP off; n=1024 steady (median of 15.73/15.42/15.55). Prior n=128 short-run was 13.0 |
 | M4 Max, 48 GB | 192 | **~15.9 tok/s — simulated (serial model)** | stock oMLX; bandwidth-model ideal-pipelining ceiling ~52–55 tok/s |
 | M4 Max, 48 GB | 128 | **~11.8 tok/s — simulated (serial model)** | ceiling ~32 tok/s |
 | M4 Pro, 32 GB | 128 | **~9.7 tok/s — simulated (serial model)** | usable for patient agent loops; ceiling ~26 tok/s |
@@ -52,7 +52,7 @@ Rows below 128 GB are re-priced under the serial-latency model (see Status); the
 
 The limit is your chip’s memory bandwidth, not clever paging math: each token still reads about 1.3 GB of weights through unified RAM. Paging only decides whether you stall waiting for SSD. Full table and methods: [SETUP.md](SETUP.md#what-the-simulation-says).
 
-**Status:** two rows are measured on silicon: the 128 GB baseline and the 36 GB paging run (M4 Max 36 GB “Santa Cruz”, oMLX 0.7.0 expert offload at 0.28 residency, median of three 128-token greedy runs; details below). The other paging rows are from a simulator calibrated within ~4% of the 128 GB baseline, replaying real router traces. At the **matched** 36 GB config (cap 143/layer), the default serial model predicts **12.9 tok/s** (LRU, true-refresh) vs **13.0 tok/s measured** (~1%; [results/sim_paging_matched_cap143.json](results/sim_paging_matched_cap143.json)). The old bandwidth/overlap model was ~2.8× optimistic; that path remains as `--time-model bandwidth`. DRAM full-fit calibration is unchanged (~55 sim / 57.4 measured). Details: [results/MEASURED_VS_SIM_36GB.md](results/MEASURED_VS_SIM_36GB.md). Next: a 48 GB M4 Max silicon run.
+**Status:** two rows are measured on silicon: the 128 GB baseline and the 36 GB paging run (M4 Max 36 GB “Santa Cruz”, oMLX 0.7.0 expert offload at 0.28 residency). Prefer **n≥1024** for the steady figure: **15.55 tok/s** median ([results/measured_santa_cruz_36gb_n1024.json](results/measured_santa_cruz_36gb_n1024.json)); earlier n=128/256 runs understated at ~12.7–13.0. That 15.55 number **already includes** oMLX 0.7.0’s default staged-IO / IO worker pool (DB-ON) — silicon A/B/A confirms keeping the default pool (see Silicon-proof below), not a new additive patch. The other paging rows are from a simulator calibrated within ~4% of the 128 GB baseline, replaying real router traces. At the matched 36 GB config (cap 143/layer), the default serial model predicts **12.9 tok/s** vs the short-run **13.0** band (~1%; [results/sim_paging_matched_cap143.json](results/sim_paging_matched_cap143.json)) — it does **not** yet describe the n=1024 DB-ON steady point. The old bandwidth/overlap model was ~2.8× optimistic; that path remains as `--time-model bandwidth`. DRAM full-fit calibration is unchanged (~55 sim / 57.4 measured). Details: [results/MEASURED_VS_SIM_36GB.md](results/MEASURED_VS_SIM_36GB.md). Next: a 48 GB M4 Max silicon run.
 
 ---
 
@@ -62,7 +62,7 @@ The limit is your chip’s memory bandwidth, not clever paging math: each token 
 |---|---|
 | **128 GB+** | Don’t use this. Load the model normally. |
 | **64 GB / 48 GB** | Works. ~12–16 tok/s simulated (serial model) at 128–192 experts per layer — slower than the older bandwidth-model table suggested; measured run pending. |
-| **36 GB (M4 Max)** | Runs. 13.0 tok/s measured idle with oMLX expert offload at 143 experts per layer (fraction 0.28). |
+| **36 GB (M4 Max)** | Runs. **15.55 tok/s** measured idle steady (n=1024) with oMLX expert offload at 143 experts per layer (fraction 0.28); keep the default IO pool. |
 | **32 GB** | Usable for patient agent loops at ~10 tok/s simulated (serial model); the older 14–26 range was bandwidth-model optimism. |
 | **24 GB** | Not recommended: ~5 tok/s simulated (serial model) on top of OS memory pressure. Prefer 32 GB+. |
 
@@ -138,16 +138,28 @@ Sizes come from the safetensors header.
 
 | | |
 |---|---|
-| Engine | oMLX 0.7.0, `moe_expert_offload_enabled`, resident fraction 0.28 (143 of 512 experts per layer), `qwen4_ple_ssd_offload`, MTP off, `--memory-guard aggressive --max-concurrent-requests 1` |
-| Decode | **13.0 tok/s** median of 3 runs (12.23–13.07), 128 greedy tokens each (`scripts/bench_decode.py`) |
-| Server-side figure for the same runs | 12.3–13.2 tok/s (oMLX log) |
-| Time to first token | 0.68 s median on an 88-token prompt (prefix-cached) |
-| Cold load | 4.7 s to first token on warm box (only resident experts load; PLE rows are gathered through mmap) |
+| Engine | oMLX 0.7.0, `moe_expert_offload_enabled`, resident fraction 0.28 (143 of 512 experts per layer), `qwen4_ple_ssd_offload`, MTP off, **default IO pool** (`OMLX_MOE_OFFLOAD_IO_WORKERS=12`), `--memory-guard aggressive --max-concurrent-requests 1` |
+| Decode (steady, prefer this) | **15.55 tok/s** median of 3× n=1024 greedy runs (15.73 / 15.42 / 15.55) |
+| Decode (short-run, understated) | **13.0 tok/s** median of 3× n=128 (12.23–13.07); n=256 SSD-instrumented run 12.71 |
+| Time to first token (n=128 set) | 0.68 s median on an 88-token prompt (prefix-cached) |
+| Cold load (n=128 set) | 4.7 s to first token on warm box (only resident experts load; PLE rows are gathered through mmap) |
 | Resident footprint | 22.6 GB actual (oMLX log: 19.0 GB of the 68 GB expert tables resident) |
 | Memory during run | ~85% free before load; ~18–19% free during decode (idle: Photo Booth / prior omlx stopped; CLIProxy left on :8317) |
-| Prior crowded run | 7.8 tok/s at fraction 0.18 when other apps held ~16 GB (live ceiling 20 GB); this idle re-run uses the 0.28 estimate.py target |
+| Prior crowded run | 7.8 tok/s at fraction 0.18 when other apps held ~16 GB (live ceiling 20 GB); idle 0.28 target is the estimate.py default |
 
-Raw JSON: [results/measured_santa_cruz_36gb.json](results/measured_santa_cruz_36gb.json); estimate: [results/estimate_santa_cruz_36gb.json](results/estimate_santa_cruz_36gb.json). Matched sim-vs-measured gap analysis at the same residency: [results/MEASURED_VS_SIM_36GB.md](results/MEASURED_VS_SIM_36GB.md); design experiments with numbers: [results/DESIGN_LEDGER.md](results/DESIGN_LEDGER.md).
+Raw JSON: [results/measured_santa_cruz_36gb_n1024.json](results/measured_santa_cruz_36gb_n1024.json) (steady); prior short-run [results/measured_santa_cruz_36gb.json](results/measured_santa_cruz_36gb.json); estimate: [results/estimate_santa_cruz_36gb.json](results/estimate_santa_cruz_36gb.json). Matched sim-vs-measured gap analysis (short-run calibration): [results/MEASURED_VS_SIM_36GB.md](results/MEASURED_VS_SIM_36GB.md); design experiments: [results/DESIGN_LEDGER.md](results/DESIGN_LEDGER.md).
+
+### Silicon-proof (Santa Cruz, 2026-10-06 evening ET)
+
+Three lab “invention” claims were scored on physical silicon. Artifacts: [results/silicon_proof_three/](results/silicon_proof_three/).
+
+| Claim | Measured | Verdict | Merge? |
+|---|---|---|---|
+| **T9/T4 staged IO / double-buffer** (default IO pool vs `IO_WORKERS=1`) | ON **15.75** / ON2 **15.64** tok/s vs OFF **9.2**; paired Δ median **+6.54** | **TRANSFERS** | **Yes — keep the default IO pool.** oMLX 0.7.0 is already default-on; this confirms the ~15.55 baseline rather than a new additive speedup. Caveat: OFF removes the full IO pool + read-ahead, so Δ ≫ the install-only prediction band (+0.33…+1.10). |
+| **T6 multi-expert coalescer** on real SSD | Physical useful/phys (F_NOCACHE / APPLE SSD BytesRead): OFF **4.67** / ON **4.44** GB/s vs prior random-chunk peak **5.02** | **FAIL** (does not beat serial) | **No.** Cached-file ~10.5 GB/s claims are **invalid as SSD proof**. |
+| **T3 LIP** (`OMLX_ADMISSION=1`) | KeyError / HTTP **507** under admission; only partial ON tps 15.66 / 14.49 | **BLOCKER** — formal score refused | **Do not claim a silicon win.** |
+
+Do not treat coalescer or LIP as shipped wins from this pass.
 
 Re-check docs against the shipped tables anytime:
 
