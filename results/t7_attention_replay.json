@@ -1,0 +1,88 @@
+{
+  "kind": "MEASURED constructed causal attention+MoE CPU model, not production LLM",
+  "tokens": 48,
+  "prefix_tokens": 24,
+  "layers": 4,
+  "hidden": 32,
+  "experts": 128,
+  "trials": [
+    {
+      "direct": {
+        "seconds": 0.006924582999999984,
+        "hits": 0,
+        "routers": 192,
+        "expert_layers": 192
+      },
+      "replay": {
+        "seconds": 0.006668457999999988,
+        "hits": 96,
+        "routers": 96,
+        "expert_layers": 192
+      }
+    },
+    {
+      "replay": {
+        "seconds": 0.006643625000000014,
+        "hits": 96,
+        "routers": 96,
+        "expert_layers": 192
+      },
+      "direct": {
+        "seconds": 0.00688029200000001,
+        "hits": 0,
+        "routers": 192,
+        "expert_layers": 192
+      }
+    },
+    {
+      "direct": {
+        "seconds": 0.006799165999999995,
+        "hits": 0,
+        "routers": 192,
+        "expert_layers": 192
+      },
+      "replay": {
+        "seconds": 0.006717250000000008,
+        "hits": 96,
+        "routers": 96,
+        "expert_layers": 192
+      }
+    },
+    {
+      "replay": {
+        "seconds": 0.006756958000000007,
+        "hits": 96,
+        "routers": 96,
+        "expert_layers": 192
+      },
+      "direct": {
+        "seconds": 0.006917292000000019,
+        "hits": 0,
+        "routers": 192,
+        "expert_layers": 192
+      }
+    },
+    {
+      "direct": {
+        "seconds": 0.007354042000000005,
+        "hits": 0,
+        "routers": 192,
+        "expert_layers": 192
+      },
+      "replay": {
+        "seconds": 0.0069079999999999975,
+        "hits": 96,
+        "routers": 96,
+        "expert_layers": 192
+      }
+    }
+  ],
+  "tokens_per_s": {
+    "direct": 6939.131671758235,
+    "replay": 7145.781383750783
+  },
+  "speedup": 1.029780341657674,
+  "hit_rate": 0.5,
+  "logits_and_all_kv_bit_exact": true,
+  "caveat": "Actual causal attention KV, but random tiny weights, no RoPE/GQA/quantization/production kernels. Prefix execution/cache seed excluded. Direct baseline bypasses replay entirely. No deployment or SSD measurement."
+}
