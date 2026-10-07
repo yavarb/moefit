@@ -1,0 +1,21 @@
+{
+  "kind": "MEASURED CPU metadata planner over recorded trace, not decode or physical IO",
+  "trace_sha256": "6d6c93c7887b247c41571bcc5e5b78bd36e3291831eacfbad897893638bacca9",
+  "positions": 143,
+  "layers": 48,
+  "cached_route_hit_rate": 1.0,
+  "planned_experts": 7436,
+  "eligible_demand_experts": 50329,
+  "demand_coverage": 0.14774781934868564,
+  "precision": 1.0,
+  "budget_experts_per_token": 52,
+  "plan_seconds": [
+    0.020061957999999963,
+    0.020092995999999724,
+    0.020573335999999942
+  ],
+  "planner_tokens_per_s": 7116.907802101885,
+  "accounted_cache_bytes": 4132128,
+  "assumptions": "Constructed repeated request over recorded payload; static first143 resident IDs/layer (not LRU simulation). Same-prefix determinism assumed, not model-tested. Planner issues no IO; physical waste/latency unmeasured.",
+  "handoff": "T2: begin current actual token, plan_reads before layer0, then execute route callbacks/expert work. Not prediction of unknown t+1. Consume only under backend deterministic namespace and demand-priority scheduling."
+}

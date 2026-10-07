@@ -132,6 +132,42 @@ class LayeredReplaySession:
         self.prefix = self.cache._extend_prefix(self.prefix, token_id)
         self.next_layer = 0
 
+    def plan_reads(self, resident, expert_bytes, max_bytes):
+        """Return (layer, expert, bytes) for cached CURRENT-prefix routes.
+
+        Pure metadata: no IO, installs, next-token prediction, or LRU refresh.
+        Caller must recheck residency before issuing IO and serialize against
+        demand. Available only immediately after begin_token, before layer0.
+        expert_bytes(layer, expert) supplies actual payload size. Budget is
+        hard; known nonresident experts are selected in layer/route order.
+        """
+        if self.next_layer != 0:
+            raise RuntimeError('plan before executing layer0')
+        if max_bytes < 0:
+            raise ValueError('negative byte budget')
+        if not self.enabled:
+            return ()
+        plan = []
+        used = 0
+        for layer in range(self.layers):
+            key = ((self.namespace, self.layers, layer), self.prefix)
+            entry = self.cache.entries.get(key)
+            if entry is None:
+                continue
+            seen = set()
+            for raw in entry[0].indices[0]:
+                expert = int(raw)
+                if expert in seen or expert in resident.get(layer, ()):
+                    continue
+                seen.add(expert)
+                size = expert_bytes(layer, expert)
+                if not isinstance(size, (int, np.integer)) or size <= 0:
+                    raise ValueError('expert byte size must be positive integer')
+                if used + size <= max_bytes:
+                    plan.append((layer, expert, int(size)))
+                    used += size
+        return tuple(plan)
+
     def route(self, layer, compute):
         if layer != self.next_layer or layer >= self.layers:
             raise RuntimeError('layers must execute once in ascending order')
