@@ -48,19 +48,29 @@ from experiments.score_dbuf_aba import load_arm, _median  # noqa: E402
 STATS_KEYS = ("hits", "misses", "tokens", "t")
 
 
-def stats_delta(snaps, label):
-    """Counter delta over an arm's window from >= 2 snapshots."""
+def stats_delta(snaps, label, denom_tokens):
+    """Counter delta over an arm's window from >= 2 snapshots.
+
+    moe_offload_stats snapshots carry hits/misses but NOT a token count,
+    so the denominator comes from the arm's collector blobs (sum of
+    ACTUAL runs[*].tokens for the runs inside the window).
+    """
     if len(snaps) < 2:
         return None, f"{label}: need >=2 stats snapshots for a delta"
     a, b = snaps[0], snaps[-1]
-    for k in STATS_KEYS:
+    for k in ("hits", "misses"):
         if k not in a or k not in b:
             return None, (f"{label}: stats snapshot missing '{k}' — "
                           "not a moe_offload_stats record")
     hits, misses = b["hits"] - a["hits"], b["misses"] - a["misses"]
-    toks = max(b["tokens"] - a["tokens"], 1)
-    return dict(hits=hits, misses=misses, miss_per_tok=round(misses / toks, 3),
-                hits_per_tok=round(hits / toks, 3)), None
+    if not denom_tokens:
+        return None, (f"{label}: no token denominator (collector runs) "
+                      "for the stats window")
+    toks = denom_tokens
+    return dict(hits=hits, misses=misses,
+                miss_per_tok=round(misses / toks, 3),
+                hits_per_tok=round(hits / toks, 3),
+                denom_tokens=toks), None
 
 
 def main():
@@ -107,16 +117,22 @@ def main():
             verdict = ("WASH (expected; per the pre-registered power "
                        "analysis this reads 'below the 0.21 tps 3-run "
                        "resolution floor', NOT 'effect absent')")
+        def arm_tokens(paths):
+            n = 0
+            for p in paths:
+                for r in json.loads(Path(p).read_text()).get("runs") or []:
+                    n += r.get("tokens") or 0
+            return n
         if a.stats_off:
             counters["off"], err = stats_delta(
                 [json.loads(Path(p).read_text()) for p in a.stats_off],
-                "OFF")
+                "OFF", arm_tokens(a.off))
             if err:
                 e.append(err)
         if a.stats_on:
             counters["on"], err = stats_delta(
                 [json.loads(Path(p).read_text()) for p in a.stats_on],
-                "ON")
+                "ON", arm_tokens(a.on))
             if err:
                 e.append(err)
         if "off" in counters and "on" in counters:
