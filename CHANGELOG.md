@@ -7,10 +7,11 @@ behaviour.
 
 Measured paging run and agent setup path:
 
-- First real paging measurement: M4 Max 36 GB (“Santa Cruz”), oMLX 0.7.0
-  expert offload at 0.18 residency, 7.8 tok/s median decode
+- Idle re-run on M4 Max 36 GB (“Santa Cruz”): oMLX 0.7.0 expert offload at
+  0.28 residency (~143 experts/layer), **13.0 tok/s** median decode
   (`results/measured_santa_cruz_36gb.json`, `results/estimate_santa_cruz_36gb.json`).
-  README speed table now labels every row measured or simulated.
+  Prior crowded run was 7.8 tok/s at 0.18 when other apps held ~16 GB.
+  README speed table labels every row measured or simulated.
 - `scripts/configure_omlx_paging.py` turns an `estimate.py` verdict into
   oMLX `model_settings.json` (expert offload fraction clamped to the Metal
   cap and, with `--ceiling-gb`, to a live 507 ceiling), links the
