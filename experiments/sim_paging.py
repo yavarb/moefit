@@ -12,10 +12,12 @@ Every expert a token uses is read from DRAM whether it was resident or
 just arrived (Apple Silicon reads weights from unified DRAM anyway), so
 the DRAM term is the full 701 MiB/token plus prefetched bytes landing.
 
-Coupled steady state per token:
+Coupled steady state per token (default --time-model serial):
   compute_ms = (floor + 701 MiB + async) / (DRAM_BW * DRAM_EFF)
-  stream_ms  = (sync + async + PLE) / SSD_BW
-  tok/s = 1000 / max(compute_ms, stream_ms)
+  stream_ms  = sum_layers(A + B*k | k>0) + install*misses + L*sync
+               (A=0.20, B=0.52, install=0.30, sync=0.122 ms; Santa Cruz
+               microbench). tok/s = 1000 / (compute_ms + stream_ms).
+  Legacy --time-model bandwidth keeps max(compute, bytes/SSD_BW).
 
 Policies (resident capacity C experts per layer):
   lru     : pure LRU cache, no prediction
@@ -86,16 +88,25 @@ def load_split(path):
 
 
 def probe_picks(bf, bl, hf, hs, budget, lam=200.0):
+    # float64 throughout: float32 matmul hit a BLAS edge case on this
+    # box (spurious "divide by zero/overflow in matmul" RuntimeWarnings
+    # on well-scaled data, Xb absmax ~5; T8 saw actual NaNs on their
+    # env). G is feat_dim^2 and Xb.T@Yb is feat_dim x 512 - trivial in
+    # double precision.
     out = np.zeros((len(hs), L, budget), np.int16)
     mu, sd = bf.mean(0), bf.std(0) + 1e-6
-    Xb = ((bf - mu) / sd).astype(np.float32)
-    Xh = ((hf[hs] - mu) / sd).astype(np.float32)
-    G = Xb.T @ Xb + lam * np.eye(Xb.shape[1], dtype=np.float32)
+    Xb = ((bf - mu) / sd).astype(np.float64)
+    Xh = ((hf[hs] - mu) / sd).astype(np.float64)
+    G = Xb.T @ Xb + lam * np.eye(Xb.shape[1], dtype=np.float64)
     for li in range(L):
-        Yb = np.zeros((len(bf), E), np.float32)
+        Yb = np.zeros((len(bf), E), np.float64)
         Yb[np.arange(len(bf))[:, None], bl[li][:len(bf)]] = 1.0
         W = np.linalg.solve(G, Xb.T @ Yb)
         s = Xh @ W
+        if not np.isfinite(s).all():
+            raise FloatingPointError(
+                f"probe_picks: non-finite scores on layer {li}; "
+                f"|Xb|max={np.abs(Xb).max()}, |G|max={np.abs(G).max()}")
         out[:, li] = np.argpartition(-s, budget - 1, axis=1)[:, :budget]
     return out
 
@@ -120,10 +131,14 @@ def simulate(gold, picks, prior_rank, cap, mode, pick, async_allow,
 
     hit_refresh=False (default, SHIPPED semantics): a hit does not refresh
     the resident's LRU timestamp, so eviction order is insertion order.
-    hit_refresh=True: true LRU (oMLX 0.7.0 ExpertCache semantics, which
-    move_to_end()s on hit). At cap=143 synth traces this moves served
-    0.840->0.879 and miss bytes 206.8->156.9 MB/token
-    (results/fidelity_miss_model.json).
+    hit_refresh=True: true LRU. (Attribution note 2026-10-07: oMLX 0.7.0
+    ExpertCache is NOT LRU — source-read by design_inventor
+    (omlx-ref @79f4488) shows decayed-routing-count eviction (+1 per
+    route, x0.7 every 4 calls, current call protected; exact replay in
+    experiments/design_omlx_exact.py). On synth traces decay-count is
+    numerically ~true-LRU (misses 56.9 vs 58.3/tok @cap143; serial tps
+    12.15 vs 12.08), so serial-model anchors computed under true-LRU
+    stand; use design_omlx_exact.py for policy-exact numbers.
 
     want_misses=True appends M to the return: (T, L) int16 per-token
     per-layer SYNC miss counts (needed by the serial-latency time model).
@@ -296,43 +311,57 @@ def serial_ms(M, compute_ms):
 
 
 def solve_policy_serial(gold, prior_rank, cap, mode, spec,
-                        hit_refresh=True, warmup=200):
-    """Serial-latency solve for prefetch-free modes (lru, prior).
+                        hit_refresh=True, warmup=200,
+                        picks=None, pick=0, async_allow=0):
+    """Serial-latency solve (default shipped time model).
 
-    hit_refresh=True by default: mirrors oMLX 0.7.0 ExpertCache (true
-    LRU). The shipped bandwidth-model rows are FIFO-ish (no refresh) —
-    do not compare the two without noting this.
+    hit_refresh=True by default: true LRU. NOTE: oMLX 0.7.0 ExpertCache
+    is actually decayed-count eviction (see simulate() attribution note
+    and experiments/design_omlx_exact.py for the exact replay); on synth
+    traces the two are within 0.6% in serial tps. The old bandwidth-model
+    rows were FIFO-ish (no refresh).
 
-    compute_ms is the model's one unmeasured knob on the 36 GB box; we
-    use the bandwidth model's DRAM term at the tier's dram spec.
-    Returns dict(tps, compute_ms, io_ms, install_ms, sync_ms,
-    misses_per_tok, served).
+    Prefetch modes (probe/sidecar): remaining SYNC misses after prefetch
+    are charged with the same A+B*k + install + sync serial formula;
+    successful async prefetch simply reduces M. Async bytes are not
+    double-charged (they replaced a sync miss).
+
+    compute_ms uses the bandwidth model's DRAM term at the tier's dram
+    spec (preserves the 128 GB DRAM_EFF / 57.4 calibration when M=0 and
+    only PLE/sync residual remains — full-fit still ~compute-bound).
+    Returns dict(tps, compute_ms, stream_ms, io_ms, install_ms, sync_ms,
+    misses_per_tok, served, sync_mb, async_mb).
     """
-    if mode not in ("lru", "prior"):
-        raise ValueError("serial model v1 covers lru/prior only; "
-                         "prefetch modes need an overlap model")
     T = len(gold)
-    picks = np.zeros((T, L, 1), np.int16)
-    srv, sync_mb, _a, M = simulate(gold, picks, prior_rank, cap, mode, 0,
-                                   0, want_misses=True,
-                                   hit_refresh=hit_refresh)
+    if picks is None:
+        picks = np.zeros((T, L, max(pick, 1)), np.int16)
+    if mode in ("lru", "prior"):
+        async_allow = 0
+        pick = 0
+    srv, sync_mb, async_mb, M = simulate(
+        gold, picks, prior_rank, cap, mode, pick, async_allow,
+        want_misses=True, hit_refresh=hit_refresh)
     assert M is not None
-    compute_ms = (READ_FLOOR_MIB + GOLD_MIB) / 1024.0 \
+    compute_ms = (READ_FLOOR_MIB + GOLD_MIB + async_mb) / 1024.0 \
         / (spec["dram"] * DRAM_EFF) * 1000.0
-    ms = serial_ms(M[warmup:], compute_ms)
-    io = float(np.where(M[warmup:] > 0,
-                        SERIAL_IO_A_MS + SERIAL_IO_B_MS * M[warmup:],
-                        0.0).sum() / max(T - warmup, 1))
-    return dict(tps=round(1000.0 / ms.mean(), 1),
+    Mw = M[warmup:]
+    ms = serial_ms(Mw, compute_ms)
+    n = max(T - warmup, 1)
+    io = float(np.where(Mw > 0,
+                        SERIAL_IO_A_MS + SERIAL_IO_B_MS * Mw,
+                        0.0).sum() / n)
+    stream_ms = float(ms.mean() - compute_ms)
+    return dict(tps=round(1000.0 / float(ms.mean()), 1),
                 compute_ms=round(compute_ms, 1),
+                stream_ms=round(stream_ms, 1),
                 io_ms=round(io, 1),
                 install_ms=round(SERIAL_INSTALL_MS
-                                 * float(M[warmup:].sum())
-                                 / max(T - warmup, 1), 1),
+                                 * float(Mw.sum()) / n, 1),
                 sync_ms=round(L * SERIAL_SYNC_MS, 1),
-                misses_per_tok=round(float(M[warmup:].sum())
-                                     / max(T - warmup, 1), 1),
-                served=round(srv, 3))
+                misses_per_tok=round(float(Mw.sum()) / n, 1),
+                served=round(srv, 3),
+                sync_mb=round(sync_mb, 1),
+                async_mb=round(async_mb, 1))
 
 
 def solve_policy(gold, picks, prior_rank, cap, mode, pick, spec,
@@ -386,16 +415,26 @@ def main():
     ap.add_argument("--traces-dir", default=str(ROOT / "results/traces"))
     ap.add_argument("--throttle", choices=("legacy", "compute"),
                     default="legacy")
+    ap.add_argument("--time-model", choices=("serial", "bandwidth"),
+                    default="serial",
+                    help="serial (default): Santa Cruz microbench A+B*k + "
+                         "install + sync, no compute/stream overlap. "
+                         "bandwidth: legacy max(compute, bytes/ssd) model.")
+    ap.add_argument("--hit-refresh", action="store_true", default=True,
+                    help="true-LRU hit refresh (default on for serial)")
+    ap.add_argument("--no-hit-refresh", action="store_false",
+                    dest="hit_refresh")
     ap.add_argument("--out", default=None,
                     help="output JSON; defaults to results/sim_paging.json "
                          "only for the shipped configuration")
     a = ap.parse_args()
 
     default_cfg = (a.traces_dir == str(ROOT / "results/traces")
-                   and a.throttle == "legacy")
+                   and a.throttle == "legacy"
+                   and a.time_model == "serial")
     out_path = Path(a.out) if a.out else (
         ROOT / "results/sim_paging.json" if default_cfg
-        else ROOT / f"results/sim_paging_{a.throttle}.json")
+        else ROOT / f"results/sim_paging_{a.time_model}_{a.throttle}.json")
 
     tdir = Path(a.traces_dir)
     bf, bl, bT = load_split(tdir / "build.npz")
@@ -403,12 +442,13 @@ def main():
     rng = np.random.default_rng(0)
     hs = np.sort(rng.choice(hT, size=min(a.eval_sub, hT), replace=False))
     gold = np.stack([hl[li][hs] for li in range(L)], axis=1).astype(np.int16)
-    print(f"build rows={bT} holdout rows={hT} evaluated={len(hs)}", flush=True)
+    print(f"build rows={bT} holdout rows={hT} evaluated={len(hs)} "
+          f"time_model={a.time_model}", flush=True)
 
     prior_rank = {li: np.argsort(-np.bincount(bl[li].ravel(), minlength=E))
                   for li in range(L)}
     modes = a.modes.split(",")
-    picks_map = {P: probe_picks(bf.astype(np.float32), bl, hf, hs, P)
+    picks_map = {P: probe_picks(bf.astype(np.float64), bl, hf, hs, P)
                  for P in [int(x) for x in a.probe_picks.split(",")]} \
         if "probe" in modes else {0: None}
 
@@ -418,19 +458,32 @@ def main():
             for mode in modes:
                 p = P if mode == "probe" else 0
                 row = dict(cap=cap, mode=mode, probe_picks=P,
-                           throttle=a.throttle)
+                           throttle=a.throttle, time_model=a.time_model)
                 for tier, spec in TIERS.items():
                     need_gib = FLOOR_MIB / 1024 + cap * L * EXPERT_MIB / 1024
                     if need_gib > spec["usable"]:
                         continue
-                    srv_f, sync_mb, async_mb, t, c_ms, st_ms = \
-                        solve_policy(gold, picks_map[P], prior_rank, cap,
-                                     mode, p, spec, throttle=a.throttle)
-                    row[f"served_{tier}"] = round(srv_f, 3)
-                    row[f"tps_{tier}"] = round(t, 1)
-                    row[f"ct_{tier}"] = round(c_ms, 1)
-                    row[f"st_{tier}"] = round(st_ms, 1)
-                    row[f"ssdMB_{tier}"] = round(sync_mb + async_mb, 0)
+                    if a.time_model == "serial":
+                        r = solve_policy_serial(
+                            gold, prior_rank, cap, mode, spec,
+                            hit_refresh=a.hit_refresh,
+                            picks=picks_map[P], pick=p,
+                            async_allow=10 ** 9)
+                        row[f"served_{tier}"] = r["served"]
+                        row[f"tps_{tier}"] = r["tps"]
+                        row[f"ct_{tier}"] = r["compute_ms"]
+                        row[f"st_{tier}"] = r["stream_ms"]
+                        row[f"ssdMB_{tier}"] = round(
+                            r["sync_mb"] + r["async_mb"], 0)
+                    else:
+                        srv_f, sync_mb, async_mb, t, c_ms, st_ms = \
+                            solve_policy(gold, picks_map[P], prior_rank, cap,
+                                         mode, p, spec, throttle=a.throttle)
+                        row[f"served_{tier}"] = round(srv_f, 3)
+                        row[f"tps_{tier}"] = round(t, 1)
+                        row[f"ct_{tier}"] = round(c_ms, 1)
+                        row[f"st_{tier}"] = round(st_ms, 1)
+                        row[f"ssdMB_{tier}"] = round(sync_mb + async_mb, 0)
                 out.append(row)
                 print(json.dumps(row), flush=True)
     out_path.write_text(json.dumps(out, indent=1))

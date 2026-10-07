@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-07 — Ship serial miss model as default simulator
+
+`experiments/sim_paging.py` now defaults to `--time-model serial`:
+per-layer `A+B·k` IO (0.20+0.52 ms) + 0.30 ms/miss install + 0.122 ms
+layer sync from Santa Cruz microbench, with serial compute+stream
+coupling. Matched cap-143 LRU predicts **12.9 tok/s** vs **13.0 measured**.
+Legacy `--time-model bandwidth` kept for comparison. Regenerated
+`results/sim_paging.json` / matched cap143; README/SETUP simulated rows
+updated; measured labels unchanged. Full-fit DRAM_EFF (~57.4) intact.
+
+
 Newest first. Every fix lists the test that reproduces the original
 behaviour.
 

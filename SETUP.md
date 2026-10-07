@@ -199,8 +199,8 @@ Geometry: 4.6 GiB non-expert floor, 64.6 GiB routed experts (512 per
 layer, 48 layers, 2.69 MiB each, top-10 routing), 29.8 GiB n-gram table.
 Decode reads about 1.26 GB of expert weights per token from unified DRAM
 whether or not they were cached, so tok/s is DRAM-bound and the ceiling
-belongs to the chip: 11.8 tok/s on a base M4, 23.6 on an M4 Pro, 45.1 on
-an M4 Max at full LRU (55 with a pinned hot-set; 57.4 measured fully
+belongs to the chip: 4.9 tok/s on a base M4, 9.7 on an M4 Pro, 15.9 on
+an M4 Max at the paging configs below (serial miss model; 57.4 measured fully
 resident on a 128 GB M4 Max). Paging decides whether those bytes are already in RAM (no
 stall) or arrive on demand from SSD (stall).
 
@@ -219,12 +219,13 @@ The table below is what perfect cross-layer pipelining could approach.
 
 | RAM tier | experts/layer resident | LRU | pinned hot-set | routing sidecar | SSD (pinned) |
 |---|---|---|---|---|---|
-| 24 GB (M4) | 32 | 8.1 | 7.6 | 8.6 | 670 MB/tok |
-| 24 GB (M4) | 64 | 11.8 | 11.7 | 11.4 | 438 MB/tok |
-| 32 GB (M4 Pro) | 64 | 14.2 | 14.0 | 14.5 | 438 MB/tok |
-| 32 GB (M4 Pro) | 128 | 23.6 | **25.7** | 23.8 | 239 MB/tok |
-| 48 GB (M4 Max) | 128 | 29.1 | **31.7** | 29.4 | 239 MB/tok |
-| 48 GB (M4 Max) | 192 | 45.1 | **54.8** | 45.3 | 138 MB/tok |
+| 24 GB (M4) | 32 | 3.7 | 3.4 | 10.3 | 655 MB/tok |
+| 24 GB (M4) | 64 | 4.9 | 4.4 | 10.6 | 427 MB/tok |
+| 32 GB (M4 Pro) | 64 | 6.4 | 5.5 | 22.3 | 427 MB/tok |
+| 32 GB (M4 Pro) | 128 | 9.7 | 8.5 | 22.9 | 222 MB/tok |
+| 48 GB (M4 Max) | 128 | 11.8 | 10.1 | 40.4 | 222 MB/tok |
+| 48 GB (M4 Max) | 192 | 15.9 | 14.5 | 40.9 | 130 MB/tok |
+
 
 Policies:
 
@@ -240,8 +241,8 @@ Policies:
 What follows from the table:
 
 1\. Paging costs real speed at these capacities: a 48 GB Mac at
-   128 experts per layer runs at about 51% of the 128 GB machine's
-   measured 57.4 tok/s with LRU (55% with the pinned hot-set), and
+   128 experts per layer runs at about 21% of the 128 GB machine's
+   measured 57.4 tok/s with LRU (18% with the pinned hot-set), and
    about 96% once 192 per layer are pinned\.
 2. The pinned hot-set beats LRU in the middle of the capacity range and
    costs no prefetch bandwidth. It is the cheapest real win.

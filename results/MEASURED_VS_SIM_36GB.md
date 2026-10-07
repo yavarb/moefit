@@ -1,4 +1,14 @@
-# Measured vs simulated: Santa Cruz 36 GB paging (updated 2026-10-07, cycle 4)
+# Measured vs simulated: Santa Cruz 36 GB paging (updated 2026-10-07)
+
+## Calibration closed (shipped)
+
+Default `--time-model serial` in `experiments/sim_paging.py` now predicts
+**12.9 tok/s** at matched cap 143 LRU vs **13.0 measured** (~1%).
+Constants from `results/microbench_expert_reads_santa_cruz.json`.
+Historical gap analysis below kept for provenance.
+
+---
+
 
 Honest ledger of what is **measured on silicon** and what is **simulated**, at
 one matched configuration, plus the current best reconciliation of the gap.
