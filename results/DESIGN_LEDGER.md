@@ -117,6 +117,18 @@ Verdicts:
   silicon test (needs an oMLX patch, not started): sidecar-driven pread
   thread vs the measured 12.7 tok/s.
 
+**Bracket, not points** (`results/DESIGN_BAND_ARBITRATION.md`, T3, commit
+57e825d): every tok/s in this entry is an OPTIMISTIC-overlap bound — T2
+hides background reads in the full compute+sync idle window (29.1 ms @
+4.85 GB/s). T7's independent re-implementation is the PESSIMISTIC bound
+(compute-only window, A-term charged): cap143 sidecar_pess 12.46, sidecar
+opt 15.13, Belady pess/opt 19.57/23.28, pipelining-only 14.09. The
+committed anchors stay canonical (their LRU baseline is validated against
+measured silicon, 12.12 vs 12.7), but quote designs as a bracket
+[T7 pessimistic … T2 optimistic] — e.g. sidecar prefetch @cap143 is
+12.5–19.0 (pess install) / 15.1–26.0 (async), and the pending silicon
+sidecar-pread run decides which bound is real.
+
 ## Cross-track synthesis: the design ordering (all SIM, measured constants)
 
 Three independent analyses (T2 idle-window, T8 mechanism probes, T6
