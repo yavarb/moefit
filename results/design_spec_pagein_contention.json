@@ -1,0 +1,105 @@
+{
+ "kind": "simulated (re-priced with measured contention constants)",
+ "source_artifact": "results/design_spec_pagein.json (commit 245eb87)",
+ "contention_provenance": "T2 t2_contention_probe (a853292), Santa Cruz MEASURED: +4.1..+10.7 ms/tok at 54-56 bg experts/tok on ~15.5 tps decode",
+ "bg_cost_ms_per_expert": [
+  0.0732,
+  0.1981
+ ],
+ "miss_cost_ms": 0.82,
+ "measured_baseline": {
+  "tps": 15.55,
+  "ms_per_tok": 64.31
+ },
+ "rows": [
+  {
+   "arm": "hist1 cancel=True",
+   "spec_issued_per_tok": 52.0,
+   "demand_miss_saved_per_tok": 0.61,
+   "saving_ms_per_tok": 0.5,
+   "contention_ms_per_tok": [
+    3.81,
+    10.3
+   ],
+   "net_ms_per_tok": [
+    -9.8,
+    -3.31
+   ],
+   "repriced_tps_on_measured_baseline": [
+    13.49,
+    14.79
+   ],
+   "delta_tps_vs_baseline": [
+    -2.06,
+    -0.76
+   ]
+  },
+  {
+   "arm": "hist1 cancel=False",
+   "spec_issued_per_tok": 52.0,
+   "demand_miss_saved_per_tok": -0.2,
+   "saving_ms_per_tok": -0.16,
+   "contention_ms_per_tok": [
+    3.81,
+    10.3
+   ],
+   "net_ms_per_tok": [
+    -10.47,
+    -3.97
+   ],
+   "repriced_tps_on_measured_baseline": [
+    13.37,
+    14.65
+   ],
+   "delta_tps_vs_baseline": [
+    -2.18,
+    -0.9
+   ]
+  },
+  {
+   "arm": "hist3 cancel=True",
+   "spec_issued_per_tok": 52.0,
+   "demand_miss_saved_per_tok": 0.54,
+   "saving_ms_per_tok": 0.44,
+   "contention_ms_per_tok": [
+    3.81,
+    10.3
+   ],
+   "net_ms_per_tok": [
+    -9.86,
+    -3.36
+   ],
+   "repriced_tps_on_measured_baseline": [
+    13.48,
+    14.78
+   ],
+   "delta_tps_vs_baseline": [
+    -2.07,
+    -0.77
+   ]
+  },
+  {
+   "arm": "hist3 cancel=False",
+   "spec_issued_per_tok": 52.0,
+   "demand_miss_saved_per_tok": -0.48,
+   "saving_ms_per_tok": -0.39,
+   "contention_ms_per_tok": [
+    3.81,
+    10.3
+   ],
+   "net_ms_per_tok": [
+    -10.7,
+    -4.2
+   ],
+   "repriced_tps_on_measured_baseline": [
+    13.33,
+    14.6
+   ],
+   "delta_tps_vs_baseline": [
+    -2.22,
+    -0.95
+   ]
+  }
+ ],
+ "verdict": "DROP, STRENGTHENED: with T2's measured contention cost charged, speculative page-in is NET NEGATIVE on the measured 15.55 tps baseline: -2.06..-0.76 tps (saved 0.5 ms/tok, paid 3.81-10.3 ms/tok) - the earlier 'below noise' DROP understated the harm: background reads are not free."
+}
