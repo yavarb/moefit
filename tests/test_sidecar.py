@@ -1,6 +1,6 @@
 """Sidecar persistence must survive a process restart.
 
-Repro for two bugs in specexp_prefetch.Sidecar:
+Repro for two bugs in pagepilot_prefetch.Sidecar:
   1. record() keys entries as "<prefix>:<layer>" but __init__ reloads them
      keyed by the bare prefix hash, so after a restart lookup() never hits.
   2. The default sidecar path lives under ~/Library/Application Support/
@@ -13,7 +13,7 @@ import os, sys, tempfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
-from specexp_prefetch import Sidecar  # noqa: E402
+from pagepilot_prefetch import Sidecar  # noqa: E402
 
 
 def main():

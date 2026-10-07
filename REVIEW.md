@@ -1,4 +1,4 @@
-# Review of specexp (branch `fable-review`)
+# Review of pagepilot (then "specexp", branch `fable-review`)
 
 Scope: `experiments/sim_paging.py`, `estimate.py`, `specexp_prefetch.py`,
 and the user-facing docs. The real routing traces
