@@ -111,6 +111,32 @@ class ScoreDbuf(unittest.TestCase):
         self.assertTrue(any("requires >= 3" in e
                             for e in out["eligibility"]))
 
+    def test_expected_prompt_hash_grounds_mixed_family(self):
+        # BATCH1 shape: unhashed ON arms (pre-hash collector) + hashed
+        # OFF blob; the hash must match the known family hash, and the
+        # attestation note must cite the verified hashed sibling.
+        on_u = self.w("on_unhashed.json", {**blob([15.55, 15.42, 15.73]),
+                                           "prompt_sha256": None})
+        p = self.w("b1.json", blob([15.0, 15.1, 15.2],
+                                   prompt="87eb8e913d26cca9"))
+        out = self.run_scorer(on_u, p,
+                              ["--accept-unhashed-prompt",
+                               "--expected-prompt-hash",
+                               "87eb8e913d26cca9"])
+        self.assertIn("TRANSFERS", out["verdicts"][0])
+        self.assertIn("verified against the known prompt hash "
+                      "87eb8e913d26cca9", out["prompt_identity"])
+
+    def test_expected_prompt_hash_mismatch_refused(self):
+        p = self.w("b1bad.json", blob([15.0, 15.1, 15.2], prompt="dead"))
+        out = self.run_scorer(self.on, p,
+                              ["--accept-unhashed-prompt",
+                               "--expected-prompt-hash",
+                               "87eb8e913d26cca9"])
+        self.assertTrue(any("do NOT match the expected prompt hash"
+                            in x for x in out["eligibility"]))
+        self.assertTrue(out["verdicts"][0].startswith("SCORING REFUSED"))
+
     def test_aba_pooling(self):
         on2 = self.w("on2.json", blob([15.60, 15.5, 15.68]))
         off = self.w("off_p.json", blob([15.0, 14.9, 14.8]))

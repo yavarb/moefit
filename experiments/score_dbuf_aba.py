@@ -101,6 +101,14 @@ def main():
                          "(e.g. 'IO_BATCH=1 (DB off, slab+overlap on)' "
                          "per prereg amendment3 — scoring the BATCH1 "
                          "arm against the original install band)")
+    ap.add_argument("--expected-prompt-hash", default=None,
+                    help="known prompt_sha256 (16-hex) of the arm family "
+                         "e.g. 87eb8e913d26cca9 (T3-verified byte-"
+                         "identical prompt literals, 908e87d). Blobs "
+                         "carrying prompt_sha256 MUST match or scoring "
+                         "is REFUSED; unhashed blobs are still scored "
+                         "under --accept-unhashed-prompt, now grounded "
+                         "by the verified hashed siblings.")
     a = ap.parse_args()
 
     prereg = json.loads(Path(a.prereg).read_text())
@@ -115,11 +123,22 @@ def main():
                  f"{off['host']}/{off['model']}")
     # prompt identity
     hashes = on["prompt_hashes"] + off["prompt_hashes"]
+    hashed = [h for h in hashes if h is not None]
+    if a.expected_prompt_hash and hashed:
+        bad = [h for h in hashed if h != a.expected_prompt_hash]
+        if bad:
+            e.append(f"hashed blob(s) {bad} do NOT match the expected "
+                     f"prompt hash {a.expected_prompt_hash} - WRONG "
+                     "PROMPT in the family; FAIL CLOSED")
     if any(h is None for h in hashes):
         if a.accept_unhashed_prompt:
             note = ("prompt identity NOT mechanically verified "
                     "(pre-prompt_sha256 blobs + --accept-unhashed-prompt; "
-                    "operator attests same prompt)")
+                    "operator attests same prompt)"
+                    + (f"; hashed sibling blobs verified against the "
+                       f"known prompt hash {a.expected_prompt_hash} "
+                       "(byte-identical literals, T3 908e87d)"
+                       if a.expected_prompt_hash and hashed else ""))
         else:
             e.append("prompt_sha256 missing on >=1 blob and "
                      "--accept-unhashed-prompt not given - FAIL CLOSED")
