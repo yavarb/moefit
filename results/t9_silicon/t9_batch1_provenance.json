@@ -1,6 +1,29 @@
 {
-  "arm": "t9_batch1_C.json (IO_BATCH=1, valid run started 21:20:26 PT)",
-  "installed_moe_expert_offload_md5": "c704058a3378731c4629578a72861ae7",
-  "note": "File was swapped 214e8823 -> c704058a at 21:17 PT by T3 lip_arm4.sh (later frozen) before the valid BATCH1 run. Diff vs 214e8823 (repo 7ea2d1e) is confined to the LIP block inside `if self._admit and ...` in _install (margin-64 insert). OMLX_ADMISSION was unset (own-restart env), so the executed code path is identical to 214e8823 and to the ON2 arm. ON arm A ran on stock d420b305; ON2 on 214e8823.",
-  "lip_margin64_risk": "margin 64 protects in-flight experts only when a single _ensure_ids call has <=64 later installs; decode calls (k=10) are safe, prefill chunks can exceed 64 misses per layer call, so the KeyError can recur in prefill. Post-loop demotion remains the safe fix."
+ "arm": "t9_batch1_C.json (IO_BATCH=1, valid run started 21:20:26 PT)",
+ "installed_moe_expert_offload_md5": "c704058a3378731c4629578a72861ae7",
+ "note": "File was swapped 214e8823 -> c704058a at 21:17 PT by T3 lip_arm4.sh (later frozen) before the valid BATCH1 run. Diff vs 214e8823 (repo 7ea2d1e) is confined to the LIP block inside `if self._admit and ...` in _install (margin-64 insert). OMLX_ADMISSION was unset (own-restart env), so the executed code path is identical to 214e8823 and to the ON2 arm. ON arm A ran on stock d420b305; ON2 on 214e8823.",
+ "lip_margin64_risk": "margin 64 protects in-flight experts only when a single _ensure_ids call has <=64 later installs; decode calls (k=10) are safe, prefill chunks can exceed 64 misses per layer call, so the KeyError can recur in prefill. Post-loop demotion remains the safe fix.",
+ "robustness": {
+  "on_runs": [
+   15.7,
+   16.0,
+   15.75,
+   15.52,
+   16.63,
+   15.64
+  ],
+  "batch1_runs": [
+   14.63,
+   15.17,
+   14.1
+  ],
+  "delta_median": 1.09,
+  "bootstrap95_delta": [
+   0.47,
+   1.9
+  ],
+  "P_delta_below_0.30": 0.0,
+  "min_on_minus_max_batch1": 0.35,
+  "note": "20k resamples seed0; arms fully separated (no overlap); band upper 1.10 lies inside CI, so 'inside band' is point-estimate, not CI-certified"
+ }
 }
