@@ -1,0 +1,23 @@
+{
+ "cap": 143,
+ "kind": "simulated",
+ "policy": "second-chance admission ON true-LRU (silicon policy)",
+ "true_lru": {
+  "miss_global": 57.4,
+  "miss_suffix": 47.751,
+  "tps_suffix": 13.28,
+  "tps_global": 11.96
+ },
+ "sanity_nogate": {
+  "miss_global": 57.151,
+  "miss_suffix": 47.504,
+  "tps_suffix": 13.32,
+  "tps_global": 11.98
+ },
+ "lru_admit": {
+  "miss_global": 58.292,
+  "miss_suffix": 46.922,
+  "tps_suffix": 13.41,
+  "tps_global": 11.84
+ }
+}
