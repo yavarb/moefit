@@ -1,0 +1,191 @@
+{
+ "kind": "simulated + measured anchors",
+ "cap": 143,
+ "tier": "48GB-M4M",
+ "measured": {
+  "tps": 13.0,
+  "ms_per_tok": 76.92
+ },
+ "per_trace": [
+  {
+   "served": 0.8399,
+   "sync_mb": 206.8,
+   "async_mb": 0.0,
+   "sim_tps": 36.6,
+   "sim_ct_ms": 18.1,
+   "sim_st_ms": 27.3,
+   "gate_mean_abs_delta": 0.0198,
+   "beta": 2.0,
+   "shift": 0.3,
+   "seed": 0,
+   "prior14_fit": 0.1876111111111111,
+   "prev_fit": 0.33145833333333335,
+   "traces": "results/traces_synth"
+  },
+  {
+   "served": 0.7673,
+   "sync_mb": 300.4,
+   "async_mb": 0.0,
+   "sim_tps": 25.2,
+   "sim_ct_ms": 18.1,
+   "sim_st_ms": 39.7,
+   "gate_mean_abs_delta": 0.0605,
+   "beta": 1.5,
+   "shift": 0.3,
+   "seed": 0,
+   "prior14_fit": 0.18538541666666666,
+   "prev_fit": 0.32745833333333335,
+   "traces": "/tmp/moefit-lab/homes/sheryl_analysis_b/cache/scratch/t7_traces/b1.5_s0.3_seed0"
+  },
+  {
+   "served": 0.8972,
+   "sync_mb": 132.7,
+   "async_mb": 0.0,
+   "sim_tps": 55.2,
+   "sim_ct_ms": 18.1,
+   "sim_st_ms": 17.6,
+   "gate_mean_abs_delta": 0.0487,
+   "beta": 2.5,
+   "shift": 0.3,
+   "seed": 0,
+   "prior14_fit": 0.18686458333333333,
+   "prev_fit": 0.37208854166666666,
+   "traces": "/tmp/moefit-lab/homes/sheryl_analysis_b/cache/scratch/t7_traces/b2.5_s0.3_seed0"
+  },
+  {
+   "served": 0.8366,
+   "sync_mb": 211.0,
+   "async_mb": 0.0,
+   "sim_tps": 35.9,
+   "sim_ct_ms": 18.1,
+   "sim_st_ms": 27.9,
+   "gate_mean_abs_delta": 0.0202,
+   "beta": 2.0,
+   "shift": 0.15,
+   "seed": 0,
+   "prior14_fit": 0.18672916666666664,
+   "prev_fit": 0.33135416666666667,
+   "traces": "/tmp/moefit-lab/homes/sheryl_analysis_b/cache/scratch/t7_traces/b2.0_s0.15_seed0"
+  },
+  {
+   "served": 0.8458,
+   "sync_mb": 199.1,
+   "async_mb": 0.0,
+   "sim_tps": 38.0,
+   "sim_ct_ms": 18.1,
+   "sim_st_ms": 26.3,
+   "gate_mean_abs_delta": 0.0187,
+   "beta": 2.0,
+   "shift": 0.45,
+   "seed": 0,
+   "prior14_fit": 0.18819791666666666,
+   "prev_fit": 0.33211979166666666,
+   "traces": "/tmp/moefit-lab/homes/sheryl_analysis_b/cache/scratch/t7_traces/b2.0_s0.45_seed0"
+  },
+  {
+   "served": 0.8437,
+   "sync_mb": 201.8,
+   "async_mb": 0.0,
+   "sim_tps": 37.5,
+   "sim_ct_ms": 18.1,
+   "sim_st_ms": 26.7,
+   "gate_mean_abs_delta": 0.0161,
+   "beta": 2.0,
+   "shift": 0.3,
+   "seed": 1,
+   "prior14_fit": 0.18670138888888888,
+   "prev_fit": 0.34358333333333335,
+   "traces": "/tmp/moefit-lab/homes/sheryl_analysis_b/cache/scratch/t7_traces/b2.0_s0.3_seed1"
+  },
+  {
+   "served": 0.8414,
+   "sync_mb": 204.8,
+   "async_mb": 0.0,
+   "sim_tps": 36.9,
+   "sim_ct_ms": 18.1,
+   "sim_st_ms": 27.1,
+   "gate_mean_abs_delta": 0.0179,
+   "beta": 2.0,
+   "shift": 0.3,
+   "seed": 2,
+   "prior14_fit": 0.1872986111111111,
+   "prev_fit": 0.33958333333333335,
+   "traces": "/tmp/moefit-lab/homes/sheryl_analysis_b/cache/scratch/t7_traces/b2.0_s0.3_seed2"
+  }
+ ],
+ "trace_band": {
+  "served_min": 0.7673,
+  "served_max": 0.8972,
+  "sim_tps_min": 25.2,
+  "sim_tps_max": 55.2,
+  "ratio_min": 0.23550724637681159,
+  "ratio_max": 0.5158730158730159,
+  "gated_0.03": {
+   "n_traces": 5,
+   "served_min": 0.8366,
+   "served_max": 0.8458,
+   "sim_tps_min": 35.9,
+   "sim_tps_max": 38.0,
+   "ratio_min": 0.34210526315789475,
+   "ratio_max": 0.36211699164345407,
+   "sim_tps_median": 36.9,
+   "ratio_at_median_tps": 0.35
+  }
+ },
+ "knob_attribution": {
+  "n_accepted": 10854,
+  "n_draws": 200000,
+  "dram_gbps": {
+   "p10": 71.918,
+   "med": 156.996,
+   "p90": 266.428
+  },
+  "ssd_gbps": {
+   "p10": 2.75,
+   "med": 4.234,
+   "p90": 6.738
+  },
+  "ple_mb": {
+   "p10": 0.598,
+   "med": 10.333,
+   "p90": 164.293
+  },
+  "miss_lat_ms": {
+   "p10": 0.009,
+   "med": 0.079,
+   "p90": 0.451
+  },
+  "regime_frac": {
+   "stream_bound": 0.729,
+   "compute_bound": 0.271,
+   "miss_dominated": 0.068
+  },
+  "ssd_only_gbps": 2.6,
+  "sync_mb": 204.8,
+  "async_mb": 0.0,
+  "miss_per_tok": 76.1
+ },
+ "residency_predictor": {
+  "71": {
+   "served": 0.694,
+   "sync_mb": 395.1,
+   "footprint_gib": 13.6,
+   "h1_flat_overhead_tps": 9.8,
+   "h2_ssd_random_tps": 6.7
+  },
+  "143": {
+   "served": 0.8399,
+   "sync_mb": 206.8,
+   "footprint_gib": 22.6,
+   "h1_flat_overhead_tps": 13.0,
+   "h2_ssd_random_tps": 12.9
+  },
+  "170": {
+   "served": 0.8689,
+   "sync_mb": 169.3,
+   "footprint_gib": 26.0,
+   "h1_flat_overhead_tps": 13.9,
+   "h2_ssd_random_tps": 15.7
+  }
+ }
+}
