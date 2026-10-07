@@ -1,0 +1,22 @@
+{
+ "kind": "simulated (signal-level check on REAL captured routing)",
+ "trace": "results/traces/holdout.npz (single real code prompt, cold, 143 routed positions, 48 layers; positions likely prefill-heavy)",
+ "proxy": "resident ~= current token's top-10 (demand resolution); candidate set = experts outside t's top-10; NOT a steady-state cache sim",
+ "decay": "x0.7 per 4 tokens (oMLX ExpertCache constant)",
+ "positions_scored": 142,
+ "layers": 48,
+ "self_overlap_mean": 0.3646,
+ "self_overlap_p50": 0.4,
+ "hist1_precision": 0.2537,
+ "hist3_precision": 0.4536,
+ "stricter_proxy_covered_last4": {
+  "hist1_precision": 0.1062,
+  "hist3_precision": 0.2204
+ },
+ "synth_reference": {
+  "hist1_precision": 0.012,
+  "hist3_precision": null,
+  "note": "design_spec_pagein.json (245eb87), steady-state synth holdout"
+ },
+ "verdict": "REGIME-DEPENDENT, NOT GLOBAL: on real routing the decayed-history signal is hist1 precision 25.4% (stricter covered-last4 proxy: 10.6%) vs 1.2% in the synth STEADY-STATE replay \u2014 9-21x higher in the cold/early window of a real prompt. The DROP verdict (245eb87) stands for warm steady-state decode; it must NOT be cited as global: speculative page-in may pay specifically in the cold/cross-prompt window where the miss burden is highest. Single cold prompt, proxy residency, prefill-heavy positions \u2014 signal-level check only, no tps claim."
+}
