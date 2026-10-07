@@ -145,7 +145,7 @@ Sizes come from the safetensors header.
 | Memory during run | ~85% free before load; ~18–19% free during decode (idle: Photo Booth / prior omlx stopped; CLIProxy left on :8317) |
 | Prior crowded run | 7.8 tok/s at fraction 0.18 when other apps held ~16 GB (live ceiling 20 GB); this idle re-run uses the 0.28 estimate.py target |
 
-Raw JSON: [results/measured_santa_cruz_36gb.json](results/measured_santa_cruz_36gb.json); estimate: [results/estimate_santa_cruz_36gb.json](results/estimate_santa_cruz_36gb.json).
+Raw JSON: [results/measured_santa_cruz_36gb.json](results/measured_santa_cruz_36gb.json); estimate: [results/estimate_santa_cruz_36gb.json](results/estimate_santa_cruz_36gb.json). Matched sim-vs-measured gap analysis at the same residency: [results/MEASURED_VS_SIM_36GB.md](results/MEASURED_VS_SIM_36GB.md) — the simulator is 2.4–2.8× optimistic on the 36 GB SSD-bound tier.
 
 Re-check docs against the shipped tables anytime:
 
