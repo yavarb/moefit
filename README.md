@@ -108,17 +108,24 @@ Setup with verify blocks: [SETUP.md](SETUP.md). FAQ: [FAQ.md](FAQ.md).
 
 ---
 
-## Where the numbers come from
+## Model footprint (checkpoint)
 
-| Quantity | Value | Source |
-|---|---|---|
-| Non-expert floor | 4.6 GiB | checkpoint header |
-| Routed experts | 64.6 GiB (512/layer × 48, top-10) | checkpoint header |
-| PLE n-gram table | 29.8 GiB | checkpoint header |
-| Decode, 128 GB M4 Max | 57.4 tok/s | measured (`experiments/bench_baseline.py`) |
-| Prefill, 128 GB M4 Max | 586 tok/s | measured |
-| Simulator vs measured | within 4% on decode | calibrated on real traces |
-| Router determinism | 8208 / 8208 identical | `experiments/det_test.py` |
+| Piece | Size |
+|---|---|
+| Always-resident floor (attention, shared expert, head) | 4.6 GiB |
+| Routed experts (512 per layer × 48 layers, top-10 active) | 64.6 GiB |
+| PLE n-gram table | 29.8 GiB |
+
+Sizes come from the safetensors header.
+
+## Measured on M4 Max 128 GB (model fits)
+
+| | |
+|---|---|
+| Decode | **57.4 tok/s** (`experiments/bench_baseline.py`) |
+| Prefill | **586 tok/s** |
+| Paging simulator vs that decode baseline | within **4%** (real router traces) |
+| Router determinism (greedy re-runs) | **8208 / 8208** identical (`experiments/det_test.py`) |
 
 Re-check docs against the shipped table anytime:
 
