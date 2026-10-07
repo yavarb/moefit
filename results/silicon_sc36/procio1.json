@@ -1,0 +1,19 @@
+{
+ "kind": "measured",
+ "host": "santacruz",
+ "timestamp": "2026-10-06T20:28:47-0700",
+ "pid": 96103,
+ "tokens": 256,
+ "decode_tps": 13.48,
+ "ttft_s": 6.648,
+ "window_s": 32.6,
+ "proc_diskio_read_MB": 68870.9,
+ "proc_pageins": 1176,
+ "proc_pagein_MB": 19.3,
+ "proc_cpu_s": 0.58,
+ "disk_iostat_window_MB": 64418.5,
+ "iostat_decode_MB_per_token": 135.3,
+ "proc_share_of_disk": 1.069,
+ "note": "window = prefill+decode+~3.5s tail; ri_* times in Mach absolute units (1 ns on Apple Silicon? verify); proc_cpu_s is indicative only",
+ "CONTAMINATED": "overlapped design_inventor t2_contention_probe 512-tok requests on the same oMLX server (server log 20:25:48-20:29:27 PT); tok/s, iostat and proc diskio totals are NOT clean single-client numbers. Only the PLE-family page-in figure is used, as an upper bound on PLE traffic."
+}

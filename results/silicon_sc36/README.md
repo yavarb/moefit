@@ -61,3 +61,19 @@ lock waits on read futures; `_platform_memmove` via numpy `array_subscript`
 - r² 0.66 pooled; pass 1 alone r² 0.48 (chinese_story outlier at 91.7 ms / 142 MB).
 - `collect_silicon_run.py` per_token_ms: chunks carry ~3 tokens (86 chunks / 256
   tokens), reported gaps p50 ~200 ms are chunk gaps, not token gaps — flagged to T4.
+
+## 6. PLE n-gram traffic is negligible (cycle 3)
+Source read (oMLX 0.7.0 vendored mlx_vlm qwen4_exp/language.py, `_SafeTensorMMap`):
+PLE rows are gathered from an mmap (MADV_RANDOM) after a 48-thread `ple-io` pool
+pre-touches unseen 16 KB pages with os.pread; a seen-page bitmap skips warm pages.
+Config: ngram_size 3, heads_per_ngram 8, ple_layer_ids [2] (one PLE layer).
+Measured (`experiments/pagecache_families.py`, mincore by tensor family, idle box):
+PLE n-gram tables 0.59 of 32.0 GB in page cache; experts 2.42 of 69.4 GB; other 0.
+`experiments/pagein_attribution.py` (mincore before/after one 256-tok decode):
+PLE n-gram page-ins 0.62 MB/token vs expert page-ins >=14 MB/token (lower bound;
+expert pages churn in/out within the window) vs iostat ~137 MB/token.
+That window OVERLAPPED another agent's requests (flagged in the json), which can only
+inflate the PLE figure, so **PLE <= ~0.6 MB/token = <0.5% of decode SSD traffic**.
+Rejects the "unmodeled PLE gathers ~376 MB/token" hypothesis by measurement + source.
+`proc_diskio.py` (proc_pid_rusage of the server pid) is committed as a tool; its one run
+is contaminated and not interpreted.
