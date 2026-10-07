@@ -64,6 +64,47 @@ class HybridExpertPack:
         return {n:memoryview(exact_pread(self.fds[parts[n]['file']],parts[n]['size'],
                     parts[n]['offset']+eid*parts[n]['size'])) for n in names}
 
+    def read_components_many(self, ids, names, *, max_experts_per_span=4):
+        """Selected components for a batch, deduplicated and grouped by file.
+
+        All inputs validated before IO. Zero gap overread; span bytes bounded
+        by max_experts_per_span * stride. No persistent cache or checksum on
+        partial payloads. Duplicate results have independent dictionaries and
+        share immutable backing bytes. Entire batch is retained in memory.
+        """
+        from moefit.coalesced_read import read_batch
+        if self.closed: raise ValueError('Store is closed')
+        ids, names = list(ids), list(names)
+        if any(type(e) is not int or not 0 <= e < self.parts[0]['experts'] for e in ids):
+            raise ValueError('Invalid expert ID')
+        if type(max_experts_per_span) is not int or max_experts_per_span < 1:
+            raise ValueError('max_experts_per_span must be positive integer')
+        if any(type(n) is not str for n in names):
+            raise ValueError('Component names must be strings')
+        names = list(dict.fromkeys(names))
+        parts = {c['name']:c for c in self.parts}
+        if any(n not in parts for n in names):
+            raise ValueError('Unknown component')
+        packed = {c['name']:c for c in self.pack.manifest['components']}
+        stride = self.pack.manifest['stride']
+        groups = {}; found = {e:{} for e in ids}
+        for eid in found:
+            for name in names:
+                if eid in self.pack.positions:
+                    c = packed[name]; fd = self.pack.fd
+                    off = self.pack.positions[eid]*stride + c['pack_offset']
+                else:
+                    c = parts[name]; fd = self.fds[c['file']]
+                    off = c['offset'] + eid*c['size']
+                groups.setdefault(fd, []).append((eid, name, off, c['size']))
+        for fd, requests in groups.items():
+            views, _ = read_batch(fd, [(r[2], r[3]) for r in requests],
+                max_gap=0, max_span=stride*max_experts_per_span,
+                max_amplification=1)
+            for (eid, name, _, _), view in zip(requests, views):
+                found[eid][name] = view
+        return [{n:found[e][n] for n in names} for e in ids]
+
     def read_many(self, ids, *, max_experts_per_span=4):
         """Deduplicate within this call, coalesce packed IDs, retain input order.
 

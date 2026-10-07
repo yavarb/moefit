@@ -1,0 +1,20 @@
+{
+  "scope": "Tiny SYNTHETIC actual pread counters, NOT SSD bandwidth/decode.",
+  "rows": {
+    "individual": {
+      "calls": 12,
+      "bytes": 144
+    },
+    "batch": {
+      "calls": 5,
+      "bytes": 96
+    }
+  },
+  "random_batches": 100,
+  "component_checks": 2867,
+  "guards": 7,
+  "exact_selected_bytes": true,
+  "span_bound": true,
+  "shards": 3,
+  "caveat": "Whole batch retained; metadata not bounded. Only caller-selected components, no partial checksum."
+}
