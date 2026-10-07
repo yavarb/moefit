@@ -1,0 +1,82 @@
+{
+ "kind": "T5 scoring of T2's MEASURED sidecar A/B/A (75398bf) vs the pre-registered band (81a6483)",
+ "measured": {
+  "off_tps": [
+   14.02,
+   14.72,
+   13.95
+  ],
+  "on_tps": [
+   20.21,
+   20.05
+  ],
+  "off_median": 14.02,
+  "on_median": 20.13,
+  "off_mean": 14.23,
+  "on_mean": 20.13,
+  "delta_median": 6.11,
+  "note": "ON arm has 2 runs (B,B2) vs 3 OFF (A0,A,A2); A0 counter deltas negative (process-start wrap) and are excluded from m; all 5 runs share text_hash 806452101 (bit-identical outputs)."
+ },
+ "mechanical_verdict": {
+  "test": "T5 sidecar prereg \u2014 breakeven framework's first prospective silicon test",
+  "kind": "T2 sidecar OFF vs ON (deploys the T5 cancel-on-wrong-route primitive)",
+  "prereg_source": "results/t5_sidecar_silicon_prereg.json (+ results/t5_iobatch1_conditional_prereg.json)",
+  "saving_basis": {
+   "save": [
+    0.52,
+    0.82
+   ],
+   "note": "original bracket (IO_BATCH=1 not landed first)",
+   "sanity_gate": null
+  },
+  "measured": {
+   "off_tps": [
+    14.02,
+    14.72,
+    13.95
+   ],
+   "on_tps": [
+    20.21,
+    20.05
+   ],
+   "off_median": 14.02,
+   "on_median": 20.13
+  },
+  "eligibility": [
+   "ON arm has 2 contributing run(s); protocol requires >= 3"
+  ],
+  "prompt_identity": "prompt_sha256 230be33663dea653 (verified identical)",
+  "verdicts": [
+   "SCORING REFUSED - INELIGIBLE: ON arm has 2 contributing run(s); protocol requires >= 3. No verdict emitted."
+  ]
+ },
+ "descriptive_framework_readout": {
+  "label": "DESCRIPTIVE, not a pre-registered verdict (the 2-ON-run arm fails the >=3 gate; verdict requires one more B run scored via the committed scorer)",
+  "m_miss_per_tok_measured": 43.99,
+  "sidecar_issued_per_tok": 42.54,
+  "sidecar_used_per_tok": 42.53,
+  "coverage": 0.9996,
+  "wasted_prefetches_total": 0,
+  "net_ms_per_tok_saved": 21.65,
+  "implied_S_minus_C_ms": 0.509,
+  "S_minus_C_bracket": [
+   0.322,
+   0.747
+  ],
+  "band_at_measured_m_prereg_baseline": [
+   20.2,
+   32.5
+  ],
+  "band_at_measured_m_reanchored_to_off": [
+   17.5,
+   26.0
+  ],
+  "on_median_in_band": true,
+  "read": "measured ON median 20.13 sits INSIDE the pre-registered m-band [18.5, 38.1] and inside the band re-anchored at measured m and OFF [17.5, 26.0]. Measured S-C = 0.509 ms/expert vs the framework bracket [0.32, 0.75]: consistent, near the lower-mid. Combined with the pending IO_BATCH=1 arm (S' = 0.52 + D/m), live contention C_live = S' - 0.509 is then measured too. Coverage 0.9996 with 0 wasted prefetches validates the cancel-on-wrong-route primitive at precision ~1.0 in the replay regime."
+ },
+ "provenance": {
+  "source": "results/t2_silicon/t2_sidecar_aba_measured.json (commit 75398bf, T2 execution)",
+  "prereg": "results/t5_sidecar_silicon_prereg.json (81a6483) + results/t5_iobatch1_conditional_prereg.json (088913d)",
+  "scorer": "experiments/score_sidecar_vs_prereg.py (f9bf40f), run unmodified on the derived canonical blob"
+ }
+}

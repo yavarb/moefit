@@ -1,0 +1,21 @@
+{
+ "kind": "DERIVED canonical copy of t2_sidecar_aba_measured.json (T5, for mechanical scoring only). Field mapping: decode_tps<-tps, tokens/finish_reason verbatim, model filled from box's single served model, prompt_sha256 = sha256(prompt)[:16] computed; arms: on",
+ "host": "santacruz",
+ "model": "Qwen3.8-Flash-Next-oQ4e-mtp",
+ "max_tokens": 1024,
+ "prompt_sha256": "230be33663dea653",
+ "runs": [
+  {
+   "decode_tps": 20.21,
+   "tokens": 1024,
+   "finish_reason": "length",
+   "arm": "B"
+  },
+  {
+   "decode_tps": 20.05,
+   "tokens": 1024,
+   "finish_reason": "length",
+   "arm": "B2"
+  }
+ ]
+}
