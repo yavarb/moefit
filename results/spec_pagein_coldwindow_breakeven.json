@@ -1,0 +1,33 @@
+{
+ "kind": "simulated (deterministic breakeven arithmetic on measured constants)",
+ "claim_under_test": "cycle-27 note: '10-25% precision over the 52-expert budget is plausibly net-positive in the cold window' (6b359d4)",
+ "contention_ms_per_issued": [
+  0.0732,
+  0.1981
+ ],
+ "realtrace_hist1_precision": {
+  "loose_proxy": 0.2537,
+  "strict_proxy": 0.1062
+ },
+ "rows": [
+  {
+   "saving_basis": "serial 0.82 ms/miss",
+   "breakeven_precision": [
+    0.089,
+    0.242
+   ],
+   "hist1_loose_25.4pct_verdict": "pays",
+   "hist1_strict_10.6pct_verdict": "marginal"
+  },
+  {
+   "saving_basis": "db_on 0.52 ms/miss (provisional, T4 Amd 2)",
+   "breakeven_precision": [
+    0.141,
+    0.381
+   ],
+   "hist1_loose_25.4pct_verdict": "marginal",
+   "hist1_strict_10.6pct_verdict": "loses"
+  }
+ ],
+ "verdict": "CYCLE-27 CLAIM CORRECTED: breakeven precision for spec page-in is 9-24% (serial basis) and 14-38% (DB-ON basis). The real-trace hist1 precision (10.6% strict / 25.4% loose proxy) sits AT or BELOW the DB-ON breakeven band \u2014 'plausibly net-positive' was too generous. The honest cold-window verdict: MARGINAL at best under the loose proxy, LOSING under the strict proxy and the DB-ON basis; only hist3-class precision (22-45%) clears breakeven convincingly. Cold-window speculation needs either a better signal or a cheaper issue policy, not just the regime change."
+}
