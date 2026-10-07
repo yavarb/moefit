@@ -1,0 +1,67 @@
+{
+ "kind": "measured",
+ "points": [
+  {
+   "prompt": "essay_uma",
+   "tokens": 256,
+   "decode_tps": 11.83,
+   "ms_per_token": 84.53,
+   "disk_MB_per_token": 157.6,
+   "disk_MBps": 1919.7,
+   "KB_per_io": 137.4
+  },
+  {
+   "prompt": "code_lru",
+   "tokens": 256,
+   "decode_tps": 12.15,
+   "ms_per_token": 82.3,
+   "disk_MB_per_token": 139.1,
+   "disk_MBps": 1919.1,
+   "KB_per_io": 178.1
+  },
+  {
+   "prompt": "math_proof",
+   "tokens": 256,
+   "decode_tps": 11.7,
+   "ms_per_token": 85.47,
+   "disk_MB_per_token": 156.9,
+   "disk_MBps": 1966.9,
+   "KB_per_io": 177.8
+  },
+  {
+   "prompt": "chinese_story",
+   "tokens": 256,
+   "decode_tps": 12.21,
+   "ms_per_token": 81.9,
+   "disk_MB_per_token": 150.7,
+   "disk_MBps": 1880.0,
+   "KB_per_io": 168.6
+  },
+  {
+   "prompt": "json_tool",
+   "tokens": 256,
+   "decode_tps": 10.58,
+   "ms_per_token": 94.52,
+   "disk_MB_per_token": 187.3,
+   "disk_MBps": 2144.0,
+   "KB_per_io": 177.3
+  },
+  {
+   "prompt": "sql_explain",
+   "tokens": 256,
+   "decode_tps": 11.42,
+   "ms_per_token": 87.57,
+   "disk_MB_per_token": 172.2,
+   "disk_MBps": 2022.6,
+   "KB_per_io": 157.5
+  }
+ ],
+ "fit": {
+  "intercept_ms": 44.25,
+  "slope_ms_per_MB": 0.2602,
+  "serialized_read_GBps": 3.84,
+  "r2": 0.897,
+  "n": 6
+ },
+ "method": "Decompose decode time on silicon by regressing ms/token on SSD MB/token\nacross workloads (no server restart, no config change).\n\nDifferent prompts route to different experts, so the same oMLX server at the\nsame residency produces different miss traffic. Fitting\n    ms_per_token = intercept + slope * disk_MB_per_token\nover several prompts gives, from measurement alone:\n    intercept : decode time that does not scale with misses (compute + sync + fixed)\n    slope     : ms of decode per MB of physical expert reads (inverse effective\n                *serialized* read+install bandwidth)\nUses measure_ssd_per_token.py (must sit next to this file).\n\nusage: python3 regress_prompts.py --max-tokens 256 --out f.json\n"
+}

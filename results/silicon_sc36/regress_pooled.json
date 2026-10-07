@@ -1,0 +1,95 @@
+{
+ "kind": "measured",
+ "n": 17,
+ "intercept_ms": 39.2,
+ "intercept_se": 8.4,
+ "slope_ms_per_MB": 0.2883,
+ "slope_se": 0.0534,
+ "points": [
+  {
+   "MB": 140.8,
+   "ms": 79.37,
+   "src": "regress1:essay_uma"
+  },
+  {
+   "MB": 146.8,
+   "ms": 79.18,
+   "src": "regress1:code_lru"
+  },
+  {
+   "MB": 161.5,
+   "ms": 80.78,
+   "src": "regress1:math_proof"
+  },
+  {
+   "MB": 141.9,
+   "ms": 91.66,
+   "src": "regress1:chinese_story"
+  },
+  {
+   "MB": 196.6,
+   "ms": 97.75,
+   "src": "regress1:json_tool"
+  },
+  {
+   "MB": 169.7,
+   "ms": 90.42,
+   "src": "regress1:sql_explain"
+  },
+  {
+   "MB": 157.6,
+   "ms": 84.53,
+   "src": "regress2:essay_uma"
+  },
+  {
+   "MB": 139.1,
+   "ms": 82.3,
+   "src": "regress2:code_lru"
+  },
+  {
+   "MB": 156.9,
+   "ms": 85.47,
+   "src": "regress2:math_proof"
+  },
+  {
+   "MB": 150.7,
+   "ms": 81.9,
+   "src": "regress2:chinese_story"
+  },
+  {
+   "MB": 187.3,
+   "ms": 94.52,
+   "src": "regress2:json_tool"
+  },
+  {
+   "MB": 172.2,
+   "ms": 87.57,
+   "src": "regress2:sql_explain"
+  },
+  {
+   "MB": 140.5,
+   "ms": 78.68,
+   "src": "measured_santa_cruz_36gb_ssd"
+  },
+  {
+   "MB": 132.9,
+   "ms": 76.22,
+   "src": "ssd_tok_run2"
+  },
+  {
+   "MB": 143.4,
+   "ms": 78.62,
+   "src": "ssd_tok_run4"
+  },
+  {
+   "MB": 148.4,
+   "ms": 78.49,
+   "src": "anchor_Repea"
+  },
+  {
+   "MB": 162.2,
+   "ms": 83.26,
+   "src": "anchor_Count"
+  }
+ ]
+}
