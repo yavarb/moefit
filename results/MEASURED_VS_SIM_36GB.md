@@ -135,15 +135,21 @@ physical-vs-logical traffic accounting (predictions 12.2–18.0, SIM).
 Policy reconciliation (T8, SIM under model S): only a **hit-refreshing
 LRU** lands on the measured band — shipped no-refresh LRU predicts 10.04
 tok/s vs measured 12.7–13.0 (−21%), true-LRU predicts 11.99–12.77. Two
-consequences: (a) oMLX's runtime behaves like true-LRU, not the shipped
-no-refresh variant (consistent with the 57.4 replay miss count); (b) the
+consequences: (a) oMLX's runtime behaves like a recency/hotness cache, not
+the shipped no-refresh variant (consistent with the 57.4 replay miss
+count) — and per design_inventor's source read of oMLX 0.7.0 (commit
+77af399), its actual policy is DECAYED-COUNT eviction (argmin of a decayed
+routing count, x0.7 every 4 calls, current ids protected), within <1% of
+true-LRU on synth (misses 56.9 vs 58.3/tok @cap143; exact replay:
+`experiments/design_omlx_exact.py`); (b) the
 hit-refresh fix is worth ~20% predicted tps — retro item 2 is now
 quantitatively justified, and all policy baselines must use the fixed LRU.
 Labeling flag to T1: the "plain LRU" replay in `gap_santa_cruz.json` is
 true-LRU by behavior; name it accordingly.
 
 **Capstone: the sim now reproduces silicon end-to-end.** The full chain —
-policy replay (`hit_refresh=True`, the oMLX ExpertCache semantics) → miss
+policy replay (`hit_refresh=True`, an approximation of oMLX's decayed-count
+ExpertCache that is within <1% of it on synth) → miss
 matrix → measured serial constants (compute 18.1 ms assumed, the one
 unmeasured term) → tok/s — predicts **12.75 tok/s** at cap 143 vs measured
 12.71–13.07 (`results/serial_lru143_hitrefresh.json`, commit 4b3e56d), and
@@ -208,24 +214,31 @@ n=128 scoring at cap ≥ 180, no crowded boxes, no 54.8.
    until then).
 3. One instrumented Santa Cruz run with
    `experiments/collect_silicon_run.py` (emits per-token gap percentiles).
-   T7's model-S signature makes this a hard discriminator, not just a
-   check: at cap143 the serial model predicts tok-gap p50 71.6 / p95
-   119.8 / p99 176.3 ms, **p95/mean ≈ 1.51** (cv 0.296); a byte-backlog
-   model with the same mean predicts p95/mean ≈ 1.0. Measured p95/mean
-   ≥ 1.3 → serial-resolve; ≈ 1.0 → byte-backlog (SIM predictions,
-   `results/t7_serial_band.json`).
-   **Provenance caveat before trusting the verdict**
+   **What it can and cannot settle** (revised after
+   `results/T7_SIGNATURE_IDENTIFIABILITY.md`, commit e06db18): the
+   serial model predicts tok-gap p50 71.6 / p95 119.8 ms, p95/mean ≈ 1.51
+   at cap143, so the run can check *compatibility* with the serial
+   signature. It CANNOT identify the mechanism: a byte-only service model
+   with no layer/install/sync costs — burstiness calibrated to the same
+   miss counts — passes the same threshold at ratio 1.831, and uniform
+   backend generation delivered in pairs reads as 2.016 even with 128
+   tokens = 128 chunks. The earlier claim that one collector run settles
+   serial-resolve vs byte-backlog is RETRACTED (the prior Q-control's
+   p95/mean = 1.0 was an imposed constant-gap assumption, not a
+   demonstrated queue property). Settling mechanism identity needs
+   backend token timestamps plus per-token miss/physical-byte counters;
+   the independent evidence for serial resolution remains the measured
+   per-layer microbench (0.20+0.52k ms), which is unaffected.
+   **Provenance caveat before trusting any readout**
    (astra_local_exp/T8, `results/t8_sse_timing_probe.json`, offline
-   counterexamples — NOT silicon): the S-vs-Q readout is only as good as
-   the token-level timing. Transport chunking alone can flip it while
-   generation is unchanged — variable 1/3-token SSE deltas flip Q→S
-   (ratio 1.000 → 1.512), pair coalescing flips S→Q (1.500 → 1.008),
-   buffering 4 single-token SSE lines gives a false S-like 4.016, and a
-   usage-only 5s trailer distorts collector tps 12.50 → 10.05. Test C
-   therefore requires verified token-level timing provenance
-   (chunk-count agreement with generated tokens is necessary but not
-   sufficient); treat an S/Q verdict from unverified chunk timestamps as
-   provisional.
+   counterexamples — NOT silicon): transport chunking alone can flip the
+   ratio while generation is unchanged — variable 1/3-token SSE deltas
+   flip it 1.000 → 1.512, pair coalescing 1.500 → 1.008, buffering four
+   single-token SSE lines gives a false 4.016, and a usage-only 5s
+   trailer distorts collector tps 12.50 → 10.05. Chunk-count agreement
+   with generated tokens is necessary but not sufficient; treat verdicts
+   from unverified chunk timestamps as provisional and descriptive, not
+   causal.
 4. A cap-180 silicon point if memory allows (~27 GiB footprint; watch the
    memory-guard at 18–19% free). T7's gated band through model S predicts
    **14.0–15.7 tok/s** (n≥1024; SIM, measured constants).
