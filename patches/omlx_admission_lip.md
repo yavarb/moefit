@@ -110,3 +110,22 @@ patches/omlx_t2_sidecar_plus_lip.py md5 c704058a3378731c4629578a72861ae7
 diagnosis: "KeyError in _glu_routes slot_of until demotion is moved
 after _ensure_ids install loop"). LIP retries on the box are FORBIDDEN
 by the reconciler until this fix is run under a coordinated window.
+
+## V3 (2026-10-07, per T9's close-out audit): POST-LOOP DEMOTION
+
+The margin-64 v2 is unsafe in general: a single _ensure_ids call that
+installs >64 experts after the demoted one (prefill chunks, cold fill)
+evicts it before _glu_routes gathers -> the same KeyError. v3 replaces
+per-install reordering entirely:
+- _install tail only RECORDS first-lifetime full-cache installs in
+  self._lip_pend (no reordering at install time).
+- _ensure_ids demotes ALL of them once, at its tail — after the last
+  install of the call, where nothing evicts before _glu_routes'
+  gathers (no installs happen between _ensure_ids return and the
+  gather). Next-call evictions reclaim pollution before the hot core:
+  Qureshi call-granularity semantics, no unbounded-call hazard.
+- _lip_pend cleared after demotion (exception-safe: stale entries only
+  reorder existing residents, never unseat them).
+Composed file md5 d9850d99ab0be7ee723fee72e360adbc (py_compile green).
+Execution still requires the box's slot-lock discipline (T4 runbook);
+LIP stays frozen until a coordinated window runs the verify-gated arm.
