@@ -1,0 +1,93 @@
+{
+  "kind": "simulated identifiability audit + mocked SSE; no silicon run",
+  "trace_sha256": "f8262a526f8cf51eda38ee33a175013fa71ffad2682338c2addf06cc058b5d8f",
+  "cap": 143,
+  "warmup_tokens": 288,
+  "evaluated_tokens": 2594,
+  "serial": {
+    "stats": {
+      "n": 2594,
+      "p50": 76.66,
+      "p90": 100.8,
+      "p95": 124.56,
+      "p99": 181.34,
+      "mean": 82.69,
+      "max": 278.1
+    },
+    "classifier": {
+      "p95_over_mean": 1.506,
+      "verdict": "serial (S)",
+      "s_threshold": 1.3,
+      "q_threshold": 1.1
+    }
+  },
+  "byte_service_only_same_mean": {
+    "stats": {
+      "n": 2594,
+      "p50": 72.1,
+      "p90": 112.48,
+      "p95": 151.41,
+      "p99": 250.91,
+      "mean": 82.69,
+      "max": 421.07
+    },
+    "classifier": {
+      "p95_over_mean": 1.831,
+      "verdict": "serial (S)",
+      "s_threshold": 1.3,
+      "q_threshold": 1.1
+    }
+  },
+  "byte_service_ms_per_miss": 1.4420158924369748,
+  "byte_service_note": "Mean calibrated null; no serial layer/install costs. Not T8's specific queue implementation.",
+  "serial_with_known_32_token_chunk_averaging": {
+    "stats": {
+      "n": 81,
+      "p50": 75.84,
+      "p90": 106.13,
+      "p95": 117.64,
+      "p99": 122.24,
+      "mean": 82.7,
+      "max": 125.76
+    },
+    "classifier": {
+      "p95_over_mean": 1.422,
+      "verdict": "serial (S)",
+      "s_threshold": 1.3,
+      "q_threshold": 1.1
+    }
+  },
+  "chunk_averaging_note": "Even exact chunk counts recover block averages, not within-block token gaps.",
+  "uniform_backend_buffered_transport": {
+    "kind": "mocked SSE, NOT silicon",
+    "true_backend_gap_ms": 100.0,
+    "tokens": 128,
+    "streamed_deltas": 128,
+    "decode_tps": 10.08,
+    "observed": {
+      "stats": {
+        "n": 127,
+        "p50": 0.0,
+        "p90": 200.0,
+        "p95": 200.0,
+        "p99": 200.0,
+        "mean": 99.21,
+        "max": 200.0
+      },
+      "classifier": {
+        "p95_over_mean": 2.016,
+        "verdict": "serial (S)",
+        "s_threshold": 1.3,
+        "q_threshold": 1.1
+      }
+    }
+  },
+  "verdict": "Threshold distinguishes shapes under assumptions, not causal S vs Q mechanisms.",
+  "recommendations": [
+    "Keep serial mean-cost validation separate; this audit does not refute measured per-layer serialization.",
+    "Retract hard Test C causal arbitration; describe S-like/Q-like observed shapes only.",
+    "Require backend per-token timestamps plus miss/byte counters to test mechanism predictions.",
+    "Exclude non-text/control SSE events; usage token counts do not validate chunk timing.",
+    "Do not infer within-chunk token percentiles by dividing chunk gaps by token counts."
+  ]
+}
