@@ -192,6 +192,16 @@ microbench.
 
 ## Highest-value next measurements
 
+**All silicon tests are pre-registered** in
+[results/SILICON_TEST_PROTOCOL_PREREGISTERED.md](results/SILICON_TEST_PROTOCOL_PREREGISTERED.md)
+(T3, commit 2ce6a32): predictions and decision rules are fixed before any
+run — Test A (48 GB, cap 192, lru AND prior, n≥1024, 3 runs; score vs
+15.9/14.5, never 54.8), Test B (36 GB cap 180; band 13.8–15.7),
+Test C (collector run: p95/mean decides serial-resolve vs byte-backlog;
+vm_stat+iostat pairing settles the 0.885 absorption), Test D (48 GB
+cap 224 separates the compute term: 17.4 vs 15.8 tok/s). Anti-rules: no
+n=128 scoring at cap ≥ 180, no crowded boxes, no 54.8.
+
 1. ~~SSD bytes/token + effective BW~~ — **done** (see above).
 2. Per-layer timing instrumentation inside oMLX (needs a server restart —
    pending a decision; the running 0.28 server and :8317 stay untouched
