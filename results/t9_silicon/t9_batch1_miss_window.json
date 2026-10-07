@@ -1,0 +1,19 @@
+{
+ "kind": "T9 correction: BATCH1 logical-miss window (stats snapshot provenance)",
+ "finding": "t9_b1_stats0.json was copied at 21:19:02 PT, BEFORE the IO_BATCH=1 server (pid 29583) started at 21:20:27 PT (serve_before_212423.log). It is the PREVIOUS process's counters; omlx counters reset per process. So stats1-stats0 (29,419) is a cross-process difference and meaningless.",
+ "correct_window": "stats1 alone = process lifetime of the BATCH1 server = exactly the 3 collector runs (readiness probe is /v1/models only; run1 TTFT 9.5 s = cold).",
+ "batch1_hits": 1381873,
+ "batch1_misses": 117307,
+ "tokens_scored": 3072,
+ "prompt_tokens_total": 240,
+ "m_per_scored_token": 38.19,
+ "m_per_token_incl_prefill": 35.42,
+ "lookups_per_position": 452.7,
+ "D_ms_per_tok": 4.74,
+ "D_over_m_ms_per_miss": [
+  0.124,
+  0.134
+ ],
+ "consequence": "T5's registered IO_BATCH=1 sanity gate (D/m <= 0.30) PASSES at 0.12-0.13 ms/miss; the FAIL in a43d7e6 came from m=9.58, an artifact of the stale stats0. The 'fetch-order serialization' attribution is not needed. Same artifact affects glm_instrumentation's 'snapshots LIVE 929,408->1,381,873' reading in T4_BATCH1_PROVENANCE.md.",
+ "unchanged": "tps numbers, DB term +1.09 tok/s, scorer verdict"
+}
