@@ -1,0 +1,832 @@
+{
+  "kind": "offline_synthetic_fixtures_NOT_silicon",
+  "source_sha256": {
+    "experiments/score_silicon_run.py": "a0b61b24b932413603c440509e3749d35606ced310cf1a371b7242a48a08fa0c",
+    "moefit/metrics.py": "d1d94646f69b5674252d23625785008fa33b514dcc0db9583fd50596207959ad"
+  },
+  "cases": [
+    {
+      "name": "A_valid_length_control",
+      "input_left": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 15.9,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "input_right": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 14.5,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "protocol_problem": null,
+      "output": {
+        "test": "A",
+        "kind": "48GB milestone cap192, both policies",
+        "prediction": {
+          "lru_serial": 15.9,
+          "lru_band": "14.1-16.5",
+          "prior_serial": 14.5,
+          "prior_band": "13-15.5",
+          "bw_model_lru": 52.0,
+          "bw_model_prior": 46.7,
+          "do_not_score": "54.8 (bandwidth artifact)"
+        },
+        "measured": {
+          "lru": 15.9,
+          "prior": 14.5
+        },
+        "warnings": [],
+        "verdicts": [
+          "lru 15.9 in [12.5, 18.5] -> serial model TRANSFERS to the 48GB box; score vs this table, NOT 54.8",
+          "prior 14.5 <= lru 15.9+1 -> serial ranking (lru > prior) holds"
+        ]
+      },
+      "substantive_conclusion": true,
+      "invalid_fixture_gets_conclusion": false
+    },
+    {
+      "name": "A_requested1024_actual128",
+      "input_left": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 128,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 15.9,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "input_right": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 128,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 14.5,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "protocol_problem": "actual tokens below 1024",
+      "output": {
+        "test": "A",
+        "kind": "48GB milestone cap192, both policies",
+        "prediction": {
+          "lru_serial": 15.9,
+          "lru_band": "14.1-16.5",
+          "prior_serial": 14.5,
+          "prior_band": "13-15.5",
+          "bw_model_lru": 52.0,
+          "bw_model_prior": 46.7,
+          "do_not_score": "54.8 (bandwidth artifact)"
+        },
+        "measured": {
+          "lru": 15.9,
+          "prior": 14.5
+        },
+        "warnings": [],
+        "verdicts": [
+          "lru 15.9 in [12.5, 18.5] -> serial model TRANSFERS to the 48GB box; score vs this table, NOT 54.8",
+          "prior 14.5 <= lru 15.9+1 -> serial ranking (lru > prior) holds"
+        ]
+      },
+      "substantive_conclusion": true,
+      "invalid_fixture_gets_conclusion": true
+    },
+    {
+      "name": "A_explicit128",
+      "input_left": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 128,
+        "runs": [
+          {
+            "tokens": 128,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 15.9,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        },
+        "tokens": 128
+      },
+      "input_right": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 128,
+        "runs": [
+          {
+            "tokens": 128,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 14.5,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        },
+        "tokens": 128
+      },
+      "protocol_problem": "actual tokens below 1024",
+      "output": {
+        "test": "A",
+        "kind": "48GB milestone cap192, both policies",
+        "prediction": {
+          "lru_serial": 15.9,
+          "lru_band": "14.1-16.5",
+          "prior_serial": 14.5,
+          "prior_band": "13-15.5",
+          "bw_model_lru": 52.0,
+          "bw_model_prior": 46.7,
+          "do_not_score": "54.8 (bandwidth artifact)"
+        },
+        "measured": {
+          "lru": 15.9,
+          "prior": 14.5
+        },
+        "warnings": [
+          "n=128 < 1024 at cap 192 >= 180: protocol FORBIDS scoring this run (short runs understate; T8 ramp)",
+          "n=128 < 1024 at cap 192 >= 180: protocol FORBIDS scoring this run (short runs understate; T8 ramp)"
+        ],
+        "verdicts": [
+          "lru 15.9 in [12.5, 18.5] -> serial model TRANSFERS to the 48GB box; score vs this table, NOT 54.8",
+          "prior 14.5 <= lru 15.9+1 -> serial ranking (lru > prior) holds"
+        ]
+      },
+      "substantive_conclusion": true,
+      "invalid_fixture_gets_conclusion": true
+    },
+    {
+      "name": "A_missing_all_counts",
+      "input_left": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "runs": [
+          {
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 15.9,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "input_right": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "runs": [
+          {
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 14.5,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "protocol_problem": "actual count unavailable",
+      "output": {
+        "test": "A",
+        "kind": "48GB milestone cap192, both policies",
+        "prediction": {
+          "lru_serial": 15.9,
+          "lru_band": "14.1-16.5",
+          "prior_serial": 14.5,
+          "prior_band": "13-15.5",
+          "bw_model_lru": 52.0,
+          "bw_model_prior": 46.7,
+          "do_not_score": "54.8 (bandwidth artifact)"
+        },
+        "measured": {
+          "lru": 15.9,
+          "prior": 14.5
+        },
+        "warnings": [],
+        "verdicts": [
+          "lru 15.9 in [12.5, 18.5] -> serial model TRANSFERS to the 48GB box; score vs this table, NOT 54.8",
+          "prior 14.5 <= lru 15.9+1 -> serial ranking (lru > prior) holds"
+        ]
+      },
+      "substantive_conclusion": true,
+      "invalid_fixture_gets_conclusion": true
+    },
+    {
+      "name": "A_mixed_lengths",
+      "input_left": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 15.9,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "input_right": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 14.5,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "protocol_problem": "one constituent run below 1024",
+      "output": {
+        "test": "A",
+        "kind": "48GB milestone cap192, both policies",
+        "prediction": {
+          "lru_serial": 15.9,
+          "lru_band": "14.1-16.5",
+          "prior_serial": 14.5,
+          "prior_band": "13-15.5",
+          "bw_model_lru": 52.0,
+          "bw_model_prior": 46.7,
+          "do_not_score": "54.8 (bandwidth artifact)"
+        },
+        "measured": {
+          "lru": 15.9,
+          "prior": 14.5
+        },
+        "warnings": [],
+        "verdicts": [
+          "lru 15.9 in [12.5, 18.5] -> serial model TRANSFERS to the 48GB box; score vs this table, NOT 54.8",
+          "prior 14.5 <= lru 15.9+1 -> serial ranking (lru > prior) holds"
+        ]
+      },
+      "substantive_conclusion": true,
+      "invalid_fixture_gets_conclusion": true
+    },
+    {
+      "name": "A_single_run",
+      "input_left": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 15.9,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "input_right": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 14.5,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "protocol_problem": "protocol asks 3 runs",
+      "output": {
+        "test": "A",
+        "kind": "48GB milestone cap192, both policies",
+        "prediction": {
+          "lru_serial": 15.9,
+          "lru_band": "14.1-16.5",
+          "prior_serial": 14.5,
+          "prior_band": "13-15.5",
+          "bw_model_lru": 52.0,
+          "bw_model_prior": 46.7,
+          "do_not_score": "54.8 (bandwidth artifact)"
+        },
+        "measured": {
+          "lru": 15.9,
+          "prior": 14.5
+        },
+        "warnings": [],
+        "verdicts": [
+          "lru 15.9 in [12.5, 18.5] -> serial model TRANSFERS to the 48GB box; score vs this table, NOT 54.8",
+          "prior 14.5 <= lru 15.9+1 -> serial ranking (lru > prior) holds"
+        ]
+      },
+      "substantive_conclusion": true,
+      "invalid_fixture_gets_conclusion": true
+    },
+    {
+      "name": "A_mismatched_pair",
+      "input_left": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 15.9,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 20
+        }
+      },
+      "input_right": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "different-host",
+        "model": "different-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 14.5,
+        "ram_gib": 36,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 143,
+          "free_percent": 20
+        }
+      },
+      "protocol_problem": "different host/model/RAM/cap",
+      "output": {
+        "test": "A",
+        "kind": "48GB milestone cap192, both policies",
+        "prediction": {
+          "lru_serial": 15.9,
+          "lru_band": "14.1-16.5",
+          "prior_serial": 14.5,
+          "prior_band": "13-15.5",
+          "bw_model_lru": 52.0,
+          "bw_model_prior": 46.7,
+          "do_not_score": "54.8 (bandwidth artifact)"
+        },
+        "measured": {
+          "lru": 15.9,
+          "prior": 14.5
+        },
+        "warnings": [],
+        "verdicts": [
+          "lru 15.9 in [12.5, 18.5] -> serial model TRANSFERS to the 48GB box; score vs this table, NOT 54.8",
+          "prior 14.5 <= lru 15.9+1 -> serial ranking (lru > prior) holds"
+        ]
+      },
+      "substantive_conclusion": true,
+      "invalid_fixture_gets_conclusion": true
+    },
+    {
+      "name": "A_crowded",
+      "input_left": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 15.9,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 15.9,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 5
+        }
+      },
+      "input_right": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 1024,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 14.5,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 192,
+          "free_percent": 5
+        }
+      },
+      "protocol_problem": "during-run free percent below 10",
+      "output": {
+        "test": "A",
+        "kind": "48GB milestone cap192, both policies",
+        "prediction": {
+          "lru_serial": 15.9,
+          "lru_band": "14.1-16.5",
+          "prior_serial": 14.5,
+          "prior_band": "13-15.5",
+          "bw_model_lru": 52.0,
+          "bw_model_prior": 46.7,
+          "do_not_score": "54.8 (bandwidth artifact)"
+        },
+        "measured": {
+          "lru": 15.9,
+          "prior": 14.5
+        },
+        "warnings": [],
+        "verdicts": [
+          "lru 15.9 in [12.5, 18.5] -> serial model TRANSFERS to the 48GB box; score vs this table, NOT 54.8",
+          "prior 14.5 <= lru 15.9+1 -> serial ranking (lru > prior) holds"
+        ]
+      },
+      "substantive_conclusion": true,
+      "invalid_fixture_gets_conclusion": true
+    },
+    {
+      "name": "B_requested1024_actual128",
+      "input_left": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 128,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 14.5,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 14.5,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 180,
+          "free_percent": 20
+        }
+      },
+      "input_right": null,
+      "protocol_problem": "actual tokens below 1024",
+      "output": {
+        "test": "B",
+        "kind": "36GB cap180 point",
+        "prediction": {
+          "serial_band": "13.8-15.7",
+          "note": "tps alone does NOT discriminate S vs Q (same median)"
+        },
+        "measured": {
+          "tps": 14.5
+        },
+        "warnings": [],
+        "verdicts": [
+          "cap180 tps 14.5 IN the pre-registered 13.8-15.7 band"
+        ]
+      },
+      "substantive_conclusion": true,
+      "invalid_fixture_gets_conclusion": true
+    },
+    {
+      "name": "D_requested1024_actual128",
+      "input_left": {
+        "kind": "synthetic_fixture_NOT_silicon",
+        "host": "fixture-host",
+        "model": "fixture-model",
+        "max_tokens": 1024,
+        "runs": [
+          {
+            "tokens": 128,
+            "decode_tps": 15.8,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 15.8,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          },
+          {
+            "tokens": 128,
+            "decode_tps": 15.8,
+            "ttft_s": 0.7,
+            "count_source": "usage.completion_tokens"
+          }
+        ],
+        "decode_tps_median": 15.8,
+        "ram_gib": 48,
+        "memory_during_run": {
+          "resident_experts_per_layer_approx": 224,
+          "free_percent": 20
+        }
+      },
+      "input_right": null,
+      "protocol_problem": "actual tokens below 1024",
+      "output": {
+        "test": "D",
+        "kind": "compute-term separation, cap224",
+        "prediction": {
+          "tps_at_compute_18_1": 17.4,
+          "tps_at_compute_24_1": 15.8,
+          "delta": 1.6,
+          "breakdown": "io 22.9 + install 10.5 + sync 5.9"
+        },
+        "measured": {
+          "tps": 15.8
+        },
+        "warnings": [],
+        "verdicts": [
+          "measured 15.8 tps is closer to the 24.1 ms (DRAM_EFF@410) prediction (|d| 0.0 vs 1.6) -> compute term follows 24.1 ms (DRAM_EFF@410); pin every tier prediction by the same offset"
+        ]
+      },
+      "substantive_conclusion": true,
+      "invalid_fixture_gets_conclusion": true
+    }
+  ],
+  "total_cases": 10,
+  "invalid_cases": 9,
+  "invalid_cases_with_conclusions": 9,
+  "note": "No production edits. Numeric scoring rules untouched. Unknown eligibility should not be accepted as verified eligibility."
+}
