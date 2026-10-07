@@ -211,7 +211,14 @@ microbench.
    and a policy-ranking discriminator: race **lru@192 vs prior@192** —
    the serial model says true-LRU wins (14.5 vs 13.3, SIM); the old
    bandwidth-model carry-forward said prior (54.8). Silicon picks the
-   ranking.
+   ranking. **Score the milestone against the serial table, not 54.8**:
+   `results/fidelity_tier_predictions.json` (T3, commit f0692cb, SIM,
+   non-36GB rows extrapolate Santa-Cruz constants — flagged in-file)
+   prices the shipped README rows as: 48 GB cap192 lru 15.9 / prior 14.5
+   (bandwidth model says 52.0/46.7); 48 GB cap128 lru 11.8 / prior 10.1
+   (bw 32.5/28.1); 32 GB cap128 lru 9.7 (bw 26.3); 24 GB cap64 lru 4.9
+   (bw 12.0). A run scoring against 54.8 would read as failure at ~16;
+   54.8 stays only as the ideal-pipelining ceiling.
 6. Method note from the T8 queue model (SIM): residency sweeps on silicon
    need runs of n ≥ 1024 tokens; short 128-token benches understate
    steady-state more as residency rises (n128/steady ≈ 0.92 @cap143,
@@ -227,11 +234,14 @@ microbench.
    worth 16.8 → 21.9–24.9 tok/s (L2 = 110–200 experts/layer, SIM), and
    the drive stops binding at ~31 physical misses/token.
 
-Tooling: `experiments/gap_report.py` pairs any sim row with any measured
-record; `moefit/metrics.py` is the RunRecord schema (tok-gap p50/p90/p95/p99
-supported); `experiments/gap_santa_cruz.py` and
+Tooling: `experiments/gap_report.py --serial` pairs the silicon-realistic
+serial-model prediction with any measured record in one command
+(commit 23aecd9); `moefit/metrics.py` is the RunRecord schema (tok-gap
+p50/p90/p95/p99 supported); `experiments/gap_santa_cruz.py` and
 `experiments/microbench_expert_reads.py` regenerate the tables above;
-`experiments/fidelity_santa_cruz.py` regenerates the policy table.
+`experiments/fidelity_santa_cruz.py` regenerates the policy table;
+`experiments/serial_predict.py` prices any policy's miss matrix in
+measured ms/token.
 
 ## Provenance
 
