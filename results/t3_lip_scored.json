@@ -1,0 +1,52 @@
+{
+ "test": "T3 LIP admission A/B/A",
+ "kind": "ON (OMLX_ADMISSION=1, env at process start) vs OFF (unset), default DB-ON env, restored patched server; Chief mandate",
+ "prereg_chain": [
+  "results/T3_ADMISSION_SILICON_PREREG.md",
+  "results/t3_admission_prereg_amendment1.json (34e7523)",
+  "results/t3_admission_power_analysis.json (2822e66)"
+ ],
+ "prediction": {
+  "single_prompt_band_tps": [
+   -0.04,
+   0.17
+  ],
+  "decision_thresholds": {
+   "transfers": 0.3,
+   "falsifies": -0.3
+  },
+  "power": {
+   "three_run_floor_tps": 0.21,
+   "wash_is_forced_below": 0.17
+  }
+ },
+ "median_off_tps": 15.64,
+ "median_on_tps": 15.98,
+ "delta_tps": 0.34,
+ "verdict": "TRANSFERS",
+ "prompt_note": "prompt identity NOT mechanically verified (pre-prompt_sha256 blobs; operator attestation)",
+ "counters": {},
+ "errors": [],
+ "bootstrap_20k": {
+  "median_delta_tps": 0.34,
+  "ci95": [
+   -1.16,
+   0.8
+  ],
+  "p_delta_le_0": 0.45,
+  "p_delta_lt_030": 0.45
+ },
+ "honest_reading": "TRANSFERS by the pre-registered letter (+0.34 >= +0.30), but NOT statistically robust: arms overlap heavily (OFF 15.52-16.63, ON 15.47-16.32), P(delta<=0)=0.45, CI95 [-1.16,+0.80]. The prereg power analysis assumed sd=0.156 (chief_executor's 3-run band); the OBSERVED within-arm spread is 0.85-1.11 tps (sd ~0.43), so the effective 3-run resolution floor is ~0.7+ tps \u2014 +0.34 is below it. Verdict at this sample size: INCONCLUSIVE, consistent with BOTH the sim claim (+0.10..+0.26) and zero. No WIN is claimed from this; resolving needs >=8 runs/arm per the cycle-40 power analysis with the corrected (observed) spread.",
+ "counters_readout": {
+  "on_process_lifetime": {
+   "hits": 1408021,
+   "misses": 114610
+  },
+  "off_process_lifetime_cited": {
+   "hits": 1372496,
+   "misses": 107191,
+   "provenance": "T9's notebook read at 20:58 of the t9_on_A2 process, BEFORE T2's sidecar arms added to it"
+  },
+  "caveat": "windows are NOT matched (ON includes a 64-token verify request; process lifetimes include different prefill/warmup traffic) \u2014 readout only, no conclusion; raw misses are HIGHER under LIP in unmatched windows, which cannot be interpreted"
+ }
+}
