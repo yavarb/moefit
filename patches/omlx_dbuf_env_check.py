@@ -64,6 +64,59 @@ def inventory(path):
     return md5, found, has_machinery
 
 
+def live_env():
+    """Probe what CAN be verified about the RUNNING omlx-server.
+
+    macOS does NOT expose another process's environment to ps/launchctl
+    on this box (verified: ps eww, ps -E, and launchctl procinfo all
+    return nothing) — so the live server's OMLX_* arm config (IO_WORKERS,
+    IO_BATCH, OVERLAP, ADMISSION) is UNVERIFIABLE from outside. A
+    restart wrapper can leave the server in a non-default env with no
+    visible trace; arms collected against it under a default-env
+    assumption would be contaminated.
+
+    FAIL-CLOSED guidance: arms must set their own env via their own
+    restart (as t9_batch1_arm.sh does) rather than trust the ambient
+    server. What this probe DOES verify: the sidecar flag file, and a
+    multiple-omlx-server hazard (port conflict / wrong server on :8000).
+    """
+    import os
+    import subprocess
+    pids = subprocess.run(["pgrep", "-x", "omlx-server"],
+                          capture_output=True, text=True).stdout.split()
+    if not pids:
+        print("no omlx-server process found")
+        return
+    print(f"omlx-server process(es): {pids}")
+    if len(pids) > 1:
+        print("HAZARD: multiple omlx-server processes — port conflict / "
+              "the :8000 server may not be the one you think; kill the "
+              "stale one before any arm")
+    # env: attempt the read, but NEVER report 'default' from absence
+    for p in pids:
+        ps = subprocess.run(["ps", "eww", "-o", "command=", "-p", p],
+                            capture_output=True, text=True).stdout
+        vis = sorted(set(re.findall(r"(OMLX_[A-Z_]+)=\S*", ps)))
+        if vis:
+            print(f"pid {p}: OMLX_* env VISIBLE: {vis} "
+                  "(non-default config — arm accordingly)")
+        else:
+            print(f"pid {p}: OMLX_* env NOT READABLE on this macOS "
+                  "(ps eww / launchctl procinfo all empty) — arm config "
+                  "UNKNOWN; FAIL-CLOSED: do NOT assume default env")
+    # sidecar flag: the one arm state that IS verifiable
+    flag = "/tmp/omlx_sidecar_on"
+    print(f"sidecar flag {flag}: "
+          + ("PRESENT (T2 sidecar arm ACTIVE)" if os.path.exists(flag)
+             else "absent (sidecar off)"))
+    print()
+    print("Arm defaults on this file: IO_WORKERS=12 (pool ON), "
+          "IO_BATCH=48 (window ON), OVERLAP=1, ADMISSION=0.")
+    print("RULE: every arm restarts omlx with its OWN env (the "
+          "t9_batch1_arm.sh restart() pattern) — never collect against "
+          "a server whose env you did not set in this arm's own restart.")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--file", default=None,
@@ -71,7 +124,15 @@ def main():
                          "auto-locate the file the live omlx-server "
                          "process has loaded (via lsof), falling back "
                          "to the Homebrew Cellar path")
+    ap.add_argument("--live", action="store_true",
+                    help="probe the RUNNING omlx-server's OMLX_* env "
+                         "(ps eww) and report which arm config is live; "
+                         "run this before/after every arm to catch "
+                         "servers left in a non-default env")
     a = ap.parse_args()
+    if a.live:
+        live_env()
+        return
     path = a.file
     if path is None:
         import subprocess
