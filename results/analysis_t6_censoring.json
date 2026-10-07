@@ -1,0 +1,82 @@
+{
+  "kind": "SIMULATED trace replay; no new silicon measurement",
+  "trace": "results/traces_synth/holdout.npz",
+  "trace_sha256": "f8262a526f8cf51eda38ee33a175013fa71ffad2682338c2addf06cc058b5d8f",
+  "tag_order": [
+    "p0_holdout0",
+    "p10_holdout10",
+    "p11_holdout11",
+    "p12_holdout12",
+    "p1_holdout1",
+    "p2_holdout2",
+    "p3_holdout3",
+    "p4_holdout4",
+    "p5_holdout5",
+    "p6_holdout6",
+    "p7_holdout7",
+    "p8_holdout8",
+    "p9_holdout9"
+  ],
+  "tokens": 2882,
+  "layers": 48,
+  "top_k": 10,
+  "cap": 143,
+  "tests": {
+    "references_checked": 400,
+    "checks": [
+      "cold sentinel equals first reference",
+      "stack distance equals brute force",
+      "distance miss mask equals LRU",
+      "future mask equals brute force"
+    ]
+  },
+  "distance": {
+    "cold_sentinel": 28821,
+    "unfiltered_percentiles": {
+      "50": 24.0,
+      "90": 170.0,
+      "95": 324.0,
+      "99": 28821.0
+    },
+    "finite_only_percentiles": {
+      "50": 23.0,
+      "90": 149.0,
+      "95": 255.0,
+      "99": 434.0
+    },
+    "finite_max": 511,
+    "cold_fraction": 0.017705441822808234
+  },
+  "concatenated": {
+    "misses_per_token": 58.281054823039554,
+    "hit_fraction": 0.8785811357853343,
+    "miss_taxonomy_counts": {
+      "cold_with_observed_later_use": 24309,
+      "cold_without_observed_later_use": 184,
+      "recurrent_miss_with_observed_later_use": 132608,
+      "recurrent_miss_without_observed_later_use": 10865
+    },
+    "miss_taxonomy_fraction": {
+      "cold_with_observed_later_use": 0.14472571830013217,
+      "cold_without_observed_later_use": 0.0010954597954347903,
+      "recurrent_miss_with_observed_later_use": 0.7894931117011776,
+      "recurrent_miss_without_observed_later_use": 0.06468571020325542
+    },
+    "after_initial_128_misses_per_token": 57.52687000726216,
+    "matched_prompt_suffix_misses_per_token": 47.77914614121511
+  },
+  "reset_each_prompt": {
+    "misses_per_token": 64.32373351839,
+    "hit_fraction": 0.8659922218366874,
+    "cold_misses_per_token": 49.882373351839,
+    "after_each_initial_128_misses_per_token": 47.779967159277504,
+    "remaining_tokens": 1218
+  },
+  "interpretation": [
+    "Cold sentinel is not a reuse distance. Finite distance cannot exceed E-1=511.",
+    "No observed future use is right-censored, not proof an expert is dead.",
+    "A reuse-distance distribution describes LRU, not optimal eviction headroom.",
+    "Prompt reset is a cache-lifecycle scenario, not a claim about the live server.",
+    "Concatenation preserves lexicographic loader order; no subsampling."
+  ]
+}
