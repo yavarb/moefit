@@ -1,0 +1,80 @@
+{
+ "label": "measured on M4 Max 36GB Santa Cruz",
+ "kind": "measured",
+ "timestamp": "2026-10-06T19:34:33-0700",
+ "host": "santacruz",
+ "chip": "Apple M4 Max",
+ "ram_gib": 36.0,
+ "macos": "27.0",
+ "server_url": "http://127.0.0.1:8000",
+ "model": "Qwen3.8-Flash-Next-oQ4e-mtp",
+ "max_tokens": 128,
+ "runs": [
+  {
+   "tokens": 128,
+   "count_source": "usage.completion_tokens",
+   "streamed_deltas": 58,
+   "ttft_s": 0.614,
+   "decode_s": 15.564,
+   "decode_tps": 8.16,
+   "wall_s": 16.179,
+   "wall_tps": 7.91,
+   "finish_reason": "length",
+   "prompt_tokens": 88,
+   "sample": "\nWe need answer user's request: \"Write a long, detailed essay on the history of unified memory architectures in personal computers, from early shared-memory des"
+  },
+  {
+   "tokens": 128,
+   "count_source": "usage.completion_tokens",
+   "streamed_deltas": 60,
+   "ttft_s": 0.916,
+   "decode_s": 16.345,
+   "decode_tps": 7.77,
+   "wall_s": 17.261,
+   "wall_tps": 7.42,
+   "finish_reason": "length",
+   "prompt_tokens": 88,
+   "sample": "\nWe need answer user's request: \"Write a long, detailed essay on the history of unified memory architectures in personal computers, from early shared-memory des"
+  },
+  {
+   "tokens": 128,
+   "count_source": "usage.completion_tokens",
+   "streamed_deltas": 61,
+   "ttft_s": 0.895,
+   "decode_s": 16.201,
+   "decode_tps": 7.84,
+   "wall_s": 17.097,
+   "wall_tps": 7.49,
+   "finish_reason": "length",
+   "prompt_tokens": 88,
+   "sample": "\nWe need answer user's request: \"Write a long, detailed essay on the history of unified memory architectures in personal computers, from early shared-memory des"
+  }
+ ],
+ "decode_tps_median": 7.8,
+ "decode_tps_min": 7.77,
+ "decode_tps_max": 8.16,
+ "ttft_s_median": 0.9,
+ "warmup": {
+  "tokens": 16,
+  "count_source": "usage.completion_tokens",
+  "streamed_deltas": 9,
+  "ttft_s": 21.311,
+  "decode_s": 2.36,
+  "decode_tps": 6.36,
+  "wall_s": 23.672,
+  "wall_tps": 0.68,
+  "finish_reason": "length",
+  "prompt_tokens": 88,
+  "sample": "\nWe need answer user's request: \"Write a long, detailed essay on the"
+ },
+ "method": "greedy streaming chat completion; decode_tps = (tokens-1) / (time from first to last streamed token); wall clock on the client",
+ "notes": "oMLX 0.7.0 expert offload, PLE on SSD, MTP off, memory-guard aggressive, max-concurrent 1; resident fraction clamped to the 20 GB live ceiling because other apps held RAM",
+ "omlx_version": "0.7.0",
+ "omlx_model_settings": {
+  "moe_expert_offload_enabled": true,
+  "moe_expert_offload_resident_fraction": 0.18,
+  "mtp_enabled": false,
+  "qwen4_ple_ssd_offload": true
+ },
+ "git_commit": "a3ea7ec"
+}

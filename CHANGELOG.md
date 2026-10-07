@@ -5,6 +5,23 @@ behaviour.
 
 ## Unreleased (review branch `fable-review`)
 
+Measured paging run and agent setup path:
+
+- First real paging measurement: M4 Max 36 GB (“Santa Cruz”), oMLX 0.7.0
+  expert offload at 0.18 residency, 7.8 tok/s median decode
+  (`results/measured_santa_cruz_36gb.json`, `results/estimate_santa_cruz_36gb.json`).
+  README speed table now labels every row measured or simulated.
+- `scripts/configure_omlx_paging.py` turns an `estimate.py` verdict into
+  oMLX `model_settings.json` (expert offload fraction clamped to the Metal
+  cap and, with `--ceiling-gb`, to a live 507 ceiling), links the
+  checkpoint into `~/.omlx/models`; `scripts/serve_paging.sh` starts and
+  waits for the server; `scripts/bench_decode.py` measures wall-clock
+  decode tok/s over the OpenAI endpoint.
+- SETUP.md rewritten end to end around `omlx serve` with verify blocks.
+- `check_docs.py` ties README measured rows to `results/measured_*.json`
+  and fails on an unlabelled speed row. FAQ SSD-traffic sentence restored
+  to the JSON values (it had drifted to 341 MB/tok; JSON says 629).
+
 Fixes with runnable reproductions under `tests/`:
 
 - `estimate.py` sized tensors as shape times a per-dtype byte table with a

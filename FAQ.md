@@ -14,10 +14,11 @@ you a little at the tight end, and the chip costs you the rest.
 Reads do not wear flash; only writes do, and this scheme writes nothing
 to the SSD during decode. The expert files are read from SSD into RAM
 and re-read as needed. What you should care about is read bandwidth and
-heat: plain LRU at 32 experts per layer streams about 341 MB per token,
-which at 15 tok/s is several terabytes read per day. The pinned hot-set
-at 192 experts per layer on a 32 GB Mac streams 75 MB per token. Choose
-the row of the SETUP.md table with the lowest SSD traffic you can afford.
+heat: plain LRU streams about 260 to 629 MB per token depending on how
+many experts per layer stay resident (128 down to 32), which at 15 tok/s
+is several terabytes read per day. The pinned hot-set at 192 experts per
+layer on a 48 GB Mac streams 138 MB per token. Choose the row of the
+SETUP.md table with the lowest SSD traffic you can afford.
 
 **Can I use this with LM Studio or Ollama?**
 Partly. The prefetch tool warms file pages in the macOS unified-memory

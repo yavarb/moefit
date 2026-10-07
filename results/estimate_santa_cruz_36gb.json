@@ -1,0 +1,17 @@
+{
+ "chip": "Apple M4 Max",
+ "ram_gib": 36.0,
+ "usable_gib": 24.0,
+ "model_total_gib": 99.0,
+ "routed_experts_gib": 64.6,
+ "ple_table_gib": 29.8,
+ "resident_floor_gib": 4.6,
+ "layers": 48,
+ "experts_per_layer": 512,
+ "expert_mib": 2.69,
+ "peak_dram_gbps": 546,
+ "resident_experts_per_layer": 153,
+ "expert_coverage_frac": 0.299,
+ "decode_ceiling_tps_bound": 36.0,
+ "verdict": "PAGING: keep 153 experts/layer resident; predictions and prefix traces cover the rest from SSD. Decode is DRAM-bound at ~36.0 tok/s ceiling regardless of paging policy."
+}

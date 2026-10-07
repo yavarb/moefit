@@ -42,14 +42,15 @@ report measured numbers back to me.
 | Your Mac | Experts kept in RAM per layer | Decode (LRU → pinned hot-set) | Notes |
 |---|---|---|---|
 | M4 Max, 128 GB | all (model fits) | **57.4 tok/s — measured** | baseline; you don’t need moefit |
-| M4 Max, 48 GB | 192 | 45.1 → **54.8 tok/s** | ~96% of full-fit when pinned |
-| M4 Max, 48 GB | 128 | 29.1 → 31.7 tok/s | |
-| M4 Pro, 32 GB | 128 | 23.6 → 25.7 tok/s | usable for agents |
-| M4, 24 GB | 64 | 11.8 tok/s | chip bandwidth ceiling; tight |
+| M4 Max, 36 GB | 92 (fraction 0.18) | **7.8 tok/s — measured** ([results/measured_santa_cruz_36gb.json](results/measured_santa_cruz_36gb.json)) | oMLX 0.7.0 expert offload, PLE table on SSD, MTP off; other apps held 16 GB, so only 20 GB was admitted |
+| M4 Max, 48 GB | 192 | 45.1 → **54.8 tok/s** — simulated | ~96% of full-fit when pinned |
+| M4 Max, 48 GB | 128 | 29.1 → 31.7 tok/s — simulated | |
+| M4 Pro, 32 GB | 128 | 23.6 → 25.7 tok/s — simulated | usable for agents |
+| M4, 24 GB | 64 | 11.8 tok/s — simulated | chip bandwidth ceiling; tight |
 
 The limit is your chip’s memory bandwidth, not clever paging math: each token still reads about 1.3 GB of weights through unified RAM. Paging only decides whether you stall waiting for SSD. Full table and methods: [SETUP.md](SETUP.md#what-the-simulation-says).
 
-**Status:** 128 GB numbers are measured on silicon. Paging rows are from a simulator calibrated within ~4% of that measured baseline, replaying real router traces. Next step is a real 48 GB M4 Max paging run to turn the 54.8 tok/s row from simulated into measured.
+**Status:** two rows are measured on silicon: the 128 GB baseline and the 36 GB paging run (M4 Max 36 GB “Santa Cruz”, oMLX 0.7.0 expert offload, median of three 128-token greedy runs; details below). The other paging rows are from a simulator calibrated within ~4% of the 128 GB baseline, replaying real router traces. The measured 36 GB number sits far below the simulator’s M4 Max rows (29.1 tok/s at 128 resident per layer): the simulator does not model oMLX’s per-step overhead, the mmap’d PLE table competing with streamed experts for page cache, or a resident set shrunk by other apps. Treat simulated rows as optimistic until they are measured. Next: re-run the 36 GB box idle at 0.28 residency, then a 48 GB M4 Max run.
 
 ---
 
@@ -59,7 +60,8 @@ The limit is your chip’s memory bandwidth, not clever paging math: each token 
 |---|---|
 | **128 GB+** | Don’t use this. Load the model normally. |
 | **64 GB / 48 GB** | Good fit. Pinned hot-set ≈ within 4% of full-resident speed in sim. |
-| **32 GB** | Yes, with care (~14–26 tok/s on M4 Pro). Prefer the pinned hot-set. |
+| **36 GB (M4 Max)** | Runs. 7.8 tok/s measured with oMLX expert offload at 92 experts per layer while other apps held 16 GB. |
+| **32 GB** | Yes, with care (~14–26 tok/s on M4 Pro, simulated). Prefer the pinned hot-set. |
 | **24 GB** | Marginal. OS wants the same RAM. Prefer 32 GB+. |
 
 Check first (stdlib only; no heavy install):
@@ -101,7 +103,8 @@ Longer write-up: [REVIEW.md](REVIEW.md). History of number changes: [CHANGELOG.m
 |---|---|
 | `estimate.py` | Go / no-go for a Hugging Face checkpoint on this Mac |
 | `moefit_prefetch.py` | Routing sidecar: store and replay traces; warm what each token needs |
-| `check_docs.py` | Fails if README numbers disagree with `results/sim_paging.json` |
+| `check_docs.py` | Fails if README/SETUP numbers disagree with `results/sim_paging.json` or `results/measured_*.json`, or a speed row is not labelled measured/simulated |
+| `scripts/` | `configure_omlx_paging.py` (estimate → oMLX settings), `serve_paging.sh`, `bench_decode.py` |
 | `experiments/` | Trace collection, paging simulator, probe studies |
 | `results/` | Simulation tables and study outputs |
 | `tests/` | Repros for bugs this repo has fixed |
@@ -129,7 +132,21 @@ Sizes come from the safetensors header.
 | Paging simulator vs that decode baseline | within **4%** (real router traces) |
 | Router determinism (greedy re-runs) | **8208 / 8208** identical (`experiments/det_test.py`) |
 
-Re-check docs against the shipped table anytime:
+## Measured on M4 Max 36 GB (Santa Cruz, paging)
+
+| | |
+|---|---|
+| Engine | oMLX 0.7.0, `moe_expert_offload_enabled`, resident fraction 0.18 (92 of 512 experts per layer), `qwen4_ple_ssd_offload`, MTP off, `--memory-guard aggressive --max-concurrent-requests 1` |
+| Decode | **7.8 tok/s** median of 3 runs (7.77–8.16), 128 greedy tokens each (`scripts/bench_decode.py`) |
+| Server-side figure for the same runs | 7.8–8.2 tok/s (oMLX log) |
+| Time to first token | 0.9 s on an 88-token prompt (prefix-cached) |
+| Cold load | 21 s to first token (only resident experts load; PLE rows are gathered through mmap) |
+| Resident footprint | 16.4 GB actual (oMLX log: 12.2 GB of the 68 GB expert tables resident) |
+| Why 0.18 and not the 0.28 estimate.py allows | other apps held ~16 GB, so oMLX’s live ceiling was 20 GB and refused the 23.8 GB load with HTTP 507; `configure_omlx_paging.py --ceiling-gb 20` shrank the resident set to fit |
+
+Raw JSON: [results/measured_santa_cruz_36gb.json](results/measured_santa_cruz_36gb.json); estimate: [results/estimate_santa_cruz_36gb.json](results/estimate_santa_cruz_36gb.json).
+
+Re-check docs against the shipped tables anytime:
 
 ```bash
 python3 check_docs.py

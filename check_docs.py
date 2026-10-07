@@ -11,7 +11,10 @@ Checks:
     sidecar at each RAM tier / capacity) cell by cell;
   * the DRAM ceilings quoted in prose (derived from the LRU compute time);
   * the LRU SSD traffic range quoted in prose;
-  * the "48 GB at ~N% of a 128 GB Mac" claim.
+  * the "48 GB at ~N% of a 128 GB Mac" claim;
+  * README speed-table rows: each must say "measured" or "simulated", and
+    a row that links results/measured_<x>.json must quote that file's
+    decode_tps_median.
 """
 import json, re, sys
 from pathlib import Path
@@ -47,6 +50,46 @@ def parse_table(md):
 def num(cell):
     m = re.search(r"\d+(?:\.\d+)?", cell.replace("**", ""))
     return float(m.group()) if m else None
+
+
+def check_measured(readme, problems):
+    """README speed table: label every row, and tie measured rows to JSON."""
+    lines = readme.splitlines()
+    table = []
+    for i, line in enumerate(lines):
+        if line.startswith("|") and "Decode" in line:
+            for l2 in lines[i + 2:]:
+                if not l2.startswith("|"):
+                    break
+                table.append(l2)
+            break
+    if not table:
+        problems.append("README speed table (header with 'Decode') missing")
+        return
+    n_meas = 0
+    for row in table:
+        low = row.lower()
+        if "measured" not in low and "simulated" not in low:
+            problems.append(f"README speed row not labelled measured/simulated: {row}")
+        m = re.search(r"\((results/measured_[\w.-]+\.json)\)", row)
+        if not m:
+            continue
+        n_meas += 1
+        path = ROOT / m.group(1)
+        if not path.exists():
+            problems.append(f"README links {m.group(1)} which does not exist")
+            continue
+        j = json.load(open(path))
+        want = j.get("decode_tps_median")
+        tps = re.search(r"(\d+(?:\.\d+)?) tok/s", row.replace("**", ""))
+        got = float(tps.group(1)) if tps else None
+        if got != want:
+            problems.append(f"README measured row says {got} tok/s, "
+                            f"{m.group(1)} says {want}")
+        if j.get("kind") != "measured":
+            problems.append(f"{m.group(1)} is not kind=measured")
+    print(f"README speed table: {len(table)} rows labelled, "
+          f"{n_meas} measured rows tied to results/measured_*.json")
 
 
 def main():
@@ -111,10 +154,13 @@ def main():
                         f"/ pinned {pct_prior}%")
     print(f"48 GB cap 128 vs measured 128 GB: LRU {pct}% pinned {pct_prior}%")
 
+    check_measured((ROOT / "README.md").read_text(), problems)
+
     if problems:
         print("\n".join("MISMATCH: " + p for p in problems))
         sys.exit(1)
-    print("all documented numbers match results/sim_paging.json")
+    print("all documented numbers match results/sim_paging.json "
+          "and results/measured_*.json")
 
 
 if __name__ == "__main__":
