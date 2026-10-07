@@ -12,7 +12,27 @@ usage: python3 estimate.py <model-dir> [--expert-tokens 10] [--json]
 import argparse, json, os, platform, re, struct, sys
 
 DT_SIZE = {"F8_E4M3": 1, "F8_E5M2": 1, "BF16": 2, "F16": 2, "F32": 4,
-           "I32": 4, "I64": 8, "BOOL": 1, "I8": 1, "U8": 1}
+           "F64": 8, "I8": 1, "U8": 1, "I16": 2, "U16": 2, "I32": 4,
+           "U32": 4, "I64": 8, "U64": 8, "BOOL": 1}
+
+
+def tensor_nbytes(meta):
+    """Byte length of one tensor from its safetensors header entry.
+
+    Prefer data_offsets (exact for every dtype, including the U32-packed
+    weights of 4-bit MLX checkpoints); fall back to shape x dtype size.
+    """
+    offs = meta.get("data_offsets")
+    if offs and len(offs) == 2 and offs[1] >= offs[0]:
+        return int(offs[1]) - int(offs[0])
+    numel = 1
+    for d in meta["shape"]:
+        numel *= d
+    dt = meta["dtype"].upper()
+    if dt not in DT_SIZE:
+        raise SystemExit(f"unknown safetensors dtype {dt!r} and no "
+                         f"data_offsets in header")
+    return numel * DT_SIZE[dt]
 
 
 def st_index(model_dir):
@@ -42,11 +62,7 @@ def tensor_sizes(model_dir):
         for k, meta in hdr.items():
             if k == "__metadata__":
                 continue
-            shape = meta["shape"]
-            numel = 1
-            for d in shape:
-                numel *= d
-            out[k] = numel * DT_SIZE.get(meta["dtype"].upper(), 2)
+            out[k] = tensor_nbytes(meta)
     return out
 
 

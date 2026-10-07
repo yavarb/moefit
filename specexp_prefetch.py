@@ -176,23 +176,28 @@ class Sidecar(threading.Thread):
     def __init__(self, path):
         super().__init__(daemon=True)
         self.path = Path(path)
-        self.index = OrderedDict()   # prefix-hash -> {layer: [experts]}
+        self.index = OrderedDict()   # "<prefix-hash>:<layer>" -> record
         if self.path.exists():
             for line in open(self.path):
                 try:
                     j = json.loads(line)
-                    self.index[j["h"]] = j
+                    self.index[self._key(j["h"], j["l"])] = j
                 except (json.JSONDecodeError, KeyError):
                     pass
 
+    @staticmethod
+    def _key(prefix_hash, layer):
+        return f"{prefix_hash}:{layer}"
+
     def record(self, prefix_hash, layer, experts):
         j = {"h": prefix_hash, "l": layer, "e": experts}
-        self.index[prefix_hash + f":{layer}"] = j
+        self.index[self._key(prefix_hash, layer)] = j
+        self.path.parent.mkdir(parents=True, exist_ok=True)
         with open(self.path, "a") as f:
             f.write(json.dumps(j) + "\n")
 
     def lookup(self, prefix_hash, layer):
-        j = self.index.get(prefix_hash + f":{layer}")
+        j = self.index.get(self._key(prefix_hash, layer))
         return j["e"] if j else None
 
 
