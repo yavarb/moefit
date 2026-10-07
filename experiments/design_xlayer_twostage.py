@@ -35,7 +35,7 @@ R1, R_EXTRA = 0.72, 0.14   # SIM: parallel batch read; first + bandwidth-share e
 CONTEND = 0.15             # measured bg contention per expert (design_inventor probe)
 
 
-def run(Ps1, Ps2, Is, cap, tau, max_pf, stages, warm=160, cover_guard=False):
+def run(Ps1, Ps2, Is, cap, tau, max_pf, stages, warm=160, cover_guard=False, resid_gate=None):
     """stages: subset of {'d2','d1'}; Ps1/Ps2 previews (d=1 / d=2)."""
     caches = [OrderedDict() for _ in range(48)]
     st = dict(steps=0, full=0, part=0, none=0, misses=0, cov=0, spec=0, used=0,
@@ -72,6 +72,17 @@ def run(Ps1, Ps2, Is, cap, tau, max_pf, stages, warm=160, cover_guard=False):
                         if pv[e] < 1e-4:
                             break
                     if not picks or np.exp(-E) * R1 <= len(picks) * CONTEND:
+                        return
+                if resid_gate is not None:
+                    # G5 residual-mass gate: preview mass on non-resident experts that
+                    # would NOT be fetched. Low residual => batch likely completes the
+                    # layer's miss set (the only case that removes a DB-ON stall).
+                    nonres = np.ones(pv.shape[0], bool)
+                    nonres[list(c.keys())] = False
+                    picked = [e for e in np.argsort(-pv)[:4 * max_pf].tolist()
+                              if pv[e] >= tau and nonres[e]][:max_pf]
+                    resid = float(pv[nonres].sum() - pv[picked].sum())
+                    if resid > resid_gate:
                         return
                 for e in np.argsort(-pv)[:4 * max_pf].tolist():
                     if pv[e] < tau or k >= max_pf:
@@ -123,7 +134,7 @@ def run(Ps1, Ps2, Is, cap, tau, max_pf, stages, warm=160, cover_guard=False):
     contend = st["spec"] / n * CONTEND
     saved = (st["stall_base"] - st["stall"]) / n
     base_ms = 63.6
-    return dict(stages="+".join(sorted(stages)) or "none", cover_guard=cover_guard, tau=tau, max_per_stage=max_pf,
+    return dict(stages="+".join(sorted(stages)) or "none", cover_guard=cover_guard, resid_gate=resid_gate, tau=tau, max_per_stage=max_pf,
                 tokens=n, miss_steps_per_tok=round(s / n, 2), misses_per_tok=round(st["misses"] / n, 2),
                 full_cover=round(st["full"] / s, 4), partial=round(st["part"] / s, 4),
                 none=round(st["none"] / s, 4), miss_coverage=round(st["cov"] / st["misses"], 4),

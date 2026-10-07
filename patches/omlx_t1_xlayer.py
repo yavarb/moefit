@@ -497,6 +497,7 @@ class ExpertCache:
         self._xl_target = None
         self._xl_pending: dict = {}
         self.xl_issued = self.xl_used = self.xl_wasted = self.xl_ready = 0
+        self.ensure_s = 0.0  # wall time inside demand _ensure_ids (T1 instrumentation)
         _ALL_CACHES.append(self)
 
     def _plans(self, e: int) -> list:
@@ -591,6 +592,13 @@ class ExpertCache:
         :meth:`OffloadSwitchGLU._forward_overlap`). Returns whether that
         happened.
         """
+        _t0 = time.perf_counter()
+        try:
+            return self._ensure_ids_inner(needed, on_slow_read)
+        finally:
+            self.ensure_s += time.perf_counter() - _t0
+
+    def _ensure_ids_inner(self, needed: set, on_slow_read=None) -> bool:
         pool = _io_pool()
         pending: dict[int, list] = {}
         if self._sc_pending:

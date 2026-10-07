@@ -72,7 +72,7 @@ def main():
     links = sum(c._xl_target is not None for c in caches)
     print(f"loaded+wrapped {time.time()-t0:.0f}s wrapped={wrapped} caches={len(caches)} "
           f"cap={caches[0].capacity} xl_links={links}", flush=True)
-    assert wrapped == 48 and links == 46, (wrapped, links)
+    assert wrapped == 48 and links == 48 - off._XL_D, (wrapped, links)
     store = caches[0].disk._store
     for fd in store._fds.values():
         fcntl.fcntl(fd, F_NOCACHE, 1)
@@ -85,7 +85,7 @@ def main():
     render = tok.apply_chat_template([{"role": "user", "content": item["text"]}],
                                      add_generation_prompt=True, tokenize=False)
 
-    keys = ("hits", "misses", "xl_issued", "xl_used", "xl_ready", "xl_wasted")
+    keys = ("hits", "misses", "xl_issued", "xl_used", "xl_ready", "xl_wasted", "ensure_s")
 
     def snap():
         return {k: sum(getattr(c, k) for c in caches) for k in keys}
@@ -120,6 +120,8 @@ def main():
                  xl_ready_per_tok=round(d["xl_ready"] / n, 2),
                  xl_wasted_per_tok=round(d["xl_wasted"] / n, 2),
                  xl_precision=round(d["xl_used"] / max(d["xl_issued"], 1), 3),
+                 demand_wait_ms_per_tok=round(1000 * d["ensure_s"] / n, 2),
+                 non_wait_ms_per_tok=round(1000 * ((stamps[-1] - stamps[0]) - d["ensure_s"]) / n, 2),
                  text_hash=hash("".join(text)) & 0xffffffff)
         print(json.dumps(r), flush=True)
         return r, "".join(text)
@@ -141,9 +143,13 @@ def main():
                gain=round(st.median(on) / st.median(of) - 1, 4),
                paired_deltas=[round(rows[i + 1]["decode_tps"] - rows[i]["decode_tps"], 3)
                               for i in range(0, len(rows), 2)],
-               outputs_identical=len(texts) == 1)
+               outputs_identical=len(texts) == 1,
+               median_wait_off=st.median([r["demand_wait_ms_per_tok"] for r in rows if r["arm"] == "OFF"]),
+               median_wait_on=st.median([r["demand_wait_ms_per_tok"] for r in rows if r["arm"] == "ON"]),
+               median_nonwait_off=st.median([r["non_wait_ms_per_tok"] for r in rows if r["arm"] == "OFF"]),
+               median_nonwait_on=st.median([r["non_wait_ms_per_tok"] for r in rows if r["arm"] == "ON"]))
     Path(a.out).write_text(json.dumps(res, indent=1))
-    print(json.dumps({k: res[k] for k in ("median_off", "median_on", "gain", "paired_deltas", "outputs_identical")}))
+    print(json.dumps({k: res[k] for k in ("median_off", "median_on", "gain", "paired_deltas", "outputs_identical", "median_wait_off", "median_wait_on", "median_nonwait_off", "median_nonwait_on")}))
 
 
 if __name__ == "__main__":
