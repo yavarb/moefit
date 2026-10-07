@@ -18,7 +18,14 @@ def disk():
     raise RuntimeError('disk0 physical counter unavailable')
 
 
+def check_slot_locks(root=Path('/tmp/moefit-bench')):
+    locks=sorted(root.glob('SLOT_LOCK_*'))
+    if locks:
+        raise RuntimeError('SSD slot reserved: '+', '.join(str(p) for p in locks))
+
+
 def check_idle(counter=disk, clock=time.perf_counter, wait=time.sleep):
+    check_slot_locks()
     a=counter(); t=clock(); wait(1); b=counter()
     rate=(b-a)/(clock()-t)
     if rate < 0 or rate > 50_000_000:
@@ -30,6 +37,7 @@ def main():
     model,out=map(Path,sys.argv[1:3])
     if os.environ.get('T6_SSD_SLOT_CONFIRMED') != '1':
         raise RuntimeError('Requires coordinated idle SSD slot: T6_SSD_SLOT_CONFIRMED=1')
+    check_slot_locks()
     cs=[components(model,li) for li in range(48)]
     assert all(c['experts']==512 for group in cs for c in group)
     paths={c['file'] for group in cs for c in group}
