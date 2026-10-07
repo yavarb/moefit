@@ -1,0 +1,51 @@
+{
+ "label": "T8: SSD-queue model of cap143 run vs measured short-run ramp (SIMULATED, traces_synth)",
+ "model": "emit[i]=max(cumsum(svc)[i]+C, emit[i-1]+C); svc=miss_MB/ssd_gbps; C=18.1ms compute",
+ "miss_MB_per_token": {
+  "p50": 191.0,
+  "p90": 247.5,
+  "p99": 506.8,
+  "cv": 0.342,
+  "cold_t0": 1291.2
+ },
+ "decode_tps_by_n": {
+  "ssd_2.63": {
+   "n16": 5.5,
+   "n32": 7.3,
+   "n64": 9.9,
+   "n128": 11.7,
+   "n256": 12.0,
+   "n1024": 12.7,
+   "n2882": 12.7
+  },
+  "ssd_2.8": {
+   "n16": 5.9,
+   "n32": 7.8,
+   "n64": 10.5,
+   "n128": 12.4,
+   "n256": 12.8,
+   "n1024": 13.5,
+   "n2882": 13.6
+  },
+  "ssd_3.0": {
+   "n16": 6.3,
+   "n32": 8.4,
+   "n64": 11.3,
+   "n128": 13.3,
+   "n256": 13.7,
+   "n1024": 14.4,
+   "n2882": 14.5
+  },
+  "ssd_7.4": "steady 36.6, n128 ~30+ \u2014 cannot reproduce measured 12-13 or warmup 6.4"
+ },
+ "measured_same_run": {
+  "n16_decode_tps": 6.43,
+  "n128_decode_tps": [
+   12.23,
+   12.98,
+   13.07
+  ]
+ },
+ "verdict": "ssd_eff 2.63-3.0 GB/s fits BOTH the n=16 warmup decode (5.5-6.3 vs measured 6.43) and the n=128 decode (11.7-13.3 vs measured 12.2-13.1); 7.4 GB/s fails both. Corroborates SSD-term calibration 2.63-3.0 GB/s independently of the mean-rate fit.",
+ "caveat": "synthetic traces; miss traffic from synth router, not real oMLX traces. Prefetch credit (any allow) changes nothing when SSD-bound: no policy win without real SSD BW."
+}

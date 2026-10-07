@@ -1,0 +1,19 @@
+{
+ "label": "SIM: phys/logical traffic absorption probe + evict-to-L2 what-if (cap143, true-LRU, locked traces)",
+ "facts": [
+  "Warm true-LRU @cap143: 57.4 logical miss/tok = 158.8 MB/tok (matches lead's 159 exactly). Measured physical 140.5 -> steady phys/logical = 0.885 (cold-incl 0.871).",
+  "Two-level model (L1=oMLX cache cap143, L2=LRU holding evicted slabs): warm phys/logical ratio by L2 size (experts/layer -> model-wide GiB): 80->0.971(10.4), 100->0.909(13.0), 120->0.843(15.6), 140->0.785(18.1), 180->0.683(23.3).",
+  "Measured 0.885 implies L2 absorption ~110-120 experts/layer ~= 13-16 GiB MODEL-WIDE of absorbed re-reads.",
+  "TENSION: during decode free RAM was 18-19% (~6.5 GiB) and oMLX loaded 22.6 GB; 36 - 22.6 - OS ~= 5-7 GiB visible spare. Absorption needs ~2-3x the visible page cache. Explanations: (a) oMLX freed-slot buffers persist in buffer cache and pread hits them (dirty-page reuse, not counted in free%), (b) reads NOT F_NOCACHE despite lead's microbench choice, (c) oMLX partial-slab reuse lowers logical count below 57.4 (measured miss lower bound 50.8 = 12% below true-LRU).",
+  "MEASURABLE DISCRIMINATOR for T1: run collect with fs_usage/pageino counters + free% during decode vs iostat; if page cache hits ~18 MB/tok (140.5 vs 158.8), (a)/(b) confirmed. One 256-tok run with 'vm_stat' + iostat deltas settles it."
+ ],
+ "whatif_pipelined": {
+  "note": "pipelined regime (cross-layer overlap, install still 0.30, drive 4.65 GB/s); evict-to-L2 keeps a window of evicted slabs re-readable from DRAM",
+  "baseline_no_L2": "16.8 tps (all 57.4 misses pay 0.52ms IO in-token)",
+  "L2_110": "21.9 tps (+30%)",
+  "L2_140": "22.9",
+  "L2_200": "24.9",
+  "crossover": "phys/tok ~31 (L2=110) x 2.765 MB = 85 MB/tok async at 4.65 GB/s = 18.2 ms ~= compute floor 18.1 - drive stops binding there (explains why oracle pipelined = 25 not 39)"
+ },
+ "caveat": "synth traces locked; L2 modeled as clean LRU (no dirty-writeback cost); free% reading from measured blob is coarse; simulated design what-if, no silicon claim."
+}

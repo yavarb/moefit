@@ -1,0 +1,61 @@
+{
+ "label": "SIM: eviction-policy arbitration for serial-latency model S (lead 463c856 constants)",
+ "model": "tok_ms = comp + 0.20*(layers_with_miss) + (0.52+0.30)*miss/tok + 0.122*48",
+ "measured_anchor": {
+  "cap143_tps": "12.71-13.0",
+  "cap143_hit": ">=0.894 (physical lower bound)",
+  "cap143_MB_phys": 140.5,
+  "cap92_tps_crowded": 7.8
+ },
+ "rows": [
+  {
+   "cap": 143,
+   "policy": "LRU no-refresh (carry-forward shipped)",
+   "miss": 76.9,
+   "hit": 0.84,
+   "MB_logic": 212.5,
+   "S_tps_comp23_2": 10.04
+  },
+  {
+   "cap": 143,
+   "policy": "TRUE-LRU hit-refresh",
+   "miss": 58.3,
+   "hit": 0.879,
+   "MB_logic": 161.3,
+   "S_tps_comp23_2": 11.99,
+   "S_tps_comp18_1": 12.77
+  },
+  {
+   "cap": 143,
+   "policy": "prior pin-half + LRU",
+   "miss": 88.3,
+   "hit": 0.816,
+   "MB_logic": 244.1,
+   "S_tps_comp23_2": 9.1
+  },
+  {
+   "cap": 92,
+   "policy": "LRU no-refresh",
+   "miss": 118.9,
+   "hit": 0.752,
+   "MB_logic": 328.8,
+   "S_tps_comp23_2": 7.39
+  },
+  {
+   "cap": 92,
+   "policy": "TRUE-LRU",
+   "miss": 92.6,
+   "hit": 0.807,
+   "MB_logic": 255.9,
+   "S_tps_comp23_2": 8.84
+  }
+ ],
+ "findings": [
+  "Model S + no-refresh LRU UNDERSHOOTS measured by 21-27 pct (10.0 vs 12.71-13.0 at cap143).",
+  "Model S + TRUE-LRU (hit-refresh) + comp 18.1-23.2 ms lands 12.0-12.8 vs measured 12.71-13.0 -> the retro carry-forward fix is REQUIRED to reconcile S with silicon, not a +5 pct nicety.",
+  "lead's gap_santa_cruz replay counted 57.4 miss/tok (hit 0.880) ~= TRUE-LRU 58.3/0.879, NOT no-refresh 76.9/0.840 despite 'plain LRU' description -> replay likely hit-refreshes; flag for lead.",
+  "static prior pin-half is WORSE than plain LRU on synth at both caps (more misses) - design warning for persist-pin WIP.",
+  "cap92: TRUE-LRU S=8.84 vs measured 7.8 (crowded box, expect sim-high)."
+ ],
+ "caveat": "synth traces locked dir+seed0; measured hit rate is a physical lower bound (page cache absorbs logical misses); comp 18.1 vs 23.2 is the unresolved compute-term spread."
+}

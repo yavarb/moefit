@@ -1,0 +1,76 @@
+{
+ "measured": {
+  "decode_tps": 12.71,
+  "disk_MB_per_tok": 140.5,
+  "disk_MBps": 1785.7,
+  "iops": 10746.0,
+  "avg_KB_per_io": 171.4
+ },
+ "measured_ramp": {
+  "n16": 6.43,
+  "n128": 13.0,
+  "n256": 12.71
+ },
+ "fits": [
+  {
+   "bw": 2.84,
+   "n16": 5.94,
+   "n128": 12.62,
+   "n256": 12.94,
+   "steady": 13.76,
+   "shape": "lru_raw",
+   "mean_MB": 206.8,
+   "sse": 0.00053
+  },
+  {
+   "bw": 2.38,
+   "n16": 4.98,
+   "n128": 12.4,
+   "n256": 13.08,
+   "steady": 15.21,
+   "shape": "true_lru_raw",
+   "mean_MB": 156.9,
+   "sse": 0.00182
+  },
+  {
+   "bw": 1.92,
+   "n16": 5.91,
+   "n128": 12.55,
+   "n256": 12.88,
+   "steady": 13.69,
+   "shape": "lru_raw_scaled",
+   "mean_MB": 140.5,
+   "sse": 0.00056
+  },
+  {
+   "bw": 2.14,
+   "n16": 5.0,
+   "n128": 12.45,
+   "n256": 13.13,
+   "steady": 15.27,
+   "shape": "true_lru_raw_scaled",
+   "mean_MB": 140.5,
+   "sse": 0.00184
+  },
+  {
+   "bw": 1.8,
+   "n16": 12.81,
+   "n128": 12.81,
+   "n256": 12.81,
+   "steady": 12.81,
+   "shape": "flat140",
+   "mean_MB": 140.5,
+   "sse": 6e-05
+  }
+ ],
+ "io_decomposition": {
+  "IOs_per_token": 839.0,
+  "avg_KB_per_io": 171.4,
+  "note": "~839 physical IOs/token at ~171 KB avg \u2014 NOT 2.7 MiB expert-slab-sized reads; effective 1.79 GB/s at this IO size on an NVMe rated ~7.4 GB/s sequential (~26% of spec).",
+  "per_IO_overhead_feasibility": {
+   "bw3.0": "serial overhead 38 us x 839 IOs + bytes 46.8 ms = 78.7 ms/tok",
+   "bw5.0": "serial overhead 60 us x 839 IOs + bytes 28.1 ms = 78.7 ms/tok",
+   "bw7.4": "serial overhead 71 us x 839 IOs + bytes 19.0 ms = 78.7 ms/tok"
+  }
+ }
+}

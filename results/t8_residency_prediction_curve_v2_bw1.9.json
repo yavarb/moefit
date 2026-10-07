@@ -1,0 +1,69 @@
+{
+ "label": "SIM residency curve, RAW sim traffic, bw band fitted at cap143 to measured n128/n256",
+ "bw_band": {
+  "hi": 2.84,
+  "lo": 1.92,
+  "note": "hi=bw when sim logical traffic used; lo=bw when physical traffic assumed at measured 140.5 MB/tok. Cache-dedup factor unknown vs cap, so true curve lies between."
+ },
+ "measured_anchor": {
+  "cap143_n256": 12.71,
+  "cap143_n128": "12.23-13.07"
+ },
+ "rows": [
+  {
+   "cap": 64,
+   "foot_gib": 12.7,
+   "sim_MB": 427.0,
+   "n128_hi": 6.7,
+   "n1024_hi": 6.7,
+   "steady_hi": 6.7,
+   "n128_lo": 4.5,
+   "n1024_lo": 4.5,
+   "steady_lo": 4.5
+  },
+  {
+   "cap": 100,
+   "foot_gib": 17.2,
+   "sim_MB": 297.0,
+   "n128_hi": 9.4,
+   "n1024_hi": 9.6,
+   "steady_hi": 9.6,
+   "n128_lo": 6.4,
+   "n1024_lo": 6.5,
+   "steady_lo": 6.5
+  },
+  {
+   "cap": 143,
+   "foot_gib": 22.6,
+   "sim_MB": 207.0,
+   "n128_hi": 12.6,
+   "n1024_hi": 13.7,
+   "steady_hi": 13.8,
+   "n128_lo": 8.5,
+   "n1024_lo": 9.2,
+   "steady_lo": 9.3
+  },
+  {
+   "cap": 180,
+   "foot_gib": 27.3,
+   "sim_MB": 158.0,
+   "n128_hi": 14.9,
+   "n1024_hi": 17.8,
+   "steady_hi": 18.0,
+   "n128_lo": 10.1,
+   "n1024_lo": 12.0,
+   "steady_lo": 12.2
+  },
+  {
+   "cap": 220,
+   "foot_gib": 32.3,
+   "sim_MB": 122.0,
+   "n128_hi": 16.0,
+   "n1024_hi": 22.4,
+   "steady_hi": 23.3,
+   "n128_lo": 10.8,
+   "n1024_lo": 15.2,
+   "steady_lo": 15.7
+  }
+ ]
+}

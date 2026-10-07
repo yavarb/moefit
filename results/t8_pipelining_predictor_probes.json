@@ -1,0 +1,13 @@
+{
+ "label": "SIM: pipelined-architecture value probes at cap143 (true-LRU base, model S constants, coact predictor)",
+ "model": "S-pipelined: tok = max(0.20*w + 0.52*sync + 0.30*(sync+async) + 0.122*48, comp) + max(0, async*2.765/4.65 - comp)",
+ "notes": [
+  "cross-layer pipelining ALONE (no predictor), true-LRU, comp=18.1: 16.6 tps vs serial 12.0 (+38%). Consistent with lead's ~18.6 ideal-overlap.",
+  "ORACLE next-token prefetch + pipelining: sync 58.3->0.1/tok; 25.1 tps with drive-cap (4.65 GB/s background), 39 tps ignoring drive cap. PERFECT PREDICTION BREAKS THE 18.6 PIPELINING CEILING: the constraint moves from SSD to the 18.1 ms compute floor. Prize for any predictor track: 16.6 -> 25+ tps (SIM).",
+  "coact predictor (build-trace co-activation matrix, P(e@t+1 | f@t), locked traces): precision@10 = 0.157 vs uniform 0.0195 (8.1x lift); freq-top10 0.136 (7.0x). BUT net effect on pipelined tps at current install cost: d=6 16.0, d=10 15.4, d=20 13.4 vs baseline 16.6 -> ALL NEGATIVE.",
+  "why: async installs cost 0.30 ms each regardless of use; at 15.7% precision, collateral LRU evictions push sync 58.3 -> 61.3 (d=10). Install-cost threshold for d=10 coact to break even: < ~0.18 ms/expert; at install=0 the same predictor gives 22.6.",
+  "ridge probe_picks from sim_paging.probe_picks() produced NaN on this checkout (matmul overflow warnings) - matches retro 'probe numerically broken'; used coact matrix instead."
+ ],
+ "implication": "Sequence the levers: (1) install batching/cheaper install FIRST - it gates prefetch value AND is worth ~0.30*58=17 ms/tok on its own; (2) cross-layer pipelining +38%; (3) prediction only pays after (1): at install<=0.15 ms the 8x-lift coact predictor flips positive on synth traffic.",
+ "caveat": "synthetic traces locked dir+seed0; synth coact lift may not transfer to real traces; drive-cap model is 1-background-stream approximation."
+}

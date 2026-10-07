@@ -1,0 +1,22 @@
+{
+ "label": "T8 probe cap143 LRU miss structure on traces_synth (SIMULATED)",
+ "T": 2882,
+ "served": 0.8399,
+ "sync_mb_token": {
+  "mean": 206.8,
+  "p50": 191.0,
+  "p90": 247.5,
+  "p99": 512.1,
+  "max": 1291.2
+ },
+ "per_layer": {
+  "min": 1.148,
+  "max": 2.192,
+  "cv": 0.156
+ },
+ "sim_tier": {
+  "dram": 546.0,
+  "ssd": 7.4,
+  "usable": 24.0
+ }
+}
