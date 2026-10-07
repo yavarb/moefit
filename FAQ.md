@@ -51,13 +51,6 @@ OS reserve and the 4.6 GiB floor taking a fifth of that. The OS will
 sometimes push on the floor and the engine will stall. Treat 24 GB as
 marginal and 32 GB as the comfortable minimum.
 
-**Does the speculative prefetch make it faster?**
-No. In the shipped simulation the n-gram speculative prefetch is
-net-negative at tight RAM, because about three quarters of its
-prefetches are wasted and they occupy the SSD when a real miss needs
-the bandwidth.
-The two things that help are free of prediction: a pinned hot-set
-learned from build traces, and the routing sidecar for repeated prompts.
 
 **Does Apple's memory compression or swap help?**
 No. Expert weights are random-looking 4-bit data and do not compress.

@@ -48,13 +48,7 @@ What follows from the table:
    costs no prefetch bandwidth. It is the cheapest real win.
 3. The routing sidecar wins the tight-capacity rows and never hurts on
    repeated prefixes.
-4\. n-gram speculative prefetch loses everywhere tested: about 75% of
-   prefetches are wasted and they eat the SSD time that hides other
-   misses. Do not ship it for byte-exact MoE execution.
-5. SSD traffic under LRU is about 260 to 629 MB per token (steady state,
-   cap 128 down to cap 32). At 15 tok/s that is several terabytes per
-   day. Prefer the pinned hot-set, and pick the RAM tier whose row shows
-   the lowest SSD traffic you can afford.
+
 
 ## Step 0: measure the machine and the model
 
@@ -103,11 +97,8 @@ restarting the tool, the same prompt still logs hits
 ## Step 3: what NOT to believe
 
 - No predictor changes the DRAM-bound tok/s ceiling.
-- Expert-skipping speculation (skip non-predicted experts): coverage of
-  0.44 at 14 candidates makes strict per-token hits almost impossible,
-  so do not implement expert skipping.
-- n-gram speculative prefetch: net-negative at tight RAM in the shipped
-  simulation.
+
+
 - 24 GB runs at the 11.8 tok/s ceiling and the OS may still press on the
   floor. 32 GB is the comfortable minimum.
 
