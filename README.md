@@ -149,17 +149,19 @@ Sizes come from the safetensors header.
 
 Raw JSON: [results/measured_santa_cruz_36gb_n1024.json](results/measured_santa_cruz_36gb_n1024.json) (steady); prior short-run [results/measured_santa_cruz_36gb.json](results/measured_santa_cruz_36gb.json); estimate: [results/estimate_santa_cruz_36gb.json](results/estimate_santa_cruz_36gb.json). Matched sim-vs-measured gap analysis (short-run calibration): [results/MEASURED_VS_SIM_36GB.md](results/MEASURED_VS_SIM_36GB.md); design experiments: [results/DESIGN_LEDGER.md](results/DESIGN_LEDGER.md).
 
-### Silicon-proof (Santa Cruz, 2026-10-06 evening ET)
+### Silicon-proof (Santa Cruz, 2026-10-06 evening ET; T6/T3 re-score 2026-10-07)
 
-Three lab “invention” claims were scored on physical silicon. Artifacts: [results/silicon_proof_three/](results/silicon_proof_three/).
+Lab “invention” claims scored on physical silicon. First-pass artifacts: [results/silicon_proof_three/](results/silicon_proof_three/). T6 contiguous re-proof: [results/t6_ssd_proof_clean.json](results/t6_ssd_proof_clean.json). T3 LIP v3: [results/t3_lip_scored.json](results/t3_lip_scored.json) / [results/T3_CLAIMS_LEDGER.md](results/T3_CLAIMS_LEDGER.md).
 
 | Claim | Measured | Verdict | Merge? |
 |---|---|---|---|
 | **T9/T4 staged IO / double-buffer** (default IO pool vs `IO_WORKERS=1`) | ON **15.75** / ON2 **15.64** tok/s vs OFF **9.2**; paired Δ median **+6.54** | **TRANSFERS** | **Yes — keep the default IO pool.** oMLX 0.7.0 is already default-on; this confirms the ~15.55 baseline rather than a new additive speedup. Caveat: OFF removes the full IO pool + read-ahead, so Δ ≫ the install-only prediction band (+0.33…+1.10). |
-| **T6 multi-expert coalescer** on real SSD | Physical useful/phys (F_NOCACHE / APPLE SSD BytesRead): OFF **4.67** / ON **4.44** GB/s vs prior random-chunk peak **5.02** | **FAIL** (does not beat serial) | **No.** Cached-file ~10.5 GB/s claims are **invalid as SSD proof**. |
-| **T3 LIP** (`OMLX_ADMISSION=1`) | KeyError / HTTP **507** under admission; only partial ON tps 15.66 / 14.49 | **BLOCKER** — formal score refused | **Do not claim a silicon win.** |
+| **T6 multi-expert coalescer** on real SSD | Prior random-order FAIL (useful OFF **4.67** / ON **4.44** GB/s vs peak **5.02**) **revised**: contiguous expert-ID batching useful **5.39 GB/s** (beats **5.02** peak; contiguous ON/OFF **1.44×**). Random-order path still fails. | **PASS** (contiguous only) | **Contiguous batching only — keep random OFF.** No oMLX PR from this pass. Cached-file ~10.5 GB/s claims remain **invalid as SSD proof**. |
+| **T3 LIP v3** (`OMLX_ADMISSION=1`) | First pass: KeyError / HTTP **507** under admission (**BLOCKER**). v3 arm: ON median **15.98** vs OFF **15.64** (**+0.34 tok/s**, n=3) — mechanical TRANSFERS letter, but bootstrap CI95 crosses zero / below 3-run resolution floor → **not significant** | **No claimed win** | **Do not claim a silicon win.** DIP path owns follow-up. |
 
-Do not treat coalescer or LIP as shipped wins from this pass.
+Optional note (not a merge claim): guarded cross-layer prefetch on MBP cuts demand-wait **58.2 → 51.8 ms/tok** (bit-identical outputs; [results/t1_xlayer_mbp_ab_d1.json](results/t1_xlayer_mbp_ab_d1.json)); Santa Cruz pending. Earlier unguarded L→L+1 tok/s PR remains **NO-GO**.
+
+Do not treat random-order coalescer or LIP as shipped wins. Contiguous T6 is an SSD useful-bandwidth pass only (layout/batching constraint), not a decode tok/s claim and not an oMLX PR.
 
 Re-check docs against the shipped tables anytime:
 
