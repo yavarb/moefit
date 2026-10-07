@@ -3,7 +3,7 @@
 Maintainer: glm_instrumentation (T4). This consolidates the scattered
 notebook rules so executors have ONE reference. Where a notebook entry
 conflicts with this file, THIS FILE wins until superseded by a commit.
-Last updated: 2026-10-08 ~11:40 ET (commit follows).
+Last updated: 2026-10-08 ~12:40 ET (post-BATCH1 close; see commit).
 
 ## 1. BOX-SAFETY RULES (learned from 4 arm-kills)
 
@@ -31,10 +31,11 @@ Last updated: 2026-10-08 ~11:40 ET (commit follows).
 | Arm | Owner | State | Scoring (verbatim) |
 |-----|-------|-------|--------------------|
 | DBUF ON vs OFF (A/B/A) | T9 exec / T4 protocol | DONE: ON 15.72 vs OFF 9.20, delta +6.53 -> TRANSFERS (scored, commit 447a027) | done |
-| DBUF BATCH1 (IO_BATCH=1, pure-DB isolator) | T9 staged | QUEUED behind T2 (refuses while locks present — correct) | `python3 experiments/score_dbuf_aba.py --on results/t9_silicon/t9_on_A.json results/t9_silicon/t9_on_A2.json --off t9_batch1_C.json --accept-unhashed-prompt --off-label 'IO_BATCH=1 (DB off, slab+overlap on)' --expected-prompt-hash 87eb8e913d26cca9` |
+| DBUF BATCH1 (IO_BATCH=1, pure-DB isolator) | T9 staged / T4 executed+scored | DONE (commit de11012): BATCH1 14.63 (14.63/15.17/14.10) vs ON 15.72 -> +1.09 TRANSFERS, INSIDE +0.33..+1.10 band; Amendment-4 discriminator -> CANDIDATE A. Decomposition closed: DB +1.09 + slab/overlap +5.43 = 6.52 ~= 6.53. File provenance caveat: BATCH1 ran on c704058a (flags off), family on d420b305/214e8823 — see t9_silicon/T4_BATCH1_PROVENANCE.md + queued spot-check | done (spot-check queued behind T2 release) |
 | LIP ON (OMLX_ADMISSION=1) | T3 (patch owner) | BROKEN: KeyError — LIP demotes a first-miss expert to slot_of head; the same call's next miss evicts it (T9 root cause, T4-verified in source, cycle 36). FIX: demote AFTER the _ensure_ids install loop (anchors: _miss_hist[e]==1 identifies first-misses, ~line 590; pop/clear/reinsert lines 497-501). NO retries until patched. | `score_lip_aba.py` (T3's, commit 1610acf) after fix + rerun |
-| T2 sidecar A/B/A | T2 running | IN FLIGHT (has been killed 4x by inline restarts; script self-aborts on pid change) | T5's `score_sidecar_vs_prereg.py` (commit f9bf40f) — band 18.5-38.1 on the 15.72 baseline |
-| T6 SSD coalescer probe | T6 staged | QUEUED behind T9 batch1 (agreed order) | T6's own artifacts |
+| T2 sidecar A/B/A | T2 running | IN FLIGHT (cycle 39 observation: pids 31786/31793 since 21:25 PT, SLOT_LOCK_T2 held, NO restart, on installed file c704058a; stats dumper verified LIVE) | T5's `score_sidecar_vs_prereg.py` (commit f9bf40f) — band 18.5-38.1 on the 15.72 baseline |
+| T6 SSD coalescer probe | T6 staged | QUEUED behind T2 sidecar (T9 batch1 DONE; agreed order now T2 -> T6) | T6's own artifacts |
+| T4 c704058a flags-off spot-check | T4 (this file) | QUEUED behind T2 release: ONE default-env n=1024 run, same prompt (hash 87eb8e913d26cca9) — in-band [15.52,16.63] confirms c704058a flags-off ~= stock, closing the BATCH1 provenance caveat | see t9_silicon/T4_BATCH1_PROVENANCE.md |
 
 ## 3. PRE-REGISTERED PREDICTIONS the arms score against (all pre-data)
 
@@ -59,3 +60,15 @@ Last updated: 2026-10-08 ~11:40 ET (commit follows).
 3. Cycle 30-31: IO_WORKERS=1 disables THREE mechanisms (slab-parallel,
    DB overlap, decode overlap) — that's why BATCH1 exists as the pure
    DB isolator (amendment 3).
+4. Cycle 38 (arm-kill #5 was NOT an agent collision): server-side
+   memory-guard crash (model unload settle barrier: freed 4.73GB,
+   need>=21.77GB) killed the IO_BATCH=1 server mid-run-2 and the
+   restore step aborted on the dead pid, leaving :8000 DOWN.
+   Fixes: restart() kill-tolerance (2>/dev/null || true) +
+   SLOT_LOCK glob skips reconciler's *.cleared backups (was falsely
+   refusing the arm). Box restored from MBP via the reconciler recipe.
+5. Cycle 39: lock glob races are real — a lock file can be absent for
+   seconds after a runner starts (observed SLOT_LOCK_T2 missing at
+   ~21:25+ while pid 31786 already ran). NEVER infer "box idle" from a
+   lock ls alone: ALWAYS pair it with `pgrep -fl` for runner procs +
+   a stats-file hits-growth probe (63.9k hits/10s = one live decode).
