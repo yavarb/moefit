@@ -18,6 +18,14 @@ def disk():
     raise RuntimeError('disk0 physical counter unavailable')
 
 
+def check_idle(counter=disk, clock=time.perf_counter, wait=time.sleep):
+    a=counter(); t=clock(); wait(1); b=counter()
+    rate=(b-a)/(clock()-t)
+    if rate < 0 or rate > 50_000_000:
+        raise RuntimeError(f'SSD slot not idle: {rate/1e6:.1f} MB/s background reads')
+    return rate
+
+
 def main():
     model,out=map(Path,sys.argv[1:3])
     if os.environ.get('T6_SSD_SLOT_CONFIRMED') != '1':
@@ -30,12 +38,7 @@ def main():
     try:
         for fd in fds.values():
             fcntl.fcntl(fd,48,1); fcntl.fcntl(fd,45,0)
-        a=disk(); t=time.perf_counter(); time.sleep(1); b=disk()
-        idle=(b-a)/(time.perf_counter()-t)
-        # Operational isolation guard, not a statistical attribution guarantee.
-        # Refuse substantial background reads rather than subtracting them later.
-        if idle > 50_000_000:
-            raise RuntimeError(f'SSD slot not idle: {idle/1e6:.1f} MB/s background reads')
+        idle=check_idle()
         rng=random.Random(6025)
         random_batches=[(i%48,rng.sample(range(512),10)) for i in range(384)]
         sequential_batches=[(i%48,list(range((i//48)*10,(i//48)*10+10))) for i in range(384)]
@@ -55,6 +58,7 @@ def main():
                 arms=[('random','OFF'),('random','ON'),('sequential','OFF'),('sequential','ON')]
                 if rep: arms.reverse()
                 for order,arm in arms:
+                    idle_before=check_idle()
                     batches=random_batches if order=='random' else sequential_batches
                     p0=disk(); start=time.perf_counter(); useful=0; check=0
                     for li,ids in batches:
@@ -67,6 +71,7 @@ def main():
                         useful+=sum(len(x) for x in blocks); check+=sum(x[0] for x in blocks)
                     seconds=time.perf_counter()-start; p1=disk()
                     r=dict(rep=rep,order=order,arm=arm,seconds=seconds,useful_bytes=useful,
+                           idle_before_Bps=idle_before,
                            useful_GBps=useful/seconds/1e9,physical_bytes=p1-p0,
                            physical_over_useful=(p1-p0)/useful,
                            physical_GBps=(p1-p0)/seconds/1e9,checksum=check)
