@@ -1,0 +1,54 @@
+{
+  "kind": "MEASURED local replay metadata setup only, not LLM/KV speed",
+  "skipped_tokens": 480,
+  "continuation_tokens": 32,
+  "layers": 8,
+  "trials": [
+    {
+      "walk_setup_s": 0.003387791000000001,
+      "walk_continuation_s": 0.0007902080000000006,
+      "walk_hits": 256,
+      "resume_setup_s": 5.662500000000459e-05,
+      "resume_continuation_s": 0.0007830830000000039,
+      "resume_hits": 256
+    },
+    {
+      "resume_setup_s": 5.216699999999186e-05,
+      "resume_continuation_s": 0.0007772909999999994,
+      "resume_hits": 256,
+      "walk_setup_s": 0.0033657500000000007,
+      "walk_continuation_s": 0.0007947909999999891,
+      "walk_hits": 256
+    },
+    {
+      "walk_setup_s": 0.0033521249999999975,
+      "walk_continuation_s": 0.0007815409999999967,
+      "walk_hits": 256,
+      "resume_setup_s": 5.433300000000363e-05,
+      "resume_continuation_s": 0.0007810830000000019,
+      "resume_hits": 256
+    },
+    {
+      "resume_setup_s": 5.054100000000117e-05,
+      "resume_continuation_s": 0.0007874590000000042,
+      "resume_hits": 256,
+      "walk_setup_s": 0.0033082499999999987,
+      "walk_continuation_s": 0.0007780830000000127,
+      "walk_hits": 256
+    },
+    {
+      "walk_setup_s": 0.003336666000000002,
+      "walk_continuation_s": 0.0007753749999999948,
+      "walk_hits": 256,
+      "resume_setup_s": 5.8541999999994765e-05,
+      "resume_continuation_s": 0.0007931250000000056,
+      "resume_hits": 256
+    }
+  ],
+  "setup_speedup": 61.69593064987712,
+  "walk_setup_ms": 3.3521249999999974,
+  "resume_setup_ms": 0.05433300000000363,
+  "continuation_hit_rate": 1.0,
+  "restored_prefixes_per_s": 18405.02088969748,
+  "contract": "Backend must independently restore matching hidden/KV state; session fork copies metadata only. Thread safety unchanged. Timing does not include actual KV restore."
+}

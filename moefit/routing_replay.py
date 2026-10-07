@@ -51,6 +51,24 @@ class RoutingReplayCache:
             raise ValueError('namespace and positive layer count required')
         return LayeredReplaySession(self, namespace, layers, deterministic)
 
+    def resume_layered(self, namespace, layers, prefix_tokens, *, deterministic=False):
+        """Resume AFTER a backend-restored prefix, without replaying its routes.
+
+        Caller must restore exactly matching hidden/KV state and use the same
+        namespace. Token equality cannot verify backend state. No cache entry
+        is admitted, refreshed or consumed by this operation.
+        """
+        session = self.layered_session(namespace, layers, deterministic=deterministic)
+        tokens = tuple(prefix_tokens)
+        for token in tokens:
+            if not isinstance(token, (int, np.integer)) or token < 0:
+                raise ValueError('invalid prefix token')
+            if self.compact_prefixes and token > 0xffffffff:
+                raise ValueError('compact token ids must fit uint32')
+        session.prefix = (np.asarray(tokens, dtype='<u4').tobytes()
+                          if self.compact_prefixes else tuple(map(int, tokens)))
+        return session
+
     def _empty_prefix(self):
         return b'' if self.compact_prefixes else ()
 
@@ -123,6 +141,14 @@ class LayeredReplaySession:
         self.layers, self.enabled = layers, enabled
         self.prefix = cache._empty_prefix()
         self.next_layer = layers
+
+    def fork(self):
+        """O(1) metadata branch at a completed token; caller forks KV separately."""
+        if self.next_layer != self.layers:
+            raise RuntimeError('cannot fork a partially executed token')
+        child = LayeredReplaySession(self.cache, self.namespace, self.layers, self.enabled)
+        child.prefix = self.prefix
+        return child
 
     def begin_token(self, token_id):
         if self.next_layer != self.layers:
