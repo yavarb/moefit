@@ -1,0 +1,68 @@
+{
+ "kind": "simulated_vs_measured",
+ "note": "synthetic calibrated traces (results/traces_synth); compute_ms is an assumption (128GB measured, BW-scaled); IO/install/sync constants measured on Santa Cruz",
+ "constants": {
+  "expert_MB": 2.765,
+  "ssd_GBps": 7.4,
+  "io_A_ms": 0.2,
+  "io_B_ms": 0.52,
+  "install_ms": 0.3,
+  "sync_ms": 0.122
+ },
+ "rows": [
+  {
+   "cap": 92,
+   "sim_miss_experts_per_token": 91.8,
+   "sim_hit_rate": 0.8088,
+   "sim_ssd_MB_per_token": 253.8,
+   "frac_layer_steps_with_miss": 0.866,
+   "compute_ms_assumed": 23.2,
+   "shipped_model_tps": 30.3,
+   "serial_latency_breakdown_ms": {
+    "compute": 23.2,
+    "io": 56.0,
+    "install": 27.5,
+    "sync": 5.9
+   },
+   "serial_latency_model_tps": 8.9,
+   "measured_tps": 7.8
+  },
+  {
+   "cap": 143,
+   "sim_miss_experts_per_token": 57.4,
+   "sim_hit_rate": 0.8804,
+   "sim_ssd_MB_per_token": 158.7,
+   "frac_layer_steps_with_miss": 0.69,
+   "compute_ms_assumed": 23.2,
+   "shipped_model_tps": 40.9,
+   "serial_latency_breakdown_ms": {
+    "compute": 23.2,
+    "io": 36.5,
+    "install": 17.2,
+    "sync": 5.9
+   },
+   "serial_latency_model_tps": 12.1,
+   "measured_tps": 13.0,
+   "measured_ssd_MB_per_token": 140.5,
+   "measured_miss_experts_per_token_lower_bound": 50.8,
+   "measured_tps_this_run": 12.71
+  }
+ ],
+ "measured": {
+  "kind": "measured",
+  "host": "santacruz",
+  "timestamp": "2026-10-06T19:53:00-0700",
+  "max_tokens": 256,
+  "tokens": 256,
+  "decode_s": 20.066,
+  "decode_tps": 12.71,
+  "ttft_s": 6.667,
+  "idle_disk_MBps": 0.03,
+  "decode_disk_MBps": 1785.7,
+  "decode_disk_MB_per_token": 140.5,
+  "decode_avg_KB_per_io": 171.4,
+  "decode_iops": 10746.0,
+  "n_decode_samples": 19,
+  "method": "iostat -d -w 1 on boot disk; samples fully inside (first+1s, last] token window; MB/token = (decode MB/s - idle MB/s) / decode tok/s. Physical reads only (page-cache hits invisible)."
+ }
+}
