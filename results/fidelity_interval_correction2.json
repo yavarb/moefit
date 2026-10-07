@@ -1,0 +1,25 @@
+{
+ "kind": "T3 correction (2nd) \u2014 miss-interval derivation repaired per T6; compute preference shown CONDITIONAL",
+ "correction_1_mincore_bound": {
+  "retracted": "cycle-12/13/15 reasoning 'mincore bounds absorption at ~3.2%': T6's residency-weighting audit (analysis_t6_residency_weighting.json) shows the snapshot byte fraction is a FOOTPRINT average, not a request-weighted absorption bound \u2014 same-size static resident sets give request coverage 0.5%-5.9% (build-bottom to holdout-oracle-top). 'Absorption <= snapshot fraction' is invalid reasoning.",
+  "corrected_bound": "the best available bound is T6's static-set ANALYTICAL ceiling: 5.9% (holdout-oracle-top, uses future knowledge \u2014 generous). Realistic build-fitted sets: 2.1-3.8%. Dynamic UBC effects unmodeled.",
+  "corrected_miss_interval": "[50.8, 54.1]/tok @cap143 (absorption 0-5.9%), replacing [50.8, 53.5]"
+ },
+ "correction_2_compute_preference_is_conditional": {
+  "headline": "the compute-24.1 preference FLIPS at absorption ~6.6% (logical ~54.4/tok): above that, comp18.1 fits the measured 12.71-13.07 band better.",
+  "table": {
+   "0%": "miss 50.8 -> 24.1: 12.87 | 18.1: 13.95",
+   "3.8%": "miss 52.8 -> 24.1: 12.61 | 18.1: 13.64",
+   "5.9%": "miss 54.0 -> 24.1: 12.46 | 18.1: 13.46",
+   "10%": "miss 56.5 -> 24.1: 12.15 | 18.1: 13.11 (18.1 fits better)",
+   "12.8%": "miss 58.3 -> 24.1: 11.93 | 18.1: 12.86 (18.1 fits better; = synth miss count)"
+  },
+  "verdict": "24.1 remains favored ONLY IF absorption <= ~6%. T6's oracle ceiling (5.9%) sits just below the 6.6% flip point \u2014 the margin is THIN. The cycle-12 conclusion is downgraded from 'best-supported' to 'CONDITIONAL on absorption <= ~6%, which is bounded only by a future-knowledge static-set argument, not a measurement.'",
+  "consequence": "the absorption question (T7/T8's original paired-counter ask) now MATERIALLY GATES the compute term, not just the miss-interval tightness. Direct logical-miss counters or a page-in/IO pairing run would settle both at once."
+ },
+ "correction_3_test_c_guard_claim": {
+  "retracted": "cycle-12 sentence '(T4's detect_coalescing guard covers this)' re the 256x2 collector run: T8's guard probe (6e18d77) shows the artifact ESCAPES the guard (direct per-run evidence overwritten by the aggregate heuristic; usage-vs-delta count never compared; equal-count buffered pairs evade). The 256x2 run's pooled p95/mean=1.094 must NOT be read as a falsifies-both result \u2014 it is chunk-gap-derived and inadmissible per Amendment 1 regardless of the guard's verdict.",
+  "protocol_note": "Amendment 1's provenance requirement stands on its own: authoritative token-count vs chunk-count mismatch (256 vs 86) is DIRECT evidence of coalescing; a detector's False is not proof of unbuffered delivery (T8's correct principle). Test C verdicts remain inadmissible for any oMLX collector run until server-side token timestamps or the usage-count comparison exist."
+ },
+ "settlers_unchanged": "second residency point (Tests B/D), direct matched-window logical-miss counters (T7's ask \u2014 now doubly motivated), sidecar-pread overlap test. No new silicon requested by T3."
+}
