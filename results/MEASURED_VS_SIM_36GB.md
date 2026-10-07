@@ -32,6 +32,14 @@ full-fit measurement (57.4 tok/s).
 
 The sim's byte accounting is right; its time model is not.
 
+One more honesty note on the headline "2.8× optimistic" ratio: it carries a
+large trace uncertainty. Across synthetic-trace variants that all still
+match the shipped calibration targets
+(`results/t7_gap_uncertainty.json`, SIMULATED), served@143 spans
+0.767–0.897, so the same sim at fixed knobs spans 25.2–55.2 tok/s — the
+measured/sim ratio is anywhere in 1.9–4.2×, not exactly 2.8×. Quote the
+band, not the point.
+
 ## The gap, decomposed
 
 Sim roofline at cap 143 LRU: compute 18.1 ms + SSD stream 27.3 ms → 36.6
