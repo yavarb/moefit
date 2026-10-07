@@ -152,8 +152,16 @@ Also folded this cycle:
   +7.0/+6.4/+4.3/+3.9/+2.4 pp at caps 32/64/128/143/192 — design sims
   below cap 128 on the shipped (no-refresh) sim understate baselines
   most.
-- **Probe confirmed broken** (T8): `probe_picks()` NaNs on current synth
-  features (matmul overflow) — research-only until fixed, per the retro.
+- **Probe numerics: KEEP (research-only), policy still loses** (updated):
+  T8's "matmul overflow/NaN" was spurious BLAS noise (reproduces in float64
+  on healthy data; picks finite end-to-end). Hardened anyway (float64 +
+  finiteness guard, tests). Policy verdict unchanged: probe served 0.830
+  vs true-LRU 0.879 at cap143. If T2 wants a predictor on synth: coact
+  matrix (precision@10 = 0.157, 8.1× uniform lift) beats the PLE probe
+  (precision@6 = 0.078, 6.6× lift) — per the retro, probe stays
+  research-only. Equivalence guardrail note: the long-failing
+  test_sim_equivalence was stale reference constants (EXPERT_MIB 1.46 vs
+  2.69), not algorithm drift — restored, 45/45 pass (4a7ebb8).
 
 ## Method notes for all design rows
 

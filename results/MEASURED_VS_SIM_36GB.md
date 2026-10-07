@@ -142,6 +142,20 @@ quantitatively justified, and all policy baselines must use the fixed LRU.
 Labeling flag to T1: the "plain LRU" replay in `gap_santa_cruz.json` is
 true-LRU by behavior; name it accordingly.
 
+**Capstone: the sim now reproduces silicon end-to-end.** The full chain —
+policy replay (`hit_refresh=True`, the oMLX ExpertCache semantics) → miss
+matrix → measured serial constants (compute 18.1 ms assumed, the one
+unmeasured term) → tok/s — predicts **12.75 tok/s** at cap 143 vs measured
+12.71–13.07 (`results/serial_lru143_hitrefresh.json`, commit 4b3e56d), and
+two independent implementations agree exactly
+(`sim_paging.solve_policy_serial` vs `moefit/metrics.serial_model_from_misses`,
+breakdown identical 18.1/37.0/17.5/5.9 ms, 58.3 misses/token). With this,
+the residual is closed: geometry, policy, and time model all reproduce the
+silicon operating point from measured constants. Caveat that remains:
+compute ms is assumed (18.1 fits best but is within run noise of 23.2),
+and the constants are Santa-Cruz-specific — other machines need their own
+microbench.
+
 ### Hypothesis verdicts (updated)
 
 - **H1 partially confirmed**: the SSD never delivers 7.4 GB/s on this
@@ -183,10 +197,16 @@ true-LRU by behavior; name it accordingly.
    pending a decision; the running 0.28 server and :8317 stay untouched
    until then).
 3. One instrumented Santa Cruz run with
-   `experiments/collect_silicon_run.py` (emits per-token gap percentiles)
-   to verify the serial model's per-token distribution, not just its mean.
+   `experiments/collect_silicon_run.py` (emits per-token gap percentiles).
+   T7's model-S signature makes this a hard discriminator, not just a
+   check: at cap143 the serial model predicts tok-gap p50 71.6 / p95
+   119.8 / p99 176.3 ms, **p95/mean ≈ 1.51** (cv 0.296); a byte-backlog
+   model with the same mean predicts p95/mean ≈ 1.0. Measured p95/mean
+   ≥ 1.3 → serial-resolve; ≈ 1.0 → byte-backlog (SIM predictions,
+   `results/t7_serial_band.json`).
 4. A cap-180 silicon point if memory allows (~27 GiB footprint; watch the
-   memory-guard at 18–19% free).
+   memory-guard at 18–19% free). T7's gated band through model S predicts
+   **14.0–15.7 tok/s** (n≥1024; SIM, measured constants).
 5. One 48 GB M4 Max paging run — the serial model's out-of-sample test,
    and a policy-ranking discriminator: race **lru@192 vs prior@192** —
    the serial model says true-LRU wins (14.5 vs 13.3, SIM); the old
@@ -196,6 +216,16 @@ true-LRU by behavior; name it accordingly.
    need runs of n ≥ 1024 tokens; short 128-token benches understate
    steady-state more as residency rises (n128/steady ≈ 0.92 @cap143,
    0.69 @cap220).
+7. Page-cache absorption probe (T8 ask, one 256-token run, no restart):
+   measured physical/logical traffic ratio is 0.885 (140.5 vs 158.8
+   MB/tok). A two-level replay fits 0.885 only with ~13–16 GiB of
+   page-cache absorption — more than the ~5–7 GiB visible spare RAM.
+   Pairing vm_stat page-in deltas with iostat during decode separates:
+   buffer-cache reuse / non-F_NOCACHE reads (pageins ≈ 18 MB/tok) vs
+   oMLX admission beating LRU (pageins ≈ 0, logical misses < 57.4).
+   Design consequence: in the pipelined regime, evict-to-L2 alone is
+   worth 16.8 → 21.9–24.9 tok/s (L2 = 110–200 experts/layer, SIM), and
+   the drive stops binding at ~31 physical misses/token.
 
 Tooling: `experiments/gap_report.py` pairs any sim row with any measured
 record; `moefit/metrics.py` is the RunRecord schema (tok-gap p50/p90/p95/p99
