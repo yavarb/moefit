@@ -1,0 +1,109 @@
+{
+  "kind": "MEASURED_LOCAL_REAL_WEIGHT_CODEC_TRIAL_NOT_DECODE",
+  "experts": 16,
+  "component_equalities": 144,
+  "payload_bytes": 44236800,
+  "stored_bytes": 40486409,
+  "stored_ratio": 0.9152201108579282,
+  "encode_seconds": 0.914652625,
+  "median_useful_GBps": {
+    "raw_random": 16.949102564705903,
+    "compressed_random": 0.474808521999896,
+    "raw_sequential": 17.333819280720725,
+    "compressed_sequential": 0.4738019249767188
+  },
+  "samples": {
+    "raw_random": [
+      {
+        "seconds": 0.002815792000000039,
+        "useful_GBps": 15.710251325381769,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.002605917000000124,
+        "useful_GBps": 16.9755214767001,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.002609458000000009,
+        "useful_GBps": 16.952485918531682,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.002610499999999849,
+        "useful_GBps": 16.94571921088012,
+        "checksum": 18019
+      }
+    ],
+    "compressed_random": [
+      {
+        "seconds": 0.09304929200000012,
+        "useful_GBps": 0.47541253726035815,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.09299250000000003,
+        "useful_GBps": 0.47570287926445665,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.09328633399999986,
+        "useful_GBps": 0.47420450673943376,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.09354445799999977,
+        "useful_GBps": 0.47289599988916614,
+        "checksum": 18019
+      }
+    ],
+    "raw_sequential": [
+      {
+        "seconds": 0.002727541999999916,
+        "useful_GBps": 16.218558687639405,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.002530917000000077,
+        "useful_GBps": 17.478566069135674,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.0023614160000000606,
+        "useful_GBps": 18.733166879532817,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.002573542000000373,
+        "useful_GBps": 17.189072492305776,
+        "checksum": 18019
+      }
+    ],
+    "compressed_sequential": [
+      {
+        "seconds": 0.09372579200000009,
+        "useful_GBps": 0.47198107432370334,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.09297162500000011,
+        "useful_GBps": 0.47580968924658407,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.09325508299999985,
+        "useful_GBps": 0.4743634188819506,
+        "checksum": 18019
+      },
+      {
+        "seconds": 0.09347637500000006,
+        "useful_GBps": 0.473240431071487,
+        "checksum": 18019
+      }
+    ]
+  },
+  "extra_read_decode_seconds": 0.09055783400000006,
+  "conditional_break_even_storage_GBps": 0.04141431872144819,
+  "decision": "DROP synchronous zlib1 speed path; retain executable negative result",
+  "caveat": "Warm/cache-influenced local reads with F_NOCACHE accepted; source model may be in use by T1. No device counters, GPU install or model decode. Break-even assumes serial byte savings and this CPU penalty transfer."
+}
