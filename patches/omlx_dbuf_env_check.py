@@ -36,15 +36,20 @@ import os
 import re
 import sys
 
-# Markers of the upstream staged-install machinery (present in
-# omlxenv/omlx-ref moe_expert_offload.py, md5s 61ead257/a12bba2a).
+# Markers of the upstream staged-install machinery. Naming across variants
+# differs: the omlxenv reference (md5 61ead257) has `def _read_ahead`; the
+# T2-sidecar+T3-LIP MERGED file (214e8823) implements the same windowed
+# read-ahead as an inner `prefetch()` closure in _ensure_ids. Detection is
+# therefore STRUCTURAL: an IO pool definition + the env gate + EITHER
+# read-ahead form. A fully-serial file (true CASE A) has none of these.
 MARKERS = {
     "io_pool_env": "OMLX_MOE_OFFLOAD_IO_WORKERS",
     "io_batch_env": "OMLX_MOE_OFFLOAD_IO_BATCH",
     "pool_def": "_IO_WORKERS",
-    "read_ahead": "def _read_ahead",
+    "read_ahead_named": "def _read_ahead",
     "windowed_ensure": "def prefetch(",  # inner fn of windowed _ensure_ids
     "install_on_payload": "payload: list | None = None",
+    "overlap_env": "OMLX_MOE_OFFLOAD_OVERLAP",
 }
 
 
@@ -53,8 +58,9 @@ def inventory(path):
     txt = src.decode("utf-8", errors="replace")
     md5 = hashlib.md5(src).hexdigest()
     found = {k: (v in txt) for k, v in MARKERS.items()}
-    has_machinery = (found["pool_def"] and found["read_ahead"]
-                     and found["windowed_ensure"])
+    read_ahead = found["read_ahead_named"] or found["windowed_ensure"]
+    has_machinery = (found["io_pool_env"] and found["pool_def"]
+                     and read_ahead)
     return md5, found, has_machinery
 
 
@@ -120,9 +126,15 @@ def main():
     print()
     print("Reference md5s known to the lab:")
     print("  d420b305...  Homebrew 0.7.0 on Santa Cruz (true-LRU "
-          "ExpertCache, design_inventor source-read)")
+          "ExpertCache, design_inventor source-read; machinery ON "
+          "by default per T9)")
     print("  61ead257...  omlxenv local copy (windowed staged install, "
-          "this file's mechanism source)")
+          "named _read_ahead)")
+    print("  214e8823...  MERGED T2-sidecar+T3-LIP drop-in (repo "
+          "patches/omlx_t2_sidecar_plus_lip.py; machinery VERIFIED "
+          "INTACT — windowed read-ahead is an inner prefetch() "
+          "closure; DB env gates + OMLX_ADMISSION + sidecar flag all "
+          "present; all three patches compose)")
     print("  a12bba2a...  omlx-ref HEAD 79f4488 (decayed-count variant)")
 
 
