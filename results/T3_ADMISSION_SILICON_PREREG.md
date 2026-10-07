@@ -40,27 +40,57 @@ first ~200 tokens slightly slower.
 - ON < OFF by > 0.30 tps: the admission gate's re-fetch cost is realized
   worse than sim — falsifies the single-prompt transfer outright.
 
-## ON-arm patch shape (installed oMLX 0.7.0, TRUE-LRU ExpertCache)
+## ON-arm patch — REVISED after reading the installed source (v1-feasible)
 
-In ExpertCache._ensure_ids (installed 0.7.0: slot_of is an LRU-ordered dict,
-hits re-insert, victim = next(iter(slot_of))):
+The prereg's original patch shape ("read and use without installing") is
+INFEASIBLE in installed v1: `ensure` must write expert bytes into a slot
+before the forward gathers via `map`; there is no transient-buffer compute
+path. Verified by reading /opt/homebrew/Cellar/omlx/0.7.0/.../
+moe_expert_offload.py on Santa Cruz (md5 d420b305, matches
+design_inventor's read).
 
-- Track per-expert lifetime miss count in a dict alongside the cache
-  (self._miss_hist, allocated in __init__, cleared in _allocate).
-- On a miss: increment _miss_hist[e]. If _miss_hist[e] >= 2 OR the cache is
-  not yet full (len(slot_of) < capacity): install as today (read + slot
-  write + LRU insertion). If _miss_hist[e] == 1 AND cache full: read the
-  expert's tensors and USE them for this call but do NOT insert into
-  slot_of (no eviction, no install) — the read result is consumed directly
-  by the call path and dropped.
-- Env-gated: OMLX_ADMISSION=1 enables; default OFF preserves stock behavior
-  bit-for-bit.
+The v1-implementable equivalent is LIP insertion (Qureshi ISCA'07
+LRU-Insertion-Policy): a first-lifetime-miss expert still installs, but is
+inserted at the LRU position (next eviction victim) instead of MRU; recurrent
+misses insert MRU. Same pollution protection (one-shots get evicted first,
+the resident core is protected), purely a slot_of ordering change.
 
-Caveat: written against design_inventor's source read of the installed file;
-the exact call path for "use without installing" needs verification against
-the installed moe_expert_offload.py at apply time (whoever holds the restart
-window: T9/silicon_dbuf + T2). The patch is ~15 lines and orthogonal to the
-T9 double-buffer toggle and the T2 sidecar flag.
+SIM re-measure of the LIP arm (results/design_admission_lip.json, locked
+synth, cap143, both windows):
+- OFF (true-LRU): 57.400 global / 47.751 suffix; serial 11.96 / 13.28 tps.
+- ON (LIP): 57.588 global (+0.19) / 46.460 suffix (-1.29); serial
+  11.93 / 13.42 tps. Best T3 eviction result to date, and the global-window
+  penalty of the use-without-install forms (+1.14) is nearly eliminated.
+
+### Honest silicon prediction (LIP arm, supersedes the number above)
+
+Single-prompt n=1024 regime: global-window semantics dominate → predicted
+measured delta **-0.05 .. +0.25 tps** on the 15.55 baseline. WASH remains the
+pre-committed expected outcome; the decision rules below are unchanged and
+apply verbatim to the LIP arm.
+
+### The silicon diff (3 lines in ExpertCache, installed v1 file)
+
+In `__init__` add: `self._miss_hist = {}` (and the same line in any
+cache-reset path if present).
+In `_ensure_ids`'s miss branch, after `self.misses += 1` and before/after the
+`_install(e, ...)` call, wrap with (env-gated, default OFF):
+
+    if _ADMISSION := os.environ.get("OMLX_ADMISSION") == "1":
+        first = self._miss_hist.get(e, 0) == 0
+        self._miss_hist[e] = self._miss_hist.get(e, 0) + 1
+    ...
+    slot = self._install(e, ...)   # unchanged
+    if _ADMISSION and first and not self.free:
+        # demote to LRU position: move slot_of's newest entry to the front
+        self.slot_of[e] = self.slot_of.pop(e)  # (already newest) — instead:
+        # OrderedDict semantics: delete any e-entry and re-insert FIRST:
+        self.slot_of.pop(e, None); items = [(e, slot)] + list(self.slot_of.items()); self.slot_of.clear(); self.slot_of.update(items)
+
+(slot_of is a plain dict in v1; insertion order IS the LRU order because
+hits re-insert via pop+assign, so the demotion is a front-insert — the exact
+expression to be finalized against the live miss-loop by the patch owner;
+T9/T2 hold the restart window.)
 
 ## Cost of running it
 

@@ -1,0 +1,17 @@
+{
+ "cap": 143,
+ "kind": "simulated",
+ "policy": "LIP insertion (first-miss at LRU position) on true-LRU \u2014 the v1-implementable admission arm",
+ "true_lru": {
+  "miss_global": 57.4,
+  "miss_suffix": 47.751,
+  "tps_suffix": 13.28,
+  "tps_global": 11.96
+ },
+ "lru_lip_admission": {
+  "miss_global": 57.588,
+  "miss_suffix": 46.46,
+  "tps_suffix": 13.49,
+  "tps_global": 11.93
+ }
+}
