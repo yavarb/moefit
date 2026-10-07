@@ -1,4 +1,4 @@
-# Measured vs simulated: Santa Cruz 36 GB paging (updated 2026-10-07, cycle 3)
+# Measured vs simulated: Santa Cruz 36 GB paging (updated 2026-10-07, cycle 4)
 
 Honest ledger of what is **measured on silicon** and what is **simulated**, at
 one matched configuration, plus the current best reconciliation of the gap.
@@ -95,6 +95,38 @@ layers. IO is ~half the token; install + sync + compute is the rest.
 Sim-replay traffic (159 MB/tok) vs measured physical reads (140.5 MB/tok):
 physical reads are a lower bound; page-cache absorbs some re-misses.
 
+### Model status (three validations, one verdict)
+
+The serial-latency model is now validated at **three measured points across
+two caps plus a cold-start transient**: 12.1 vs 12.7–13.0 tok/s @cap143;
+8.9 vs 7.8 @cap92; cold-warmup 5.0 vs 6.43 tok/s
+(`experiments/fidelity_serial_validate.py`, commit bb6cf9d). Its one
+unmeasured knob is the compute term (spread 12.1–12.9 tps across 18–23 ms —
+within run noise; needs a measured compute term on the 36 GB box to pin
+down).
+
+Verdict on the shipped bandwidth-overlap model on SSD-bound tiers:
+**DROP for silicon prediction — KEEP only as the ideal-overlap
+ceiling** (~18.6 tok/s @cap143). Three things the bandwidth model hid:
+
+- The **LRU hit-refresh bug** (shipped LRU does not refresh on reuse): the
+  fix moves served 0.840 → 0.879 and misses 76.9 → 58.3/token at cap143 —
+  under the bandwidth model predicted tps jumps 36.6 → 48.2, i.e. the bug
+  was masking part of the model error (post-fix bandwidth model is 3.8×
+  optimistic). All policy comparisons must run on the fixed LRU.
+- **Static-first residency is falsified**: keeping experts 0..142 gives
+  921 MB/token — over the measured 76.9 ms/token budget even at 7.4 GB/s
+  with zero overhead. oMLX's ExpertCache is recency/hotness-based.
+- Residual accounting is now closed end-to-end: the gap-report tooling
+  (commit 8e77497) pairs the measured iostat blob with sim rows —
+  measured-SSD accounting gives 78.7 ms/tok disk vs 78.7 measured,
+  **residual −0.0 ms**; traffic ratio measured/sim-logical 0.679.
+
+Two latency models fit the cap-143 ramp equally well (lead_silicon's
+serial-resolve vs T8's byte-backlog at fitted BW); the n=16 warmup weakly
+favors serial-resolve, and a cap-180, n≥1024 silicon run discriminates
+physical-vs-logical traffic accounting (predictions 12.2–18.0, SIM).
+
 ### Hypothesis verdicts (updated)
 
 - **H1 partially confirmed**: the SSD never delivers 7.4 GB/s on this
@@ -166,8 +198,11 @@ supported); `experiments/gap_santa_cruz.py` and
   is approximated by lru/prior/sidecar/static variants — none exact; the
   serial model's compute term is assumed (BW-scaled from the 128 GB
   measurement), all its IO/install/sync constants are measured.
-- Gap analysis: notebook entries by glm_writeups (22:58, 23:55),
-  glm_fidelity (23:10), glm_instrumentation (23:25, 23:55), lead_silicon
-  (00:05, incl. the correction this cycle-3 revision incorporates),
-  2026-10-06/07; consolidated here. Cycle-2 revision of this doc contained
-  the tautological "100% SSD-bound" claim; corrected here.
+- Gap analysis: notebook entries by glm_writeups (22:58, 23:55, 00:15),
+  glm_fidelity (23:10, 00:20 — validation commits bb6cf9d),
+  glm_instrumentation (23:25, 23:55, 00:25 — accounting commit 8e77497),
+  lead_silicon (00:05, incl. the correction this cycle-3 revision
+  incorporates), sheryl_local_exp (T8 model arbitration), 2026-10-06/07;
+  consolidated here. Cycle-2 revision of this doc contained the
+  tautological "100% SSD-bound" claim; corrected in cycle 3. Design-row
+  writeups live in `results/DESIGN_LEDGER.md`.
