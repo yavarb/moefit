@@ -52,7 +52,12 @@ roofline terms, sim-spec "unexplained" (labeled as an accounting
 artifact of the 7.4 GB/s sequential assumption), measured-SSD accounting
 (disk ms/tok vs measured ms/tok, residual), and — when the measured run
 carries per-token gaps — the tok-gap percentiles and the S-vs-Q
-signature verdict (`serial_signature_check`: p95/mean >= 1.3 -> serial
+signature verdict (`serial_signature_check`, AMENDMENT 1 semantics: p95/mean
+>= 1.3 -> "shape-compatible: bursty" — compatible with serial (S) AND
+bursty byte-backlog (Q), NO mechanism verdict; <= 1.1 -> one-directional
+falsification of BOTH models, decisive only with verified token-level
+provenance. Collector-timestamp records are marked transport-provisional
+unless `timing_provenance` starts with "verified". Thresholds unchanged.)
 miss resolution; <= 1.1 -> smoothed byte-backlog; T7 predicts ~1.51 for
 S at cap143 true-LRU).
 
@@ -67,9 +72,13 @@ the miss matrix through the measured serial constants. Rule of thumb at
 cap143: every miss/tok removed is worth ~0.82 ms/tok (0.52 io + 0.30
 install). `--hit-refresh` approximates oMLX's ExpertCache (actual policy:
 decayed-count eviction per the oMLX 0.7.0 source; exact replay in
-`experiments/design_omlx_exact.py` — omlx-exact 56.9 miss/tok @cap143
-matches the measured ~57.4 within 1%, true-LRU replay gives 58.3; both
-reproduce measured 12.7–13.0 tok/s, serial tps within 0.6%).
+`experiments/design_omlx_exact.py` — omlx-exact 56.9 miss/tok @cap143 on
+the global synth window vs true-LRU's 58.3; the two differ by <1% there
+but −1.8% on matched per-prompt suffixes). CAUTION on miss-count
+provenance (astra T7 audit): "~57.4 misses/tok" is a SIM replay value —
+140.5 MB/tok physical reads imply ≥50.8 full-expert misses with no
+absorption (mincore: no hidden page-cache tier); direct logical-miss
+counters are still unmeasured.
 No-refresh contrast: 10.56 tok/s.
 Equivalent implementation inside the sim: `sim_paging.solve_policy_serial`.
 

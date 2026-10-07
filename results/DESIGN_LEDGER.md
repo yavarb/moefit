@@ -60,12 +60,20 @@ true-LRU replay 0.879, shipped FIFO-LRU 0.84 undercounts by 3.9pp):
 |---|---|---|
 | plain true-LRU | 0.879 | baseline |
 
-Baseline note: the true-LRU basis is a <1% approximation of silicon —
-oMLX 0.7.0's actual policy is DECAYED-COUNT eviction (source read,
-`experiments/design_omlx_exact.py`), whose exact replay gives 56.9
-miss/tok @cap143, matching the measured ~57.4 (iostat-derived) within 1%,
-closer than true-LRU's 58.3; serial tps differ by ≤0.6% and all ranking
-verdicts are robust to the identification.
+Baseline note: the true-LRU basis approximates silicon — oMLX 0.7.0's
+actual policy is DECAYED-COUNT eviction (source read,
+`experiments/design_omlx_exact.py`). Provenance correction (astra T7/T6
+audits, `results/T7_MISS_ANCHOR_PROVENANCE.md`): the often-quoted "~57.4
+misses/tok" is a SIM replay value, not a measured counter — deriving
+0.885 = 140.5/(57.4×2.765) from iostat bytes and inverting it recovers
+57.4 circularly. What IS measured: 140.5 MB/tok physical reads, which
+correspond to ≥50.8 full-expert misses with no absorption (mincore
+confirms no hidden page-cache tier). The policy identification stands on
+the source read and throughput agreement, not on a measured miss count;
+direct logical-miss counters are still needed. Window caveat (astra T6):
+omlx-exact vs true-LRU agreement is <1% on the global replay window but
+−1.8% (decayed-count fewer) on matched per-prompt suffixes — fix the
+window when comparing.
 | static hot-set pinning (0 → 50% of cap) | −2.9pp at any pin fraction | **pinning HURTS** — persist-pin-style designs lose at this cap |
 | perfect next-token prefetcher | +12.1pp | **upper bound for ANY prefetcher** — the served-fraction lever caps here |
 | sidecar (exact prefix knowledge) | 1.000 | removes all sync misses; only helps if it feeds pipelining |

@@ -157,10 +157,18 @@ two independent implementations agree exactly
 (`sim_paging.solve_policy_serial` vs `moefit/metrics.serial_model_from_misses`,
 breakdown identical 18.1/37.0/17.5/5.9 ms, 58.3 misses/token). With this,
 the residual is closed: geometry, policy, and time model all reproduce the
-silicon operating point from measured constants. Caveat that remains:
-compute ms is assumed (18.1 fits best but is within run noise of 23.2),
-and the constants are Santa-Cruz-specific — other machines need their own
-microbench.
+silicon operating point from measured constants. **Caveat resolved
+(cycle 13)**: the compute term is no longer assumed — with mincore
+rejecting page-cache absorption, real logical misses are 140.5/2.765 =
+**50.8/token**, and feeding that REAL miss count through the serial model
+gives **12.87 tok/s with compute 24.1 ms (the 410 GB/s DRAM bin — the
+physically correct chip)** vs measured 12.71–13.07, while the earlier
+"18.1 fits best" was an artifact compensating for synth-trace miss
+overstatement (T3, commit a61a035). Two consequences: (a) synth
+overstates misses at cap143 by ~15% (58.3 vs 50.8), so every synth-based
+serial prediction is ~0.8–1.1 tok/s conservative; (b) 48 GB (546 GB/s bin)
+keeps compute 18.1 in its tier table. Constants remain
+Santa-Cruz-specific — other machines need their own microbench.
 
 **Post-capstone: the per-miss constant and fixed term are now MEASURED
 directly** (T1 cycle 2, `results/silicon_sc36/regress_pooled.json`,
@@ -178,6 +186,16 @@ its prompt; and GPU device utilization is a median **42%** during decode
 SSD-bound). Upper bound if miss latency were fully overlapped with the
 fixed term: ~**25 tok/s** @0.28 (1000/max(39.2, 40.3), SIM bound from
 measured terms).
+
+**First real-trace check** (T3, commit 29e12a6, one collected real prompt
+— cold-only, single prompt, likely prefill positions, NOT a steady
+anchor): the synth persistence calibration holds on real routing —
+all-layer cross-position expert repeat 0.365 real vs 0.350 synth (within
+4%); omlx-exact decayed-count vs true-LRU also transfers (cold misses
+96.8 vs 97.6/token, 0.8% apart). One divergence flagged: the L0 layer
+(0.045 vs 0.272) — needs more prompts. Completing the multi-prompt
+real-trace collection (paused by the Chief priority order) is the highest
+payoff per unit of trace.
 
 ### Hypothesis verdicts (updated)
 
