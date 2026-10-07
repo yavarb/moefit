@@ -16,11 +16,12 @@ class Decoder:
         self.hits=self.routers=self.experts=0
     def fork(self):
         return Decoder(self.model,self.session.fork() if self.session else None,self.kv)
-    def run(self,tokens):
+    def run(self,tokens, *, before_layers=None, after_route=None):
         emb,qkv,gate,experts,head=self.model
         outputs=[]
         for token in tokens:
             if self.session:self.session.begin_token(token)
+            if before_layers is not None:before_layers(self.session)
             x=emb[token].copy()
             for l in range(L):
                 q,k,v=np.einsum('h,ahj->aj',x,qkv[l],optimize=False)
@@ -39,6 +40,7 @@ class Decoder:
                 if self.session:
                     ids,w,hit=self.session.route(l,compute);self.hits+=hit
                 else:ids,w=compute()
+                if after_route is not None:after_route(l,ids)
                 vals=np.einsum('h,khj->kj',x,experts[l,ids],optimize=False)
                 x=np.tanh(x+np.sum(vals*w[:,None],axis=0));self.experts+=1
             outputs.append(np.einsum('h,hv->v',x,head,optimize=False))

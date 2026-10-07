@@ -1,0 +1,26 @@
+{
+  "kind": "EXECUTED constructed attention + replay planner integration; no IO or timing",
+  "rows": [
+    {
+      "planner": "partial",
+      "tokens": 48,
+      "route_hits": 144,
+      "route_calls": 192,
+      "planned_requests": 216,
+      "verified_nonresident_demands": 216,
+      "eligible_demands": 629,
+      "false_requests": 0
+    },
+    {
+      "planner": "complete",
+      "tokens": 48,
+      "route_hits": 144,
+      "route_calls": 192,
+      "planned_requests": 172,
+      "verified_nonresident_demands": 172,
+      "eligible_demands": 629,
+      "false_requests": 0
+    }
+  ],
+  "caveat": "Simulated LRU16 residency, fixed6-expert issue budget, random tiny model. Metadata is validated against direct router demand, but no reads are issued, landed, or installed; no tok/s/SSD gain claimed."
+}
