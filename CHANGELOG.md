@@ -68,3 +68,13 @@ conclusions are unchanged: LRU reaches the chip ceiling when capacity
 allows, the pinned hot-set is the cheapest win, n-gram speculative
 prefetch loses, and the sidecar wins tight capacity on repeated
 prefixes.
+
+## Renamed to pagepilot
+
+`specexp` was short for "speculative experts", the original thesis. The
+speculation lost to measurement (see above); what shipped is expert
+paging with a pinned hot-set and an exact routing sidecar, so the tool
+is now **pagepilot**. `specexp_prefetch.py` became
+`pagepilot_prefetch.py` and the sidecar moved to
+`~/Library/Application Support/pagepilot/`. History below keeps the old
+names as they were at the time.
