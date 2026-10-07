@@ -1,0 +1,17 @@
+{
+  "scope": "Tiny synthetic real file cleanup + injected exceptions, NOT crash durability/BW/decode.",
+  "passed_cases": [
+    "read",
+    "pack_fsync",
+    "index_fsync",
+    "serialize",
+    "interrupt",
+    "existing_pack",
+    "orphan_index"
+  ],
+  "cleanup_retry_cases": 5,
+  "preserved_existing_cases": 2,
+  "verified_expert_reads": 10,
+  "source_unchanged": true,
+  "limitations": "Not atomic across two files; process kill/power loss or concurrent destination mutation unsupported."
+}

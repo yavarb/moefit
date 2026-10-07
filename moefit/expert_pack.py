@@ -57,14 +57,20 @@ def build_pack(model_dir, output, ids, layer=0, alignment=16384) -> dict:
     for x in c:
         offsets.append(dict(x, pack_offset=cursor))
         cursor += x['size']
+    output = Path(output)
+    index_path = Path(str(output)+'.json')
+    if output.exists() or index_path.exists():
+        raise FileExistsError('Output pack or index exists')
     handles = {}
     hashes = {}
+    owned_pack = owned_index = False
     try:
         # Open each shard once, and include partial acquisition in cleanup.
         for x in c:
             if x['file'] not in handles:
                 handles[x['file']] = os.open(x['file'], os.O_RDONLY)
         with open(output, 'xb') as out:
+            owned_pack = True
             for eid in ids:
                 data = b''.join(exact_pread(handles[x['file']], x['size'], x['offset']+eid*x['size']) for x in c)
                 hashes[str(eid)] = hashlib.sha256(data).hexdigest()
@@ -72,12 +78,22 @@ def build_pack(model_dir, output, ids, layer=0, alignment=16384) -> dict:
                 out.write(bytes(stride-payload))
             out.flush()
             os.fsync(out.fileno())
+        manifest = dict(version=1, layer=layer, expert_ids=ids, payload_bytes=payload,
+                        stride=stride, alignment=alignment, components=offsets, sha256=hashes)
+        with index_path.open('x') as index:
+            owned_index = True
+            index.write(json.dumps(manifest, indent=2)+'\n')
+            index.flush()
+            os.fsync(index.fileno())
+    except BaseException:
+        # Exception cleanup only: not a two-file crash-atomic publication.
+        # Destination directory must not be concurrently mutated by callers.
+        if owned_index: index_path.unlink(missing_ok=True)
+        if owned_pack: output.unlink(missing_ok=True)
+        raise
     finally:
         for fd in handles.values():
             os.close(fd)
-    manifest = dict(version=1, layer=layer, expert_ids=ids, payload_bytes=payload,
-                    stride=stride, alignment=alignment, components=offsets, sha256=hashes)
-    Path(str(output)+'.json').write_text(json.dumps(manifest, indent=2)+'\n')
     return manifest
 
 
