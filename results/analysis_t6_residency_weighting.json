@@ -1,0 +1,65 @@
+{
+  "kind": "OFFLINE logical counterexample + SIMULATED trace traffic, NOT silicon absorption measurement",
+  "source_hashes": {
+    "results/traces_synth/build.npz": "a2ac4777dba47f08765fc590e064558f62ea2e9736d2df4f82961b2603e5a84c",
+    "results/traces_synth/holdout.npz": "f8262a526f8cf51eda38ee33a175013fa71ffad2682338c2addf06cc058b5d8f",
+    "results/silicon_sc36/pagecache_expert_residency.json": "862ae147fddc52e823f729dfaeb98fd8a87b70abaafed37746e897893f4449fa"
+  },
+  "measured_snapshot": {
+    "kind": "measured",
+    "host": "santacruz",
+    "timestamp": "2026-10-06T20:01:36-0700",
+    "experts": 24576,
+    "fully_cached": 683,
+    "partially_cached": 1416,
+    "cached_GB": 2.29,
+    "expert_tables_GB": 71.57,
+    "fully_cached_per_layer_mean": 14.2,
+    "fully_cached_per_layer_min": 0,
+    "fully_cached_per_layer_max": 57,
+    "scan_s": 1.3
+  },
+  "snapshot_byte_fraction": 0.03199664663965349,
+  "snapshot_full_expert_fraction": 0.027791341145833332,
+  "same_residency_counterexamples": {
+    "all_cached": 1.0,
+    "none_cached": 0.0
+  },
+  "static_set_trace_weighting": {
+    "build_top": {
+      "resident_experts": 683,
+      "resident_expert_fraction": 0.027791341145833332,
+      "heldout_miss_requests_covered": 6432,
+      "heldout_miss_request_fraction": 0.038293464153459626
+    },
+    "build_bottom": {
+      "resident_experts": 683,
+      "resident_expert_fraction": 0.027791341145833332,
+      "heldout_miss_requests_covered": 3521,
+      "heldout_miss_request_fraction": 0.020962575759379876
+    },
+    "holdout_oracle_top": {
+      "resident_experts": 683,
+      "resident_expert_fraction": 0.027791341145833332,
+      "heldout_miss_requests_covered": 9834,
+      "heldout_miss_request_fraction": 0.05854756319731374
+    },
+    "holdout_oracle_bottom": {
+      "resident_experts": 683,
+      "resident_expert_fraction": 0.027791341145833332,
+      "heldout_miss_requests_covered": 835,
+      "heldout_miss_request_fraction": 0.004971244180369837
+    }
+  },
+  "uniform_random_resident_set_expected_request_fraction": 0.027791341145833332,
+  "holdout_miss_requests": 167966,
+  "interpretation": [
+    "Footprint averages over addresses; absorption averages over requested bytes.",
+    "These averages coincide only with suitable uniformity/independence assumptions.",
+    "Snapshot lacks resident identities, request weights, and time alignment; its fraction is not an absorption bound.",
+    "Static sets do not model UBC eviction, overlap with expert cache, or changes during decode.",
+    "Top holdout sets use future knowledge and are analytical bounds only; build sets avoid holdout fitting.",
+    "This does not prove actual absorption is large. It invalidates bounding it by global footprint alone.",
+    "Logical-miss interval inferred by imposing absorption <= snapshot fraction is conditional, not measured."
+  ]
+}
