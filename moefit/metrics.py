@@ -132,8 +132,12 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
         gaps = r.get("per_token_ms")
         if gaps is None and r.get("chunk_ts_s") and r.get("chunk_tokens"):
             ts, cts = r["chunk_ts_s"], r["chunk_tokens"]
-            gaps = [1000.0 * (b - a) / max(t, 1)
-                    for a, b, t in zip(ts, ts[1:], cts[1:])]
+            # token-bearing events ONLY: control chunks (empty deltas,
+            # finish) must not enter the gap samples (T8 fix; collector
+            # already emits per_token_ms this way for new runs)
+            idx = [j for j, t in enumerate(cts) if t > 0]
+            gaps = [1000.0 * (ts[b] - ts[a]) / max(cts[b], 1)
+                    for a, b in zip(idx, idx[1:])]
         if gaps:
             lat[r.get("run", i)] = latency_stats_from_deltas(gaps)
             all_gaps.extend(gaps)
@@ -168,6 +172,10 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
         host=d.get("host"),
         measured_at=d.get("timestamp"),
         git_commit=d.get("git_commit"),
+        timing_provenance=(runs[0].get("timing_provenance")
+                           if runs else None) or
+        "unverified (pre-provenance blob; treat signature as "
+        "transport-provisional)",
     )
     if all_gaps:
         rec["tok_gap_ms"] = latency_stats_from_deltas(all_gaps)
@@ -280,18 +288,25 @@ def detect_coalescing(delta_ms):
 
 
 def serial_signature_check(tok_gap_ms):
-    """S-vs-Q discriminator (T7's falsifiable signature, 2026-10-07).
+    """Per-token gap SHAPE check (T7 signature, AMENDMENT 1 semantics).
 
-    Model S (serial-latency miss resolution) predicts a bursty per-token
-    gap: p95/mean ~ 1.47-1.51 (locked synth, cap143 true-LRU). A
-    smoothed byte-backlog model (Q) with the same mean predicts
-    p95/mean ~ 1.0. Accepts a tok_gap_ms stats dict (from
-    latency_stats_from_deltas) or a raw list of per-token gaps.
-    Returns dict(ratio, verdict). Verdicts: "serial (S)", "byte-backlog
-    (Q)", or "ambiguous". Threshold 1.3 per
-    results/MEASURED_VS_SIM_36GB.md. For silicon records use
-    signature_from_silicon_record, which marks coalesced-stream inputs
-    inadmissible (T8 probe).
+    Original pre-registration read p95/mean >= 1.3 as "serial (S)".
+    Amendment 1 (T3, commit 9640761, after astra_analysis_b e06db18 +
+    astra_local_exp 175d734): the burst shape is inherited from the
+    shared miss pattern — byte-service-only on the identical miss
+    matrix scores 1.827-1.831, and transport chunking alone flips the
+    ratio both ways at unchanged generation. The threshold therefore
+    cannot arbitrate mechanism; it now gates only a ONE-DIRECTIONAL
+    falsification. Thresholds (1.3 / 1.1) are unchanged.
+
+    Verdicts:
+      "shape-compatible: bursty (>=1.3) ..."   — compatible with S AND
+        bursty-Q; NO mechanism verdict.
+      "falsifies BOTH serial (S) and bursty byte-backlog (Q) ..." —
+        one-directional; only decisive with VERIFIED token-level
+        provenance (see signature_from_silicon_record for the
+        transport-provisional marking).
+      "ambiguous" — between the thresholds.
     """
     if isinstance(tok_gap_ms, dict):
         mean, p95 = tok_gap_ms["mean"], tok_gap_ms["p95"]
@@ -302,13 +317,17 @@ def serial_signature_check(tok_gap_ms):
         raise ValueError("mean must be > 0")
     ratio = round(p95 / mean, 3)
     if ratio >= 1.3:
-        verdict = "serial (S)"
+        verdict = ("shape-compatible: bursty (>=1.3) - compatible with "
+                   "serial (S) AND bursty byte-backlog (Q); no mechanism "
+                   "verdict (Amendment 1)")
     elif ratio <= 1.1:
-        verdict = "byte-backlog (Q)"
+        verdict = ("falsifies BOTH serial (S) and bursty byte-backlog (Q) "
+                   "[one-directional; decisive only with verified "
+                   "token-level provenance]")
     else:
         verdict = "ambiguous"
     return dict(p95_over_mean=ratio, verdict=verdict,
-                s_threshold=1.3, q_threshold=1.1)
+                s_threshold=1.3, q_threshold=1.1, amendment=1)
 
 
 def signature_from_silicon_record(rec: dict) -> dict:
@@ -333,6 +352,16 @@ def signature_from_silicon_record(rec: dict) -> dict:
                            f"frac>5xmed {co.get('frac_gt_5x_median')}) - "
                            "rerun with per-token timestamps; omlx streams "
                            "~1 token/chunk")
+        return sig
+    prov = rec.get("timing_provenance") or ""
+    if not prov.startswith("verified"):
+        # client SSE chunk timestamps are transport observations, not
+        # server token-level timing (T8 provenance requirements,
+        # Amendment 1): even the one-directional low-ratio falsification
+        # stays provisional until provenance is verified
+        sig = dict(sig, verdict=f"{sig['verdict']} "
+                   "[transport-provisional: client chunk timestamps, "
+                   "not verified token-level timing]")
     return sig
 
 
@@ -457,8 +486,9 @@ def format_gap_report(rep: dict) -> str:
                      f" max {tg['max']} (n={tg['n']})")
     sig = rep.get("s_vs_q_signature")
     if sig:
-        lines.append(f"  S-vs-Q signature: p95/mean {sig['p95_over_mean']}"
-                     f" -> {sig['verdict']}"
-                     f" (S predicts ~1.5, byte-backlog ~1.0;"
+        lines.append(f"  tok-gap shape (Amendment 1): p95/mean"
+                     f" {sig['p95_over_mean']} -> {sig['verdict']}"
+                     f" (serial S predicts ~1.5 but bursty byte-backlog"
+                     f" scores >=1.3 too; ~1.0 falsifies BOTH;"
                      f" thresholds {sig['s_threshold']}/{sig['q_threshold']})")
     return "\n".join(lines)

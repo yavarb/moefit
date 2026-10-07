@@ -57,9 +57,8 @@ signature verdict (`serial_signature_check`, AMENDMENT 1 semantics: p95/mean
 bursty byte-backlog (Q), NO mechanism verdict; <= 1.1 -> one-directional
 falsification of BOTH models, decisive only with verified token-level
 provenance. Collector-timestamp records are marked transport-provisional
-unless `timing_provenance` starts with "verified". Thresholds unchanged.)
-miss resolution; <= 1.1 -> smoothed byte-backlog; T7 predicts ~1.51 for
-S at cap143 true-LRU).
+unless `timing_provenance` starts with "verified". Thresholds unchanged;
+serial (S) predicts ~1.51 and bursty-Q ~1.83 at cap143 true-LRU.)
 
 ## Pricing designs in silicon-realistic units
 

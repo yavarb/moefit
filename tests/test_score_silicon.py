@@ -56,7 +56,8 @@ def test_all():
         c = _path(td, _blob(12.7, tokens=256,
                             gaps=[70] * 180 + [150] * 20 + [110, 170, 120]))
         out = _run(["--test", "C", "--measured", c])
-        assert out["verdicts"][0].endswith("serial (S)")
+        v0 = out["verdicts"][0]
+        assert "shape-compatible" in v0 and "transport-provisional" in v0, v0
 
         # n=128 at cap224 must trip the anti-rule warning
         short = _path(td, _blob(16.0, tokens=128))

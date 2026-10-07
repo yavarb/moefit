@@ -114,21 +114,31 @@ def test_serial_signature_check():
         rng.normal(70, 8, 200), rng.normal(150, 20, 30)]).clip(5, None))
     s = latency_stats_from_deltas(gaps)
     sc = serial_signature_check(s)
-    assert sc["verdict"] == "serial (S)", sc
-    # flat gaps -> byte-backlog
+    # Amendment 1: >=1.3 is shape-compatibility, NOT a serial verdict
+    assert sc["verdict"].startswith("shape-compatible"), sc
+    assert sc["amendment"] == 1
+    # flat gaps -> one-directional falsification of BOTH models
     flat = latency_stats_from_deltas([78.0] * 100)
     sc2 = serial_signature_check(flat)
-    assert sc2["verdict"] == "byte-backlog (Q)", sc2
+    assert sc2["verdict"].startswith("falsifies BOTH"), sc2
     # raw list input path
-    assert serial_signature_check(gaps)["verdict"] == "serial (S)"
-    # wired into gap_report output
+    assert serial_signature_check(gaps)["verdict"].startswith(
+        "shape-compatible")
+    # wired into gap_report output (transport-provisional marking:
+    # fixture has no verified token-level provenance)
     rec = silicon_record_from_measured(SILICON_FIXTURE, "fixture")
     rec["tok_gap_ms"] = s
     sim = sim_record_from_row(SIM_ROW, "48GB-M4M", "fixture")
     rep = gap_report(sim, rec)
-    assert rep["s_vs_q_signature"]["verdict"] == "serial (S)"
+    v = rep["s_vs_q_signature"]["verdict"]
+    assert v.startswith("shape-compatible") and "transport-provisional" in v, v
+    # a VERIFIED-provenance record drops the provisional marking
+    rec2 = dict(rec, timing_provenance="verified token-level timing")
+    rep2 = gap_report(sim, rec2)
+    assert "transport-provisional" not in \
+        rep2["s_vs_q_signature"]["verdict"]
     txt = format_gap_report(rep)
-    assert "S-vs-Q signature" in txt
+    assert "tok-gap shape (Amendment 1)" in txt
 
 
 def test_coalescing_detection_and_inadmissible_verdict():

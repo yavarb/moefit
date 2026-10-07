@@ -3,7 +3,10 @@
 Implements the decision rules of results/SILICON_TEST_PROTOCOL_PREREGISTERED.md
 (T3, commit 2ce6a32) as code, so results cannot be scored post-hoc: the
 verdicts and thresholds below were fixed BEFORE any of these runs execute.
-Do not edit thresholds without re-registering the protocol.
+Amendment 1 (T3, commit 9640761): Test C verdict labels follow the
+downgrade to shape-compatibility — thresholds are UNCHANGED, only the
+semantics of what they gate. Do not edit thresholds without re-registering
+the protocol.
 
 usage:
   Test A (48GB milestone, needs BOTH policies):
@@ -97,11 +100,17 @@ def test_b(a):
 
 def test_c(a):
     rec, tokens = _rec(a.measured, "collector n256")
-    out = dict(test="C", kind="collector run: S-vs-Q signature",
+    out = dict(test="C", kind="collector run: tok-gap SHAPE (Amendment 1)",
                prediction=dict(s_p95_over_mean=1.51,
                                s_p50_ms=72, s_p95_ms=120,
-                               q_p95_over_mean=1.0,
-                               threshold=1.3))
+                               bursty_q_p95_over_mean="1.83 (shares the "
+                               "miss-burst shape; astra_analysis_b)",
+                               threshold=1.3,
+                               note=">=1.3 is shape-compatibility ONLY "
+                                    "(no mechanism verdict); <=1.1 "
+                                    "falsifies BOTH S and bursty-Q, "
+                                    "decisive only with verified "
+                                    "token-level provenance"))
     v = []
     tg = rec.get("tok_gap_ms")
     if tg:

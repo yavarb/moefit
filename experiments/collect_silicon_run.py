@@ -17,7 +17,13 @@ usage:
       --out results/measured_<label>.json --label "santacruz 36GB idle"
 NOTE: decode_tps from chunk counting can undercount when the server
 coalesces chunks; usage.completion_tokens (requested via
-stream_options) is authoritative when present.
+stream_options) is authoritative when present. The decode interval
+closes on the LAST TOKEN-BEARING event (not stream EOF, so usage
+trailers cannot deflate tps — T8 fix) and control chunks (empty
+deltas / finish) never enter the per-token gap samples. Timestamps
+are client-observed SSE arrivals: timing is TRANSPORT-provisional
+(Amendment 1) unless a server-side token-level source vouches for it
+(`timing_provenance` field says which).
 """
 import argparse, json, time, urllib.request
 from pathlib import Path
@@ -33,6 +39,10 @@ def one_run(url, model, prompt, max_tokens, timeout):
         url, data=body, headers={"Content-Type": "application/json"})
     t0 = time.monotonic()
     chunk_ts, chunk_tokens, n_text_chunks = [], [], 0
+    text_ts, text_tokens = [], []   # token-bearing events only (T8 fix:
+    # control chunks — role/finish/empty deltas — must not enter gap
+    # samples; the decode interval closes on the LAST token-bearing
+    # event, not stream EOF, so a usage trailer cannot deflate tps)
     completion_tokens = usage_prompt = None
     finish_reason = None
     ttft = None
@@ -58,20 +68,28 @@ def one_run(url, model, prompt, max_tokens, timeout):
             txt = delta.get("content") or delta.get("reasoning_content") or ""
             n_tok = 1 if txt else 0   # omlx streams ~1 token/chunk
             now = time.monotonic()
-            if txt and ttft is None:
-                ttft = now - t0
-            n_text_chunks += 1 if txt else 0
+            if txt:
+                if ttft is None:
+                    ttft = now - t0
+                n_text_chunks += 1
+                text_ts.append(now)
+                text_tokens.append(n_tok)
             chunk_ts.append(now)
             chunk_tokens.append(n_tok)
             if ch[0].get("finish_reason"):
                 finish_reason = ch[0]["finish_reason"]
     wall = time.monotonic() - t0
-    # per-token gaps: divide inter-chunk time by tokens in the LATER chunk
+    last_text_s = (text_ts[-1] - t0) if text_ts else None
+    # per-token gaps: token-bearing events only, so finish/role control
+    # chunks and any post-last-token trailer (usage) contribute nothing
     per_token_ms = [
         1000.0 * (b - a) / max(t, 1)
-        for a, b, t in zip(chunk_ts, chunk_ts[1:], chunk_tokens[1:])]
+        for a, b, t in zip(text_ts, text_ts[1:], text_tokens[1:])]
     tokens = completion_tokens if completion_tokens else n_text_chunks
-    decode_s = (wall - ttft) if ttft else wall
+    # decode interval closes at the last token-bearing event (T8:
+    # wall-EOF made a 5s usage trailer cut collector tps 12.50 -> 10.05
+    # with generation unchanged)
+    decode_s = (last_text_s - ttft) if (ttft and last_text_s) else wall
     return dict(
         tokens=tokens,
         count_source=("usage.completion_tokens" if completion_tokens
@@ -82,11 +100,15 @@ def one_run(url, model, prompt, max_tokens, timeout):
         decode_tps=round((tokens - 1) / decode_s, 2) if decode_s > 0
         and tokens > 1 else None,
         wall_s=round(wall, 3),
+        last_token_event_s=round(last_text_s, 3) if last_text_s else None,
+        n_control_chunks=len(chunk_ts) - n_text_chunks,
         finish_reason=finish_reason,
         prompt_tokens=usage_prompt,
         chunk_ts_s=[round(t - t0, 4) for t in chunk_ts],
         chunk_tokens=chunk_tokens,
         per_token_ms=[round(g, 3) for g in per_token_ms],
+        timing_provenance=("client SSE chunk timestamps (transport-"
+                           "provisional; not verified token-level timing)"),
     )
 
 
