@@ -29,5 +29,26 @@
    "hist1_strict_10.6pct_verdict": "loses"
   }
  ],
- "verdict": "CYCLE-27 CLAIM CORRECTED: breakeven precision for spec page-in is 9-24% (serial basis) and 14-38% (DB-ON basis). The real-trace hist1 precision (10.6% strict / 25.4% loose proxy) sits AT or BELOW the DB-ON breakeven band \u2014 'plausibly net-positive' was too generous. The honest cold-window verdict: MARGINAL at best under the loose proxy, LOSING under the strict proxy and the DB-ON basis; only hist3-class precision (22-45%) clears breakeven convincingly. Cold-window speculation needs either a better signal or a cheaper issue policy, not just the regime change."
+ "verdict": "CYCLE-27 CLAIM CORRECTED: breakeven precision for spec page-in is 9-24% (serial basis) and 14-38% (DB-ON basis). The real-trace hist1 precision (10.6% strict / 25.4% loose proxy) sits AT or BELOW the DB-ON breakeven band \u2014 'plausibly net-positive' was too generous. The honest cold-window verdict: MARGINAL at best under the loose proxy, LOSING under the strict proxy and the DB-ON basis; only hist3-class precision (22-45%) clears breakeven convincingly. Cold-window speculation needs either a better signal or a cheaper issue policy, not just the regime change.",
+ "t1_preview_crosscheck": {
+  "source": "results/design_xlayer_guarded.json (ba024ae), guarded d=2 tau.01+staged, comp24.1",
+  "note": "SIM on REAL decode routes (1288 tok, 8 prompts) \u2014 not silicon; T1's numbers",
+  "spec_per_tok": 30.75,
+  "hits_per_tok": 13.42,
+  "precision": 0.436,
+  "wasted_MB_per_tok": 47.9,
+  "my_framework_prediction_ms_saved": [
+   4.91,
+   8.75
+  ],
+  "t1_sim_reported_ms_saved": 6.7,
+  "reconciles": true,
+  "waste_per_saved_miss_MB": 3.57,
+  "hist1_reference_waste_per_saved_miss_MB": 232.2,
+  "clears_breakeven": {
+   "serial": true,
+   "db_on": true
+  },
+  "reading": "The T5 breakeven framework, built to kill history-based speculation, PASSES the router-preview signal: 43.6% precision clears even the DB-ON pessimistic band (38%), waste per saved miss is 3.6 MB vs hist1's 232 MB (65x), and my framework's predicted saving band brackets T1's sim-reported gain. The 'better signal' clause of the T5 DROP verdict is now ANSWERED by T1's preview \u2014 the framework stands as the discriminator between dead and viable speculative page-in signals."
+ }
 }
