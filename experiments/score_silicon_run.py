@@ -22,7 +22,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from moefit.metrics import silicon_record_from_measured, serial_signature_check
+from moefit.metrics import (silicon_record_from_measured,
+                            signature_from_silicon_record)
 
 
 def _rec(path, label):
@@ -104,7 +105,7 @@ def test_c(a):
     v = []
     tg = rec.get("tok_gap_ms")
     if tg:
-        sig = serial_signature_check(tg)
+        sig = signature_from_silicon_record(rec)
         out["measured"] = dict(p50=tg["p50"], p95=tg["p95"], mean=tg["mean"],
                                p95_over_mean=sig["p95_over_mean"])
         v.append(f"p95/mean {sig['p95_over_mean']} -> {sig['verdict']}")

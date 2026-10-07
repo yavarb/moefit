@@ -131,11 +131,43 @@ def test_serial_signature_check():
     assert "S-vs-Q signature" in txt
 
 
+def test_coalescing_detection_and_inadmissible_verdict():
+    from moefit.metrics import (detect_coalescing,
+                                signature_from_silicon_record,
+                                latency_stats_from_deltas)
+    # Sheryl-style coalesced stream: bursts of ~0 gaps then one large
+    bursty = [0.01] * 90 + [500.0] * 10
+    co = detect_coalescing(bursty)
+    assert co["coalesced"], co
+    # clean per-token gaps do not trip it
+    clean = [70.0] * 200 + [150.0] * 30
+    assert not detect_coalescing(clean)["coalesced"]
+    # normalizer flags a coalesced run and the signature is inadmissible
+    blob = dict(SILICON_FIXTURE)
+    blob["runs"] = [dict(tokens=100, decode_tps=13.0, ttft_s=0.5,
+                         per_token_ms=bursty,
+                         chunk_tokens=[1] * 101)]
+    rec = silicon_record_from_measured(blob, "coalesced-fixture")
+    assert rec.get("tok_gap_coalesced", {}).get("coalesced"), rec
+    sig = signature_from_silicon_record(rec)
+    assert sig["verdict"].startswith("inadmissible"), sig
+    # and it flows into gap_report output
+    sim = sim_record_from_row(SIM_ROW, "48GB-M4M", "fixture")
+    rep = gap_report(sim, rec)
+    assert rep["s_vs_q_signature"]["verdict"].startswith("inadmissible")
+    # clean record still gets an admissible verdict
+    clean_rec = silicon_record_from_measured(SILICON_FIXTURE, "fixture")
+    clean_rec["tok_gap_ms"] = latency_stats_from_deltas(clean)
+    assert not signature_from_silicon_record(clean_rec)["verdict"].startswith(
+        "inadmissible")
+
+
 if __name__ == "__main__":
     for fn in [test_validate_record, test_sim_record_from_row,
                test_silicon_record_and_gap,
                test_silicon_ssd_blob_and_measured_accounting,
                test_serial_model_from_misses,
-               test_serial_signature_check]:
+               test_serial_signature_check,
+               test_coalescing_detection_and_inadmissible_verdict]:
         fn()
         print("ok", fn.__name__)

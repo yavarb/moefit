@@ -126,6 +126,7 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
     tpss = [r["decode_tps"] for r in runs]
     import statistics
     lat = {}
+    run_co = {}
     all_gaps = []
     for i, r in enumerate(runs):
         gaps = r.get("per_token_ms")
@@ -136,6 +137,13 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
         if gaps:
             lat[r.get("run", i)] = latency_stats_from_deltas(gaps)
             all_gaps.extend(gaps)
+            co = detect_coalescing(gaps)
+            multi = (r.get("chunk_tokens")
+                     and any(t > 1 for t in r["chunk_tokens"]))
+            if multi and not co["coalesced"]:
+                co = dict(co, coalesced=True,
+                          note="direct evidence: chunk(s) carry >1 token")
+            run_co[r.get("run", i)] = co
     rec = dict(
         kind="silicon",
         source=source,
@@ -164,6 +172,10 @@ def silicon_record_from_measured(path_or_dict, source: str) -> dict:
     if all_gaps:
         rec["tok_gap_ms"] = latency_stats_from_deltas(all_gaps)
         rec["tok_gap_ms_per_run"] = lat
+        if any(c.get("coalesced") for c in run_co.values()):
+            # flag with the aggregate over all runs' gaps
+            rec["tok_gap_coalesced"] = detect_coalescing(all_gaps)
+            rec["tok_gap_coalesced"]["runs_flagged"] = sorted(run_co)
     if rec["tps"] is None:
         raise ValueError(f"no decode_tps in measured record {source}")
     errs = validate_record(rec)
@@ -241,6 +253,32 @@ def serial_model_from_misses(M, constants=None, compute_ms=18.1):
     )
 
 
+def detect_coalescing(delta_ms):
+    """Flag SSE chunk coalescing in per-token gap data.
+
+    Coalescing servers (vllm-style; NOT omlx, which streams ~1
+    token/chunk) emit bursts of near-zero inter-chunk gaps followed by
+    one large gap. Per-token gaps derived from such streams (dividing
+    each inter-chunk gap by the LATER chunk's token count) misattribute
+    the burst time and can distort the S-vs-Q signature (astra_local_exp
+    probe, T8). Detection: >= 20% of gaps < 2 ms AND >= 10% of gaps
+    > 5x median (bimodal burst signature). Direct evidence also counts:
+    any chunk carrying > 1 token.
+    """
+    d = [float(x) for x in delta_ms if x >= 0]
+    n = len(d)
+    if n < 10:
+        return dict(coalesced=False, frac_sub2ms=0.0,
+                    frac_gt_5x_median=0.0, note="too few gaps")
+    import statistics
+    med = statistics.median(d)
+    frac_sub = sum(1 for x in d if x < 2.0) / n
+    frac_big = sum(1 for x in d if x > 5 * max(med, 1.0)) / n
+    return dict(coalesced=(frac_sub >= 0.20 and frac_big >= 0.10),
+                frac_sub2ms=round(frac_sub, 3),
+                frac_gt_5x_median=round(frac_big, 3), median_ms=round(med, 2))
+
+
 def serial_signature_check(tok_gap_ms):
     """S-vs-Q discriminator (T7's falsifiable signature, 2026-10-07).
 
@@ -249,9 +287,11 @@ def serial_signature_check(tok_gap_ms):
     smoothed byte-backlog model (Q) with the same mean predicts
     p95/mean ~ 1.0. Accepts a tok_gap_ms stats dict (from
     latency_stats_from_deltas) or a raw list of per-token gaps.
-    Returns dict(ratio, verdict) with verdict in
-    {"serial (S)", "byte-backlog (Q)", "ambiguous"}.
-    Threshold 1.3 per results/MEASURED_VS_SIM_36GB.md.
+    Returns dict(ratio, verdict). Verdicts: "serial (S)", "byte-backlog
+    (Q)", or "ambiguous". Threshold 1.3 per
+    results/MEASURED_VS_SIM_36GB.md. For silicon records use
+    signature_from_silicon_record, which marks coalesced-stream inputs
+    inadmissible (T8 probe).
     """
     if isinstance(tok_gap_ms, dict):
         mean, p95 = tok_gap_ms["mean"], tok_gap_ms["p95"]
@@ -269,6 +309,31 @@ def serial_signature_check(tok_gap_ms):
         verdict = "ambiguous"
     return dict(p95_over_mean=ratio, verdict=verdict,
                 s_threshold=1.3, q_threshold=1.1)
+
+
+def signature_from_silicon_record(rec: dict) -> dict:
+    """S-vs-Q signature for a silicon record, honoring coalescing.
+
+    If the record carries tok_gap_coalesced (normalizer flag: SSE chunk
+    coalescing detected in the per-token gaps), the verdict becomes
+    "inadmissible (chunk coalescing ...)" — a coalesced stream
+    misattributes per-token time and can flip the S-vs-Q thresholds
+    (astra_local_exp probe, T8); rerun with per-token timestamps
+    (omlx streams ~1 token/chunk, so collector runs there are clean).
+    """
+    tg = rec.get("tok_gap_ms")
+    if not tg:
+        raise ValueError("record has no tok_gap_ms")
+    sig = serial_signature_check(tg)
+    co = rec.get("tok_gap_coalesced")
+    if co and co.get("coalesced"):
+        sig = dict(sig,
+                   verdict="inadmissible (chunk coalescing detected: "
+                           f"frac<2ms {co.get('frac_sub2ms')}, "
+                           f"frac>5xmed {co.get('frac_gt_5x_median')}) - "
+                           "rerun with per-token timestamps; omlx streams "
+                           "~1 token/chunk")
+    return sig
 
 
 def gap_report(sim: dict, silicon: dict) -> dict:
@@ -337,7 +402,9 @@ def gap_report(sim: dict, silicon: dict) -> dict:
     tg = silicon.get("tok_gap_ms")
     if tg:
         rep["tok_gap_ms"] = tg
-        rep["s_vs_q_signature"] = serial_signature_check(tg)
+        rep["s_vs_q_signature"] = signature_from_silicon_record(silicon)
+        if silicon.get("tok_gap_coalesced"):
+            rep["tok_gap_coalesced"] = silicon["tok_gap_coalesced"]
     return rep
 
 
