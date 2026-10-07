@@ -1,0 +1,146 @@
+{
+  "kind": "held-prompt reanalysis of existing measured data + conditional model bootstrap; no new silicon",
+  "hashes": {
+    "results/silicon_sc36/regress1.json": "890cc397e54e2ad287fce5307b0a2d04a603b944f0f01ce58592a5a93c6d1ad0",
+    "results/silicon_sc36/regress2.json": "a29126e9d1a12d8f8c578f1fdd123a642bbfdd9a248621f116dd73d66c2191e4"
+  },
+  "actual_completion_tokens": 256,
+  "n_rows": 12,
+  "n_prompt_groups": 6,
+  "held_prompt_out": {
+    "regression_rmse_ms": 4.990059626018065,
+    "mean_baseline_rmse_ms": 6.823962008979824,
+    "regression_mae_ms": 3.7200089079894227,
+    "mean_baseline_mae_ms": 5.9338333333333315,
+    "folds": [
+      {
+        "prompt": "chinese_story",
+        "actual_ms": [
+          91.66,
+          81.9
+        ],
+        "predicted_ms": [
+          79.65781433875945,
+          82.40122406758601
+        ],
+        "baseline_ms": [
+          86.189,
+          86.189
+        ],
+        "train_intercept": 35.42033246143096,
+        "train_slope": 0.3117511055484742
+      },
+      {
+        "prompt": "code_lru",
+        "actual_ms": [
+          79.18,
+          82.3
+        ],
+        "predicted_ms": [
+          83.30180893245398,
+          81.41586567766308
+        ],
+        "baseline_ms": [
+          87.397,
+          87.397
+        ],
+        "train_intercept": 47.34642324371311,
+        "train_slope": 0.2449276954273901
+      },
+      {
+        "prompt": "essay_uma",
+        "actual_ms": [
+          79.37,
+          84.53
+        ],
+        "predicted_ms": [
+          82.00139738463105,
+          86.0340254208769
+        ],
+        "baseline_ms": [
+          87.155,
+          87.155
+        ],
+        "train_intercept": 48.204133842760875,
+        "train_slope": 0.24003738310987333
+      },
+      {
+        "prompt": "json_tool",
+        "actual_ms": [
+          97.75,
+          94.52
+        ],
+        "predicted_ms": [
+          90.58255796234157,
+          89.22387351621805
+        ],
+        "baseline_ms": [
+          84.31800000000001,
+          84.31800000000001
+        ],
+        "train_intercept": 61.86026096149381,
+        "train_slope": 0.1460951017337119
+      },
+      {
+        "prompt": "math_proof",
+        "actual_ms": [
+          80.78,
+          85.47
+        ],
+        "predicted_ms": [
+          87.23555402899314,
+          86.05543327015687
+        ],
+        "baseline_ms": [
+          86.92,
+          86.92
+        ],
+        "train_intercept": 45.80305347419805,
+        "train_slope": 0.2565479910513627
+      },
+      {
+        "prompt": "sql_explain",
+        "actual_ms": [
+          90.42,
+          87.57
+        ],
+        "predicted_ms": [
+          88.76533314837314,
+          89.40610843453044
+        ],
+        "baseline_ms": [
+          85.746,
+          85.746
+        ],
+        "train_intercept": 45.26950672401584,
+        "train_slope": 0.25631011446291874
+      }
+    ]
+  },
+  "full_12_row_fit": {
+    "intercept_ms": 45.525564973822725,
+    "slope_ms_per_MB": 0.25461622003754464
+  },
+  "conditional_overlap": {
+    "assumptions": "Two separable positive stages; complete overlap; no contention, extra IO, or changed installation costs. Descriptive coefficients assumed to represent stages, not established by regression.",
+    "anchor_physical_MB_per_token": 140.5,
+    "point_tps": 21.965680174974253,
+    "seed": 744,
+    "bootstrap_draws": 10000,
+    "excluded_single_group_draws": 0,
+    "positive_stage_draws": 9344,
+    "nonpositive_stage_draws": 656,
+    "tps_p025_p50_p975": [
+      13.286393550795763,
+      21.388969684484007,
+      24.374020070896453
+    ],
+    "gain_p025_p50_p975": [
+      1.1050516215149355,
+      1.7149260910268642,
+      1.9481673797159713
+    ],
+    "caveat": "Percentile sensitivity interval conditional on positive stages; only six clusters. NOT a measured speedup, calibrated confidence interval, or universal upper bound."
+  },
+  "normalization_clarification": "All counts are256 (255 timed token intervals in collector). Variable-token-count denominator bias is absent. Previous rate permutations demonstrate possible duration exposure, not actual correlated measurement error. A matched independently integrated byte count would avoid constructing total bytes from rate times full duration."
+}
