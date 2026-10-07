@@ -1,0 +1,19 @@
+{
+  "scope": "Tiny synthetic actual file IO and backing-buffer accounting; NOT RSS, bandwidth or decode.",
+  "requests": 10,
+  "chunks": [
+    3,
+    3,
+    2,
+    2
+  ],
+  "component_checks": 90,
+  "payload_budget": 256,
+  "peak_chunk_backing_bytes": 256,
+  "actual_pread_calls": 30,
+  "first_chunk_pread_calls": 1,
+  "duplicate_requests": 100,
+  "duplicate_chunks": 15,
+  "guard_cases": 3,
+  "caveat": "Metadata excluded; consumers retaining prior chunks can exceed budget. One-ID lookahead and incremental validation; per-chunk duplicate suppression only."
+}

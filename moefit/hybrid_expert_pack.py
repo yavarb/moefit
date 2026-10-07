@@ -58,6 +58,33 @@ class HybridExpertPack:
             if e not in found: found[e] = self.read(e)
         return [dict(found[e]) for e in ids]
 
+    def iter_batches(self, ids, *, max_bytes, max_requests=64):
+        """Yield bounded lists in input order, no read-ahead across yields.
+
+        Payload bound is unique-count * pack stride (conservative for fallback).
+        Python metadata and consumer-retained prior outputs are excluded. Input
+        is validated incrementally; a late invalid ID may follow yielded batches.
+        At most one input ID is looked ahead. Deduplication is per chunk only.
+        """
+        if self.closed: raise ValueError('Store is closed')
+        stride = self.pack.manifest['stride']
+        if type(max_bytes) is not int or max_bytes < stride:
+            raise ValueError('max_bytes must hold one expert stride')
+        if type(max_requests) is not int or max_requests < 1:
+            raise ValueError('max_requests must be positive integer')
+        limit = max_bytes // stride
+        pending = []; unique = set()
+        for eid in ids:
+            if type(eid) is not int or not 0 <= eid < self.parts[0]['experts']:
+                raise ValueError('Invalid expert ID')
+            if pending and (len(pending) == max_requests or
+                            (eid not in unique and len(unique) == limit)):
+                yield self.read_many(pending)
+                pending = []; unique = set()
+            pending.append(eid); unique.add(eid)
+        if pending:
+            yield self.read_many(pending)
+
     def close(self):
         if not self.closed:
             for fd in self.fds.values():os.close(fd)
