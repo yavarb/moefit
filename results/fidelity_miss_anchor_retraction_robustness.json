@@ -1,0 +1,22 @@
+{
+ "kind": "retraction + robustness analysis (T3)",
+ "trigger": "astra_analysis_b fb927fc + astra_analysis_a (T7/T6): the ~57.4 miss/tok 'measured' anchor is CIRCULAR \u2014 57.4 is sim_miss_experts_per_token from a synth replay; q=0.885 was derived by dividing measured physical bytes by simulated logical bytes; inverting recovers 57.4 identically. Physical bytes alone do not identify logical misses.",
+ "retraction": {
+  "cycle_9_claim": "omlx-exact replay (56.9) matches the MEASURED miss count (~57.4) within 1% \u2014 closing the behavioral-inference gap at mechanism level",
+  "retracted_because": "57.4 was never measured; it is a synth-replay output. The only MEASURED miss quantity is physical SSD bytes (140.5 MB/tok @cap143). The correct anchor statement: omlx-exact reproduces the SIM-replay miss count; policy identification rests on the source read + conditional throughput agreement, NOT on measured logical misses.",
+  "corrected_anchor": "logical misses/tok are identified only up to the absorption assumption. mincore (26a943e) bounds UBC absorption at ~3.2% (2.29/71.6 GB cached) -> logical misses in [50.8, 52.5]/tok at the operating point. BOTH synth policies (true-LRU 58.3, omlx-exact 56.9) OVERSTATE real misses by 9-15% \u2014 the routing/trace difference stands, the 'within 1% mechanism match' does not."
+ },
+ "robustness_of_cycle12_compute_resolution": {
+  "question": "does the compute-term resolution (24.1 ms, 410-bin) survive the miss-count uncertainty band?",
+  "band": "absorption 0-5% -> logical misses 50.8-53.5/tok",
+  "results": {
+   "comp_24.1": "12.52-12.87 tok/s \u2014 brackets/lands on measured 12.71-13.07 in the whole band",
+   "comp_18.1": "13.54-13.95 tok/s \u2014 overshoots by 0.5-1.2 tps everywhere in the band"
+  },
+  "verdict": "RESOLUTION STANDS: 24.1 ms is the best explanation across the entire miss-count interval; the circularity critique weakens the miss-count point estimate but not the compute conclusion. Independent support unaffected: the measured regression SLOPE (0.797 ms/expert, computed from MB not miss counts) is immune to the circularity critique and confirms the model's 0.82 within 2.8%."
+ },
+ "protocol_note_scorer_eligibility": {
+  "from": "astra_local_exp d778463 / t8_scorer_eligibility_probe.json: 9/9 protocol-invalid fixtures still get substantive A/B/D conclusions \u2014 the n>=1024 anti-rule is NOT fail-closed (requested max_tokens masks actual run tokens with zero warnings)",
+  "T3_position": "The pre-registered anti-rules were always intended as hard gates. The scorer MUST verify ACTUAL per-run completion counts (runs[*].tokens), not requested max_tokens, and refuse scoring otherwise. T4's pending fix is required before any n>=1024 sweep is scored; until then any scorer output on sweep data is provisional."
+ }
+}
