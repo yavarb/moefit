@@ -86,9 +86,29 @@ def test_silicon_ssd_blob_and_measured_accounting():
     assert "sim-spec accounting" in txt
 
 
+def test_serial_model_from_misses():
+    import numpy as np
+    from moefit.metrics import serial_model_from_misses
+    # 2 layers x 4 tokens; layer0 misses 1 expert on every token,
+    # layer1 misses 2 experts on half the tokens
+    M = np.zeros((4, 2), dtype=np.int16)
+    M[:, 0] = 1
+    M[::2, 1] = 2
+    ser = serial_model_from_misses(M, compute_ms=18.1)
+    # misses/tok = 1 + 1 = 2; install = 0.3*2 = 0.6
+    # io = A*(1.0 + 0.5) + B*2 = 0.30 + 1.04 = 1.34; sync = 0.122*2
+    assert ser["miss_experts_per_tok"] == 2.0
+    assert ser["breakdown_ms"]["install"] == 0.6
+    assert ser["breakdown_ms"]["io"] == 1.3
+    assert ser["breakdown_ms"]["sync"] == 0.2
+    # tps from UNrounded total 18.1+1.34+0.6+0.244 = 20.284 ms
+    assert ser["tps"] == round(1000.0 / 20.284, 2)
+
+
 if __name__ == "__main__":
     for fn in [test_validate_record, test_sim_record_from_row,
                test_silicon_record_and_gap,
-               test_silicon_ssd_blob_and_measured_accounting]:
+               test_silicon_ssd_blob_and_measured_accounting,
+               test_serial_model_from_misses]:
         fn()
         print("ok", fn.__name__)

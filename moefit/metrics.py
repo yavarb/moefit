@@ -194,6 +194,53 @@ def latency_stats_from_deltas(delta_ms) -> dict:
                 mean=round(statistics.fmean(d), 2), max=round(d[-1], 2))
 
 
+# Measured on Santa Cruz by lead_silicon (results/gap_santa_cruz.json,
+# commit 463c856): per-layer-step miss-resolution latency is
+# A + B*k ms for k missed experts; install is per-expert; sync is per
+# layer-step. Drive microbench: 3.8-5.6 GB/s on the same pattern, so
+# these SERIAL constants describe oMLX's resolve discipline, not the
+# SSD ceiling. compute_ms is the one ASSUMED term (18.1 = sim DRAM_EFF
+# at 546 GB/s; glm_fidelity: 12.1-12.9 tps spread is within run noise).
+SERIAL_CONSTANTS_MEASURED = dict(
+    io_A_ms=0.20, io_B_ms=0.52, install_ms=0.30, sync_ms=0.122,
+    expert_mb=2.765)
+
+
+def serial_model_from_misses(M, constants=None, compute_ms=18.1):
+    """Serial-latency time model (lead_silicon, measured constants).
+
+    M: (T, L) per-token per-layer SYNC miss counts, as returned by
+    sim_paging.simulate(..., want_misses=True)[3]. Returns the ms/token
+    breakdown (compute / io / install / sync), serial-model tps, and
+    the miss stats the breakdown rests on. SIMULATED prediction built
+    from MEASURED latency constants.
+    """
+    import numpy as np
+    c = dict(SERIAL_CONSTANTS_MEASURED)
+    c.update(constants or {})
+    M = np.asarray(M)
+    T, L = M.shape
+    per_layer = M.sum(axis=0) / T                # misses/tok per layer
+    steps = (M > 0).sum(axis=0) / T              # layer-steps w/ >=1 miss
+    io_ms = sum(c["io_A_ms"] * steps[li] + c["io_B_ms"] * per_layer[li]
+                for li in range(L))
+    install_ms = c["install_ms"] * float(per_layer.sum())
+    sync_ms = c["sync_ms"] * L
+    total = compute_ms + io_ms + install_ms + sync_ms
+    return dict(
+        breakdown_ms=dict(compute=round(compute_ms, 1),
+                          io=round(io_ms, 1),
+                          install=round(install_ms, 1),
+                          sync=round(sync_ms, 1)),
+        total_ms=round(total, 1),
+        tps=round(1000.0 / total, 2),
+        miss_experts_per_tok=round(float(per_layer.sum()), 1),
+        frac_layer_steps_with_miss=round(
+            float(steps.mean()), 3),
+        constants=c, compute_ms_assumed=compute_ms,
+    )
+
+
 def gap_report(sim: dict, silicon: dict) -> dict:
     """Field-by-field sim↔silicon comparison + roofline attribution.
 
